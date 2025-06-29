@@ -88,14 +88,21 @@ export default function SubmitTipPage() {
   }, [])
 
   async function fetchLatestCuts() {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!isSupabaseConfigured) {
       setLatestCuts(mockLatestCuts)
       setCutsLoading(false)
       return
     }
 
     try {
-      const { data, error } = await supabase!
+      const client = supabase()
+      if (!client) {
+        setLatestCuts(mockLatestCuts)
+        setCutsLoading(false)
+        return
+      }
+
+      const { data, error } = await client
         .from("v_latest_cuts")
         .select("*")
         .order("announcement_date", { ascending: false })
@@ -371,22 +378,6 @@ export default function SubmitTipPage() {
                 <Link href="/cuts" className="text-sm text-blue-600 hover:underline">
                   View full list of cuts
                 </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscribe</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-3">
-                <strong>Join our newsletter:</strong> Get monthly updates about program cuts sent straight to your
-                inbox.
-              </p>
-              <div className="space-y-2">
-                <Input placeholder="Your email address" />
-                <Button className="w-full bg-green-600 hover:bg-green-700">Subscribe</Button>
               </div>
             </CardContent>
           </Card>
