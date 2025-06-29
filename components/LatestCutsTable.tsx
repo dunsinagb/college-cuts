@@ -28,16 +28,20 @@ export function LatestCutsTable() {
     fetchLatestCuts()
 
     // Subscribe to realtime updates
-    const channel = supabase
-      .channel("public:program_cuts")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "program_cuts" }, (payload) => {
-        // Refetch data when new cuts are added
-        fetchLatestCuts()
-      })
-      .subscribe()
+    if (supabase) {
+      const channel = supabase
+        .channel("public:program_cuts")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "program_cuts" }, (payload) => {
+          // Refetch data when new cuts are added
+          fetchLatestCuts()
+        })
+        .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
+      return () => {
+        if (supabase) {
+          supabase.removeChannel(channel)
+        }
+      }
     }
   }, [])
 
@@ -52,6 +56,11 @@ export function LatestCutsTable() {
 
   async function fetchLatestCuts() {
     try {
+      if (!supabase) {
+        console.error("Supabase client not configured")
+        return
+      }
+      
       const { data, error } = await supabase
         .from("v_latest_cuts")
         .select("*")
@@ -105,6 +114,7 @@ export function LatestCutsTable() {
                 <th className="h-12 px-4 text-left align-middle font-medium">Program</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">State</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">Cut Type</th>
+                <th className="h-12 px-4 text-left align-middle font-medium">Control</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
               </tr>
             </thead>
@@ -132,6 +142,9 @@ export function LatestCutsTable() {
                   <td className="p-4 align-middle">{cut.state}</td>
                   <td className="p-4 align-middle">
                     <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
+                  </td>
+                  <td className="p-4 align-middle">
+                    {cut.control || "—"}
                   </td>
                   <td className="p-4 align-middle">
                     {cut.source_url && (

@@ -33,6 +33,7 @@ const mockCuts: Cut[] = [
     effective_term: "Fall 2024",
     students_affected: 150,
     faculty_affected: 8,
+    control: "Public",
     notes: "Program suspended due to budget constraints",
     source_url: "https://example.com/news",
     source_publication: "University Times",
@@ -49,6 +50,7 @@ const mockCuts: Cut[] = [
     effective_term: "Spring 2025",
     students_affected: 75,
     faculty_affected: 12,
+    control: "Private non-profit",
     notes: "Department closure effective next semester",
     source_url: "https://example.com/announcement",
     source_publication: "State College News",
@@ -63,6 +65,7 @@ interface FilterOptions {
   programs: string[]
   effectiveTerms: string[]
   sourcePublications: string[]
+  controls: string[]
 }
 
 export function CutsDataGrid() {
@@ -76,6 +79,7 @@ export function CutsDataGrid() {
     programs: [],
     effectiveTerms: [],
     sourcePublications: [],
+    controls: [],
   })
 
   // Filter states - reduced to 8 filters
@@ -84,6 +88,7 @@ export function CutsDataGrid() {
   const [cutTypeFilter, setCutTypeFilter] = useState<string>("all")
   const [institutionFilter, setInstitutionFilter] = useState<string>("all")
   const [programFilter, setProgramFilter] = useState<string>("all")
+  const [controlFilter, setControlFilter] = useState<string>("all")
   const [dateRangeFilter, setDateRangeFilter] = useState<string>("all")
   const [studentsAffectedFilter, setStudentsAffectedFilter] = useState<string>("all")
   const [hasSourceFilter, setHasSourceFilter] = useState<string>("all")
@@ -102,6 +107,7 @@ export function CutsDataGrid() {
     cutTypeFilter,
     institutionFilter,
     programFilter,
+    controlFilter,
     dateRangeFilter,
     studentsAffectedFilter,
     hasSourceFilter,
@@ -201,6 +207,7 @@ export function CutsDataGrid() {
         programs: ["Liberal Arts", "Philosophy"],
         effectiveTerms: ["Fall 2024", "Spring 2025"],
         sourcePublications: ["University Times", "State College News"],
+        controls: ["Public", "Private non-profit", "Private for-profit"],
       })
       return
     }
@@ -212,12 +219,14 @@ export function CutsDataGrid() {
         { data: programsData },
         { data: effectiveTermsData },
         { data: sourcePublicationsData },
+        { data: controlsData },
       ] = await Promise.all([
         supabase.from("v_latest_cuts").select("state").order("state"),
         supabase.from("v_latest_cuts").select("institution").order("institution"),
         supabase.from("v_latest_cuts").select("program_name").order("program_name"),
         supabase.from("v_latest_cuts").select("effective_term").order("effective_term"),
         supabase.from("v_latest_cuts").select("source_publication").order("source_publication"),
+        supabase.from("v_latest_cuts").select("control").order("control"),
       ])
 
       setFilterOptions({
@@ -230,6 +239,7 @@ export function CutsDataGrid() {
         sourcePublications: Array.from(
           new Set(sourcePublicationsData?.map((item) => item.source_publication).filter(Boolean) || []),
         ),
+        controls: Array.from(new Set(controlsData?.map((item) => item.control).filter(Boolean) || [])),
       })
     } catch (error) {
       console.error("❌ Error fetching filter options:", error)
@@ -285,6 +295,13 @@ export function CutsDataGrid() {
       console.log(`🔍 Program filter: ${beforeProgram} → ${filtered.length}`)
     }
 
+    // Control filter
+    if (controlFilter !== "all") {
+      const beforeControl = filtered.length
+      filtered = filtered.filter((cut) => cut.control === controlFilter)
+      console.log(`🔍 Control filter (${controlFilter}): ${beforeControl} → ${filtered.length}`)
+    }
+
     // Date range filter - THIS IS KEY FOR 2024 DATA
     if (dateRangeFilter !== "all") {
       const beforeDate = filtered.length
@@ -292,6 +309,10 @@ export function CutsDataGrid() {
       const cutoffDate = new Date()
 
       switch (dateRangeFilter) {
+        case "last_7_days":
+          cutoffDate.setDate(now.getDate() - 7)
+          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
+          break
         case "last_30_days":
           cutoffDate.setDate(now.getDate() - 30)
           filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
@@ -315,6 +336,9 @@ export function CutsDataGrid() {
         case "2023":
           filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2023"))
           break
+        case "2022":
+          filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2022"))
+          break
       }
       console.log(`🔍 Date range filter (${dateRangeFilter}): ${beforeDate} → ${filtered.length}`)
     }
@@ -325,8 +349,10 @@ export function CutsDataGrid() {
       filtered = filtered.filter((cut) => {
         const students = cut.students_affected || 0
         switch (studentsAffectedFilter) {
-          case "1_25":
-            return students >= 1 && students <= 25
+          case "1_10":
+            return students >= 1 && students <= 10
+          case "11_25":
+            return students >= 11 && students <= 25
           case "26_50":
             return students >= 26 && students <= 50
           case "51_100":
@@ -335,8 +361,10 @@ export function CutsDataGrid() {
             return students >= 101 && students <= 250
           case "251_500":
             return students >= 251 && students <= 500
-          case "500_plus":
-            return students > 500
+          case "501_1000":
+            return students >= 501 && students <= 1000
+          case "1000_plus":
+            return students > 1000
           case "unknown":
             return cut.students_affected === null
           default:
@@ -372,6 +400,7 @@ export function CutsDataGrid() {
     setCutTypeFilter("all")
     setInstitutionFilter("all")
     setProgramFilter("all")
+    setControlFilter("all")
     setDateRangeFilter("all")
     setStudentsAffectedFilter("all")
     setHasSourceFilter("all")
@@ -393,7 +422,7 @@ export function CutsDataGrid() {
         "Announcement Date",
         "Effective Term",
         "Students Affected",
-        "Faculty Affected",
+        "Control",
         "Notes",
         "Source URL",
         "Source Publication",
@@ -412,7 +441,7 @@ export function CutsDataGrid() {
             cut.announcement_date,
             cut.effective_term || "",
             cut.students_affected || "",
-            cut.faculty_affected || "",
+            cut.control || "",
             cut.notes ? `"${cut.notes.replace(/"/g, '""')}"` : "",
             cut.source_url || "",
             cut.source_publication ? `"${cut.source_publication.replace(/"/g, '""')}"` : "",
@@ -443,6 +472,7 @@ export function CutsDataGrid() {
     cutTypeFilter !== "all" ? cutTypeFilter : null,
     institutionFilter !== "all" ? institutionFilter : null,
     programFilter !== "all" ? programFilter : null,
+    controlFilter !== "all" ? controlFilter : null,
     dateRangeFilter !== "all" ? dateRangeFilter : null,
     studentsAffectedFilter !== "all" ? studentsAffectedFilter : null,
     hasSourceFilter !== "all" ? hasSourceFilter : null,
@@ -489,39 +519,6 @@ export function CutsDataGrid() {
             <Button variant="link" className="p-0 h-auto ml-2" onClick={() => fetchCuts()}>
               Retry
             </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Enhanced Debug Info */}
-      {cuts.length > 0 && (
-        <Alert className="bg-blue-50 border-blue-200">
-          <Database className="h-4 w-4" />
-          <AlertDescription>
-            <div className="space-y-2">
-              <div>
-                <strong>📊 Data Summary:</strong> Loaded {cuts.length} total cuts
-              </div>
-              <div>
-                <strong>📅 By Year:</strong>{" "}
-                {Object.entries(yearBreakdown)
-                  .sort(([a], [b]) => b.localeCompare(a))
-                  .map(([year, count]) => `${year}: ${count}`)
-                  .join(" | ")}
-              </div>
-              <div>
-                <strong>🔍 Currently Showing:</strong> {filteredCuts.length} cuts
-                {dateRangeFilter !== "all" && ` (filtered to ${dateRangeFilter})`}
-              </div>
-              <div className="flex gap-2 mt-2">
-                <Button size="sm" variant="outline" onClick={showOnly2024}>
-                  Show Only 2024 Data
-                </Button>
-                <Button size="sm" variant="outline" onClick={clearAllFilters}>
-                  Show All Data
-                </Button>
-              </div>
-            </div>
           </AlertDescription>
         </Alert>
       )}
@@ -604,6 +601,11 @@ export function CutsDataGrid() {
                     Program: {programFilter.length > 20 ? `${programFilter.substring(0, 20)}...` : programFilter}
                   </Badge>
                 )}
+                {controlFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Control: {controlFilter}
+                  </Badge>
+                )}
                 {dateRangeFilter !== "all" && (
                   <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
                     Date: {dateRangeFilter.replace("_", " ")}
@@ -639,7 +641,7 @@ export function CutsDataGrid() {
 
           {/* Filter Grid with Titles */}
           <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
               {/* State Filter */}
               <div className="text-center">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">State</h3>
@@ -711,6 +713,24 @@ export function CutsDataGrid() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Control Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Control</h3>
+                <Select value={controlFilter} onValueChange={setControlFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    {filterOptions.controls.map((control) => (
+                      <SelectItem key={control} value={control}>
+                        {control}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -723,12 +743,14 @@ export function CutsDataGrid() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="last_7_days">Last 7 Days</SelectItem>
                     <SelectItem value="last_30_days">Last 30 Days</SelectItem>
                     <SelectItem value="last_90_days">Last 90 Days</SelectItem>
                     <SelectItem value="last_6_months">Last 6 Months</SelectItem>
                     <SelectItem value="last_year">Last Year</SelectItem>
                     <SelectItem value="2024">2024</SelectItem>
                     <SelectItem value="2023">2023</SelectItem>
+                    <SelectItem value="2022">2022</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -742,12 +764,14 @@ export function CutsDataGrid() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Ranges</SelectItem>
-                    <SelectItem value="1_25">1-25 Students</SelectItem>
+                    <SelectItem value="1_10">1-10 Students</SelectItem>
+                    <SelectItem value="11_25">11-25 Students</SelectItem>
                     <SelectItem value="26_50">26-50 Students</SelectItem>
                     <SelectItem value="51_100">51-100 Students</SelectItem>
                     <SelectItem value="101_250">101-250 Students</SelectItem>
                     <SelectItem value="251_500">251-500 Students</SelectItem>
-                    <SelectItem value="500_plus">500+ Students</SelectItem>
+                    <SelectItem value="501_1000">501-1,000 Students</SelectItem>
+                    <SelectItem value="1000_plus">1,000+ Students</SelectItem>
                     <SelectItem value="unknown">Unknown</SelectItem>
                   </SelectContent>
                 </Select>
@@ -789,11 +813,11 @@ export function CutsDataGrid() {
                 <tr className="border-b bg-muted/50">
                   <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
                   <th className="h-12 px-4 text-left align-middle font-medium">Institution</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Program</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium w-64">Program</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Control</th>
                   <th className="h-12 px-4 text-left align-middle font-medium">State</th>
                   <th className="h-12 px-4 text-left align-middle font-medium">Cut Type</th>
                   <th className="h-12 px-4 text-left align-middle font-medium">Students</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Faculty</th>
                   <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
                 </tr>
               </thead>
@@ -808,25 +832,23 @@ export function CutsDataGrid() {
                         {new Date(cut.announcement_date).toLocaleDateString()}
                       </Link>
                     </td>
-                    <td className="p-4 align-middle">
-                      <Link href={`/cut/${cut.id}`} className="hover:underline font-medium">
+                    <td className="whitespace-nowrap">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {cut.institution}
-                      </Link>
+                      </span>
                     </td>
-                    <td className="p-4 align-middle">
-                      <Link href={`/cut/${cut.id}`} className="hover:underline">
-                        {cut.program_name || "N/A"}
-                      </Link>
+                    <td className="max-w-xs w-64">
+                      <span className="block text-xs leading-tight text-gray-600 dark:text-gray-300 line-clamp-2">
+                        {cut.program_name}
+                      </span>
                     </td>
+                    <td className="p-4 align-middle">{cut.control || "—"}</td>
                     <td className="p-4 align-middle">{cut.state}</td>
                     <td className="p-4 align-middle">
                       <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
                     </td>
                     <td className="p-4 align-middle">
                       {cut.students_affected ? cut.students_affected.toLocaleString() : "—"}
-                    </td>
-                    <td className="p-4 align-middle">
-                      {cut.faculty_affected ? cut.faculty_affected.toLocaleString() : "—"}
                     </td>
                     <td className="p-4 align-middle">
                       {cut.source_url && (

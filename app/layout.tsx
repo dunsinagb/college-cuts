@@ -19,9 +19,13 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans">
         <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <div className="mx-auto max-w-5xl w-full px-4">
+            <Header />
+          </div>
+          <main className="flex-1 w-full max-w-[var(--max-width)] mx-auto">{children}</main>
+          <div className="mx-auto max-w-5xl w-full px-4">
+            <Footer />
+          </div>
         </div>
       </body>
     </html>

@@ -2,87 +2,104 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, GraduationCap } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const pathname = usePathname()
+
+  const navItems = [
+    { href: "/", label: "Dashboard", icon: TrendingUp },
+    { href: "/cuts", label: "All Cuts", icon: AlertTriangle },
+    { href: "/about", label: "About", icon: Info },
+    { href: "/submit-tip", label: "Submit Tip", icon: Send },
+  ]
+
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/"
+    }
+    return pathname.startsWith(href)
+  }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <GraduationCap className="h-6 w-6" />
-            <span className="hidden font-bold sm:inline-block">CollegeCuts</span>
-          </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              Dashboard
-            </Link>
-            <Link href="/cuts" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              All Cuts
-            </Link>
-            <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              About
-            </Link>
-            <Link href="/submit-tip" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              Submit Tip
-            </Link>
-          </nav>
-        </div>
-        <Button
-          className="inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-accent-foreground h-9 py-2 mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
-          type="button"
-          aria-haspopup="dialog"
-          aria-expanded={isMenuOpen}
-          aria-controls="radix-:R16u6la:"
-          data-state={isMenuOpen ? "open" : "closed"}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          <span className="sr-only">Toggle Menu</span>
-        </Button>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <Link href="/" className="flex items-center space-x-2 md:hidden">
-              <GraduationCap className="h-6 w-6" />
-              <span className="font-bold">CollegeCuts</span>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm">
+      <div className="flex justify-center items-center w-full py-4">
+        <div className="flex items-center justify-between w-full max-w-4xl">
+          {/* Logo */}
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <GraduationCap className="h-8 w-8 relative z-10 text-primary-foreground" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-xl gradient-text">CollegeCuts</span>
+                <span className="text-xs text-muted-foreground -mt-1">Tracker</span>
+              </div>
             </Link>
           </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} />
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
         </div>
       </div>
+
+      {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="border-b md:hidden">
-          <nav className="flex flex-col space-y-3 p-4">
-            <Link
-              href="/"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/cuts"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              All Cuts
-            </Link>
-            <Link
-              href="/about"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/submit-tip"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Submit Tip
-            </Link>
+        <div className="md:hidden border-t bg-background/95 backdrop-blur-md">
+          <nav className="py-4 space-y-2 max-w-4xl mx-auto">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} />
+                  <span>{item.label}</span>
+                </Link>
+              )
+            })}
           </nav>
         </div>
       )}

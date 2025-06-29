@@ -8,8 +8,6 @@ interface EnhancedKpiCardProps {
   subtitle?: string
   icon?: LucideIcon
   loading?: boolean
-  trend?: "up" | "down" | "neutral"
-  trendValue?: string
 }
 
 export function EnhancedKpiCard({
@@ -18,29 +16,17 @@ export function EnhancedKpiCard({
   subtitle,
   icon: Icon,
   loading,
-  trend,
-  trendValue,
 }: EnhancedKpiCardProps) {
-  const getTrendColor = () => {
-    switch (trend) {
-      case "up":
-        return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30"
-      case "down":
-        return "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30"
-      default:
-        return "text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-950/30"
-    }
-  }
-
   return (
-    <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 border-l-4 border-l-primary/20">
-      <CardContent className="p-6">
+    <Card className="card-hover relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <CardContent className="p-4 relative z-10">
         <div className="flex items-start justify-between">
-          <div className="space-y-3 flex-1">
+          <div className="space-y-2 flex-1">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
               {Icon && (
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <Icon className="h-5 w-5 text-primary" />
                 </div>
               )}
@@ -48,21 +34,18 @@ export function EnhancedKpiCard({
 
             {loading ? (
               <div className="space-y-2">
-                <Skeleton className="h-8 w-24" />
-                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-3 w-24" />
               </div>
             ) : (
-              <div className="space-y-2">
-                <p className="text-3xl font-bold tracking-tight">
+              <div className="space-y-1">
+                <p className="text-2xl font-bold tracking-tight gradient-text">
                   {typeof value === "number" ? value.toLocaleString() : value}
                 </p>
-                {subtitle && <p className="text-sm text-muted-foreground leading-relaxed">{subtitle}</p>}
-                {trendValue && (
-                  <div
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTrendColor()}`}
-                  >
-                    {trendValue}
-                  </div>
+                {subtitle && (
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {subtitle}
+                  </p>
                 )}
               </div>
             )}

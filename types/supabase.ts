@@ -12,6 +12,7 @@ export interface Database {
           effective_term: string | null
           students_affected: number | null
           faculty_affected: number | null
+          control: string | null
           notes: string | null
           source_url: string | null
           source_publication: string | null

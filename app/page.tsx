@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient"
 import { EnhancedKpiCard } from "@/components/EnhancedKpiCard"
-import { NewsletterSignup } from "@/components/NewsletterSignup"
-import { GraduationCap, Building2, Users, MapPin, AlertTriangle, TrendingUp, Clock, RefreshCw } from "lucide-react"
+import { GraduationCap, Building2, Users, MapPin, AlertTriangle, TrendingUp, Clock, RefreshCw, ArrowRight, Activity } from "lucide-react"
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@/components/ui/card"
 import type { Cut } from "@/types/supabase"
 
 interface KpiData {
@@ -21,11 +21,11 @@ interface KpiData {
 }
 
 const cutTypeColors = {
-  program_suspension: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  teach_out: "bg-orange-100 text-orange-800 border-orange-200",
-  department_closure: "bg-red-100 text-red-800 border-red-200",
-  campus_closure: "bg-rose-100 text-rose-800 border-rose-200",
-  institution_closure: "bg-gray-100 text-gray-800 border-gray-200",
+  program_suspension: "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
+  teach_out: "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200",
+  department_closure: "bg-red-100 text-red-800 border-red-200 hover:bg-red-200",
+  campus_closure: "bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200",
+  institution_closure: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
 }
 
 // Mock data as fallback only
@@ -198,97 +198,92 @@ export default function HomePage() {
         .subscribe((status) => {
           console.log("🔴 Subscription status:", status)
         })
-
-      return () => {
-        try {
-          supabase.removeChannel(channel)
-        } catch (err) {
-          console.warn("Error removing channel:", err)
-        }
-      }
     } catch (err) {
-      console.warn("Error setting up real-time subscription:", err)
+      console.error("Error setting up real-time subscription:", err)
     }
   }
 
-  /** Manual refresh function */
   async function refreshData() {
-    if (refreshing) return // Prevent multiple simultaneous refreshes
+    if (refreshing) return
 
     setRefreshing(true)
-    console.log("🔄 Refreshing dashboard data...")
-
     try {
       await Promise.all([fetchKpiData(), fetchLatestCuts()])
       setLastRefresh(new Date())
-      setError(null) // Clear any previous errors
-    } catch (error) {
-      console.error("Error refreshing data:", error)
-      setError(error instanceof Error ? error.message : "Failed to refresh data")
+    } catch (err) {
+      console.error("Error refreshing data:", err)
     } finally {
       setRefreshing(false)
     }
   }
 
-  /** Fetch aggregated KPI numbers with fresh data */
   async function fetchKpiData() {
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("Using mock KPI data")
+      setKpiData(mockKpiData)
+      setLoading(false)
+      return
+    }
+
     try {
-      console.log("📊 Fetching fresh KPI data from ALL records...")
+      console.log("Fetching KPI data from Supabase...")
 
-      // if Supabase is not configured, skip straight to mock data
-      if (!isSupabaseConfigured || !supabase) {
-        setKpiData({
-          ...mockKpiData,
-          lastUpdated: new Date().toISOString(),
-        })
-        setLoading(false)
-        return
+      // Fetch total cuts count
+      const { count: totalCuts, error: cutsError } = await supabase
+        .from("v_latest_cuts")
+        .select("*", { count: "exact", head: true })
+
+      if (cutsError) {
+        console.error("Error fetching total cuts:", cutsError)
+        throw cutsError
       }
 
-      const [
-        { count: totalCuts, error: e1 },
-        { data: institutions, error: e2 },
-        { data: studentsData, error: e3 },
-        { data: statesData, error: e4 },
-      ] = await Promise.all([
-        supabase
-          .from("v_latest_cuts")
-          .select("id", { count: "exact", head: true }), // count-only, no ordering
-        supabase
-          .from("v_latest_cuts")
-          .select("institution"), // Get ALL institutions
-        supabase
-          .from("v_latest_cuts")
-          .select("students_affected"), // Get ALL student data
-        supabase
-          .from("v_latest_cuts")
-          .select("state"), // Get ALL state data
-      ])
+      // Fetch unique institutions count
+      const { data: institutionsData, error: institutionsError } = await supabase
+        .from("v_latest_cuts")
+        .select("institution")
 
-      // if any query failed -> mock
-      if (e1 || e2 || e3 || e4) {
-        console.error("Database query failed:", e1 || e2 || e3 || e4)
-        throw e1 || e2 || e3 || e4
+      if (institutionsError) {
+        console.error("Error fetching institutions:", institutionsError)
+        throw institutionsError
       }
 
-      console.log("📊 KPI Data Summary:", {
-        totalCuts: totalCuts,
-        institutionRecords: institutions?.length,
-        studentRecords: studentsData?.length,
-        stateRecords: statesData?.length,
-      })
+      const uniqueInstitutions = new Set(institutionsData?.map((item) => item.institution) || [])
+      const institutionsImpacted = uniqueInstitutions.size
 
-      const institutionsImpacted = new Set(institutions!.map((i) => i.institution)).size
-      const studentsAffected = studentsData!.reduce((sum, item) => sum + (item.students_affected || 0), 0) || null
+      // Fetch students affected sum
+      const { data: studentsData, error: studentsError } = await supabase
+        .from("v_latest_cuts")
+        .select("students_affected")
 
-      const stateCounts = statesData!.reduce<Record<string, number>>((acc, item) => {
+      if (studentsError) {
+        console.error("Error fetching students data:", studentsError)
+        throw studentsError
+      }
+
+      const studentsAffected = studentsData
+        ?.reduce((sum, item) => sum + (item.students_affected || 0), 0) || null
+
+      // Fetch most affected state
+      const { data: stateData, error: stateError } = await supabase
+        .from("v_latest_cuts")
+        .select("state")
+
+      if (stateError) {
+        console.error("Error fetching state data:", stateError)
+        throw stateError
+      }
+
+      const stateCounts = stateData?.reduce((acc, item) => {
         acc[item.state] = (acc[item.state] || 0) + 1
         return acc
-      }, {})
+      }, {} as Record<string, number>) || {}
 
-      const mostAffectedState = Object.entries(stateCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || ""
+      const mostAffectedState = Object.entries(stateCounts).reduce((a, b) =>
+        stateCounts[a[0]] > stateCounts[b[0]] ? a : b
+      )[0]
 
-      const freshKpiData = {
+      const kpiData: KpiData = {
         totalCuts: totalCuts || 0,
         institutionsImpacted,
         studentsAffected,
@@ -296,35 +291,33 @@ export default function HomePage() {
         lastUpdated: new Date().toISOString(),
       }
 
-      console.log("📊 Fresh KPI data:", freshKpiData)
-      setKpiData(freshKpiData)
-    } catch (error) {
-      console.error("Error fetching KPI data:", error)
-      setKpiData({
-        ...mockKpiData,
-        lastUpdated: new Date().toISOString(),
-      }) // graceful fallback
+      console.log("KPI data fetched successfully:", kpiData)
+      setKpiData(kpiData)
+    } catch (err) {
+      console.error("Error fetching KPI data:", err)
+      setError(err instanceof Error ? err.message : "Failed to fetch KPI data")
+      // Fallback to mock data
+      setKpiData(mockKpiData)
     } finally {
       setLoading(false)
     }
   }
 
-  /** Fetch the 5 most recent cuts with fresh data */
   async function fetchLatestCuts() {
-    try {
-      console.log("📋 Fetching fresh latest cuts...")
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("Using mock latest cuts data")
+      setLatestCuts(mockLatestCuts)
+      setCutsLoading(false)
+      return
+    }
 
-      // instant fallback when Supabase is missing
-      if (!isSupabaseConfigured || !supabase) {
-        setLatestCuts(mockLatestCuts)
-        setCutsLoading(false)
-        return
-      }
+    try {
+      console.log("Fetching latest cuts from Supabase...")
 
       const { data, error } = await supabase
         .from("v_latest_cuts")
         .select("*")
-        .order("announcement_date", { ascending: false }) // Most recent first
+        .order("announcement_date", { ascending: false })
         .limit(5)
 
       if (error) {
@@ -332,12 +325,13 @@ export default function HomePage() {
         throw error
       }
 
-      console.log("📋 Fresh latest cuts:", data?.length || 0, "records")
-      console.log("📋 Date range:", data?.[0]?.announcement_date, "to", data?.[data.length - 1]?.announcement_date)
+      console.log("Latest cuts fetched successfully:", data)
       setLatestCuts(data || [])
-    } catch (error) {
-      console.error("Error fetching latest cuts:", error)
-      setLatestCuts(mockLatestCuts) // graceful fallback
+    } catch (err) {
+      console.error("Error fetching latest cuts:", err)
+      setError(err instanceof Error ? err.message : "Failed to fetch latest cuts")
+      // Fallback to mock data
+      setLatestCuts(mockLatestCuts)
     } finally {
       setCutsLoading(false)
     }
@@ -355,55 +349,43 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
-      <div className="container mx-auto px-4 py-8 space-y-12">
-        {/* Error Display */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-            <div className="text-red-800 font-medium mb-2">Connection Issue</div>
-            <div className="text-red-600 text-sm mb-3">{error}</div>
-            <Button onClick={refreshData} disabled={refreshing} size="sm" variant="outline">
-              Try Again
-            </Button>
-          </div>
-        )}
-
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="max-w-[var(--max-width)] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
         {/* Hero Section */}
-        <div className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium border border-red-200 shadow-sm">
-            <div className="h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>
-            LIVE TRACKING
-          </div>
-
-          <div className="space-y-4">
-            <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent md:text-4xl">
-              CollegeCuts Tracker
+        <div className="text-center space-y-8">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20">
+              <Activity className="h-4 w-4" />
+              <span className="text-sm font-medium">Live Dashboard</span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
+              <span className="gradient-text">CollegeCuts</span>
+              <br />
+              <span className="text-foreground">Tracker</span>
             </h1>
-            <p className="text-muted-foreground max-w-3xl mx-auto leading-relaxed text-sm">
+            
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
               Real-time monitoring of program cuts, department closures, and institutional changes across higher
               education. Keeping students, faculty, and communities informed about the evolving landscape of American
               colleges and universities.
             </p>
           </div>
 
-          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground flex-wrap">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground flex-wrap px-4">
+            <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 rounded-full border">
               <Clock className="h-4 w-4" />
               <span>Data updated continuously</span>
             </div>
-            <div className="h-4 w-px bg-border hidden sm:block"></div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 rounded-full border">
               <TrendingUp className="h-4 w-4" />
               <span>Started covering from 2024</span>
             </div>
             {lastRefresh && (
-              <>
-                <div className="h-4 w-px bg-border hidden sm:block"></div>
-                <div className="flex items-center gap-2">
-                  <RefreshCw className="h-4 w-4" />
-                  <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
-                </div>
-              </>
+              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-3 py-2 rounded-full border">
+                <RefreshCw className="h-4 w-4" />
+                <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
+              </div>
             )}
           </div>
 
@@ -413,8 +395,8 @@ export default function HomePage() {
               onClick={refreshData}
               disabled={refreshing}
               variant="outline"
-              size="sm"
-              className="bg-white hover:bg-gray-50"
+              size="lg"
+              className="glass card-hover"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
               {refreshing ? "Refreshing..." : "Refresh Data"}
@@ -423,15 +405,13 @@ export default function HomePage() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <EnhancedKpiCard
             title="Total Program Cuts"
             value={kpiData?.totalCuts || 0}
             subtitle="confirmed closures & suspensions"
             icon={GraduationCap}
             loading={loading}
-            trend="up"
-            trendValue="↑ Live updates"
           />
           <EnhancedKpiCard
             title="Institutions Affected"
@@ -439,8 +419,6 @@ export default function HomePage() {
             subtitle="colleges & universities"
             icon={Building2}
             loading={loading}
-            trend="up"
-            trendValue="↑ Real-time"
           />
           <EnhancedKpiCard
             title="Students Impacted"
@@ -448,8 +426,6 @@ export default function HomePage() {
             subtitle="enrollment affected"
             icon={Users}
             loading={loading}
-            trend="up"
-            trendValue="↑ Dynamic"
           />
           <EnhancedKpiCard
             title="Most Affected State"
@@ -460,116 +436,113 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="max-w-4xl mx-auto">
-          <NewsletterSignup />
-        </div>
-
         {/* Latest 5 Cuts */}
         <div className="space-y-8">
-          <div className="flex items-center justify-between">
+          <div className="text-center sm:text-left">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">Latest Program Cuts</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Latest Program Cuts</h2>
               <p className="text-muted-foreground">Most recent announcements and institutional changes</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-green-50 px-3 py-2 rounded-full border border-green-200">
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Live updates</span>
             </div>
           </div>
 
           <div className="space-y-4">
             {cutsLoading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="p-6 border rounded-xl bg-card shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="h-6 w-48" />
-                          <Skeleton className="h-6 w-24" />
+                  <Card key={i} className="card-hover">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-3 flex-1">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <Skeleton className="h-6 w-32 sm:w-48" />
+                            <Skeleton className="h-6 w-16 sm:w-24" />
+                          </div>
+                          <Skeleton className="h-4 w-48 sm:w-64" />
                         </div>
-                        <Skeleton className="h-4 w-64" />
+                        <Skeleton className="h-5 w-5" />
                       </div>
-                      <Skeleton className="h-5 w-5" />
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))
               : latestCuts.map((cut, index) => (
-                  <div
-                    key={cut.id}
-                    className="group p-6 border rounded-xl bg-card shadow-sm hover:shadow-md transition-all duration-200 hover:border-primary/20"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <Link
-                            href={`/cut/${cut.id}`}
-                            className="font-semibold text-lg hover:text-primary transition-colors group-hover:underline"
-                          >
-                            {cut.institution}
-                          </Link>
-                          <Badge className={`${cutTypeColors[cut.cut_type]} border`} variant="secondary">
-                            {cut.cut_type.replace("_", " ")}
-                          </Badge>
+                  <Card key={cut.id} className="card-hover group">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <Link
+                              href={`/cut/${cut.id}`}
+                              className="font-semibold text-base sm:text-lg hover:text-primary transition-colors group-hover:underline"
+                            >
+                              {cut.institution}
+                            </Link>
+                            <Badge className={`${cutTypeColors[cut.cut_type]} border transition-colors text-xs`} variant="secondary">
+                              {cut.cut_type.replace("_", " ")}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                            {cut.program_name && (
+                              <>
+                                <span className="font-medium">{cut.program_name}</span>
+                                <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
+                              </>
+                            )}
+                            <span>{cut.state}</span>
+                            <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
+                            <span>{new Date(cut.announcement_date).toLocaleDateString()}</span>
+                            {cut.students_affected && (
+                              <>
+                                <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
+                                <span>{cut.students_affected.toLocaleString()} students affected</span>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                          {cut.program_name && (
-                            <>
-                              <span className="font-medium">{cut.program_name}</span>
-                              <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
-                            </>
-                          )}
-                          <span>{cut.state}</span>
-                          <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
-                          <span>{new Date(cut.announcement_date).toLocaleDateString()}</span>
-                          {cut.students_affected && (
-                            <>
-                              <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
-                              <span>{cut.students_affected.toLocaleString()} students affected</span>
-                            </>
+                        <div className="flex items-center gap-3">
+                          {cut.source_url && (
+                            <a
+                              href={cut.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary/80 p-2 hover:bg-primary/10 rounded-lg transition-colors"
+                              title="View source"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {cut.source_url && (
-                          <a
-                            href={cut.source_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="View source"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
           </div>
 
           <div className="text-center">
-            <Button asChild variant="outline" size="lg" className="shadow-sm bg-transparent">
-              <Link href="/cuts">View All Cuts →</Link>
+            <Button asChild variant="outline" size="lg" className="glass card-hover">
+              <Link href="/cuts" className="flex items-center gap-2">
+                View All Cuts
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>
 
         {/* Call to Action */}
-        <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 text-red-600 font-medium">
-              <AlertTriangle className="h-5 w-5" />
-              <span>[LIVE] Tracking higher education cuts and institutional changes</span>
+        <Card className="gradient-border">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 text-red-600 font-medium bg-red-50 px-3 sm:px-4 py-2 rounded-full border border-red-200 text-sm">
+                <AlertTriangle className="h-4 w-5" />
+                <span>[LIVE] Tracking higher education cuts and institutional changes</span>
+              </div>
+              <p className="text-muted-foreground text-base sm:text-lg">
+                Have information about program cuts or institutional changes?{" "}
+                <Link href="/submit-tip" className="text-primary hover:text-primary/80 font-medium hover:underline">
+                  Let me know if you see anything missing!
+                </Link>
+              </p>
             </div>
-            <p className="text-muted-foreground">
-              Have information about program cuts or institutional changes?{" "}
-              <Link href="/submit-tip" className="text-blue-600 hover:text-blue-800 font-medium hover:underline">
-                Let me know if you see anything missing!
-              </Link>
-            </p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
