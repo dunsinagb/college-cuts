@@ -21,6 +21,7 @@ const mockLatestCuts: Cut[] = [
     institution: "University of Example",
     program_name: "Liberal Arts Program",
     state: "CA",
+    control: "Public",
     cut_type: "program_suspension",
     announcement_date: "2024-03-15",
     effective_term: "Fall 2024",
@@ -37,6 +38,7 @@ const mockLatestCuts: Cut[] = [
     institution: "State College",
     program_name: "Philosophy Department",
     state: "TX",
+    control: "Public",
     cut_type: "department_closure",
     announcement_date: "2024-03-10",
     effective_term: "Spring 2025",
@@ -53,6 +55,7 @@ const mockLatestCuts: Cut[] = [
     institution: "Regional University",
     program_name: "Art History Program",
     state: "IL",
+    control: "Private non-profit",
     cut_type: "program_suspension",
     announcement_date: "2024-02-20",
     effective_term: "Summer 2024",
@@ -85,14 +88,14 @@ export default function SubmitTipPage() {
   }, [])
 
   async function fetchLatestCuts() {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabase) {
       setLatestCuts(mockLatestCuts)
       setCutsLoading(false)
       return
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from("v_latest_cuts")
         .select("*")
         .order("announcement_date", { ascending: false })
@@ -112,11 +115,29 @@ export default function SubmitTipPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch('/api/submit-tip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
 
-    setIsSubmitted(true)
-    setIsLoading(false)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit tip')
+      }
+
+      setIsSubmitted(true)
+    } catch (error) {
+      console.error('Error submitting tip:', error)
+      // You could add error state handling here
+      alert('Failed to submit tip. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleInputChange = (field: string, value: string) => {

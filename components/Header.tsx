@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send } from "lucide-react"
+import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
@@ -13,6 +13,7 @@ export function Header() {
   const navItems = [
     { href: "/", label: "Dashboard", icon: TrendingUp },
     { href: "/cuts", label: "All Cuts", icon: AlertTriangle },
+    { href: "/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/about", label: "About", icon: Info },
     { href: "/submit-tip", label: "Submit Tip", icon: Send },
   ]

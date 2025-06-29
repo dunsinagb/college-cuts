@@ -87,7 +87,6 @@ export function CutsDataGrid() {
   const [stateFilter, setStateFilter] = useState<string>("all")
   const [cutTypeFilter, setCutTypeFilter] = useState<string>("all")
   const [institutionFilter, setInstitutionFilter] = useState<string>("all")
-  const [programFilter, setProgramFilter] = useState<string>("all")
   const [controlFilter, setControlFilter] = useState<string>("all")
   const [dateRangeFilter, setDateRangeFilter] = useState<string>("all")
   const [studentsAffectedFilter, setStudentsAffectedFilter] = useState<string>("all")
@@ -106,7 +105,6 @@ export function CutsDataGrid() {
     stateFilter,
     cutTypeFilter,
     institutionFilter,
-    programFilter,
     controlFilter,
     dateRangeFilter,
     studentsAffectedFilter,
@@ -288,13 +286,6 @@ export function CutsDataGrid() {
       console.log(`🔍 Institution filter: ${beforeInstitution} → ${filtered.length}`)
     }
 
-    // Program filter
-    if (programFilter !== "all") {
-      const beforeProgram = filtered.length
-      filtered = filtered.filter((cut) => cut.program_name === programFilter)
-      console.log(`🔍 Program filter: ${beforeProgram} → ${filtered.length}`)
-    }
-
     // Control filter
     if (controlFilter !== "all") {
       const beforeControl = filtered.length
@@ -399,7 +390,6 @@ export function CutsDataGrid() {
     setStateFilter("all")
     setCutTypeFilter("all")
     setInstitutionFilter("all")
-    setProgramFilter("all")
     setControlFilter("all")
     setDateRangeFilter("all")
     setStudentsAffectedFilter("all")
@@ -471,7 +461,6 @@ export function CutsDataGrid() {
     stateFilter !== "all" ? stateFilter : null,
     cutTypeFilter !== "all" ? cutTypeFilter : null,
     institutionFilter !== "all" ? institutionFilter : null,
-    programFilter !== "all" ? programFilter : null,
     controlFilter !== "all" ? controlFilter : null,
     dateRangeFilter !== "all" ? dateRangeFilter : null,
     studentsAffectedFilter !== "all" ? studentsAffectedFilter : null,
@@ -596,11 +585,6 @@ export function CutsDataGrid() {
                     {institutionFilter.length > 20 ? `${institutionFilter.substring(0, 20)}...` : institutionFilter}
                   </Badge>
                 )}
-                {programFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
-                    Program: {programFilter.length > 20 ? `${programFilter.substring(0, 20)}...` : programFilter}
-                  </Badge>
-                )}
                 {controlFilter !== "all" && (
                   <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
                     Control: {controlFilter}
@@ -641,7 +625,7 @@ export function CutsDataGrid() {
 
           {/* Filter Grid with Titles */}
           <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {/* State Filter */}
               <div className="text-center">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">State</h3>
@@ -690,24 +674,6 @@ export function CutsDataGrid() {
                     {filterOptions.institutions.slice(0, 50).map((institution) => (
                       <SelectItem key={institution} value={institution}>
                         {institution.length > 25 ? `${institution.substring(0, 25)}...` : institution}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Program Filter */}
-              <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Program</h3>
-                <Select value={programFilter} onValueChange={setProgramFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Programs" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Programs</SelectItem>
-                    {filterOptions.programs.slice(0, 50).map((program) => (
-                      <SelectItem key={program} value={program}>
-                        {program.length > 25 ? `${program.substring(0, 25)}...` : program}
                       </SelectItem>
                     ))}
                   </SelectContent>
