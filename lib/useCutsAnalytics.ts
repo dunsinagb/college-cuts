@@ -33,15 +33,16 @@ interface CutsAnalytics {
 
 const fetcher = async (): Promise<CutsAnalytics> => {
   try {
-    if (!supabase) {
-      throw new Error("Supabase client not configured")
+    const client = supabase()
+    if (!client) {
+      throw new Error("Supabase client not initialized")
     }
 
     // Since we don't have the exact table structure with institutions join,
     // we'll use the v_latest_cuts view and adapt the queries
     
     // a) cutsByMonth
-    const { data: monthData, error: monthError } = await supabase
+    const { data: monthData, error: monthError } = await client
       .from("v_latest_cuts")
       .select("announcement_date")
     
@@ -58,7 +59,7 @@ const fetcher = async (): Promise<CutsAnalytics> => {
       .sort((a, b) => a.month.localeCompare(b.month))
 
     // b) cutsByControl (count unique universities by control type)
-    const { data: controlData, error: controlError } = await supabase
+    const { data: controlData, error: controlError } = await client
       .from("v_latest_cuts")
       .select("control, institution")
     
@@ -84,7 +85,7 @@ const fetcher = async (): Promise<CutsAnalytics> => {
       .sort((a, b) => b.cuts - a.cuts)
 
     // c) cutsByState
-    const { data: stateData, error: stateError } = await supabase
+    const { data: stateData, error: stateError } = await client
       .from("v_latest_cuts")
       .select("state")
     
@@ -100,7 +101,7 @@ const fetcher = async (): Promise<CutsAnalytics> => {
       .sort((a, b) => b.cuts - a.cuts)
 
     // d) cutsByType
-    const { data: typeData, error: typeError } = await supabase
+    const { data: typeData, error: typeError } = await client
       .from("v_latest_cuts")
       .select("cut_type")
     
@@ -139,14 +140,15 @@ export function useCutsAnalytics() {
 
   // Subscribe to realtime updates
   useEffect(() => {
-    if (!supabase) return
+    const client = supabase()
+    if (!client) return
 
-    const channel = supabase
+    const channel = client
       .channel("analytics-updates")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "v_latest_cuts" },
-        (payload) => {
+        (payload: any) => {
           // Mutate SWR cache when data changes
           mutate()
         }
@@ -154,8 +156,9 @@ export function useCutsAnalytics() {
       .subscribe()
 
     return () => {
-      if (supabase) {
-        supabase.removeChannel(channel)
+      const currentClient = supabase()
+      if (currentClient) {
+        currentClient.removeChannel(channel)
       }
     }
   }, [mutate])

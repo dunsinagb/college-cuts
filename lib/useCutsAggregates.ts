@@ -62,11 +62,12 @@ const fetcher = async (): Promise<CutsAggregates> => {
 
   try {
     // Try to fetch real data first
-    if (!supabase) {
+    const client = supabase()
+    if (!client) {
       throw new Error("Supabase client not initialized")
     }
     
-    const { data: cuts } = await supabase.from("v_latest_cuts").select("state, announcement_date")
+    const { data: cuts } = await client.from("v_latest_cuts").select("state, announcement_date")
 
     if (cuts && cuts.length > 0) {
       // Process real data for state breakdown

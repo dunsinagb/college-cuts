@@ -24,15 +24,17 @@ const getSupabaseConfig = () => {
     if (!supabaseAnon) supabaseAnon = config.NEXT_PUBLIC_SUPABASE_ANON_KEY
   }
 
-  // Debug logging
-  console.log(`🔍 Supabase Environment Check [${new Date().toISOString()}]:`)
-  console.log("URL exists:", !!supabaseUrl)
-  console.log("Key exists:", !!supabaseAnon)
-  if (supabaseUrl) {
-    console.log("URL preview:", supabaseUrl.substring(0, 50) + "...")
-  }
-  if (supabaseAnon) {
-    console.log("Key preview:", supabaseAnon.substring(0, 20) + "...")
+  // Debug logging - only on client side
+  if (typeof window !== "undefined") {
+    console.log(`🔍 Supabase Environment Check [${new Date().toISOString()}]:`)
+    console.log("URL exists:", !!supabaseUrl)
+    console.log("Key exists:", !!supabaseAnon)
+    if (supabaseUrl) {
+      console.log("URL preview:", supabaseUrl.substring(0, 50) + "...")
+    }
+    if (supabaseAnon) {
+      console.log("Key preview:", supabaseAnon.substring(0, 20) + "...")
+    }
   }
 
   return { supabaseUrl, supabaseAnon }
@@ -93,8 +95,8 @@ export function getSupabaseClient(): SupabaseClient<Database> | null {
   }
 }
 
-// Export the lazy client for backward compatibility
-export const supabase = getSupabaseClient()
+// Export a function that returns the client instead of the client directly
+export const supabase = () => getSupabaseClient()
 
 // Debug function to check connection
 export async function testSupabaseConnection() {

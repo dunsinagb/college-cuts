@@ -25,21 +25,48 @@ export function LatestCutsTable() {
   const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
+    async function fetchLatestCuts() {
+      try {
+        const client = supabase()
+        if (!client) {
+          console.warn("Supabase client not available")
+          return
+        }
+
+        const { data, error } = await client
+          .from("v_latest_cuts")
+          .select("*")
+          .order("announcement_date", { ascending: false })
+          .limit(5)
+
+        if (error) {
+          console.error("Error fetching latest cuts:", error)
+          return
+        }
+
+        setCuts(data || [])
+      } catch (err) {
+        console.error("Error:", err)
+      }
+    }
+
     fetchLatestCuts()
 
     // Subscribe to realtime updates
-    if (supabase) {
-    const channel = supabase
-      .channel("public:v_latest_cuts")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "v_latest_cuts" }, (payload) => {
-        // Refetch data when new cuts are added
-        fetchLatestCuts()
-      })
-      .subscribe()
+    const client = supabase()
+    if (client) {
+      const channel = client
+        .channel("public:v_latest_cuts")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "v_latest_cuts" }, (payload: any) => {
+          // Refetch data when new cuts are added
+          fetchLatestCuts()
+        })
+        .subscribe()
 
-    return () => {
-        if (supabase) {
-      supabase.removeChannel(channel)
+      return () => {
+        const currentClient = supabase()
+        if (currentClient) {
+          currentClient.removeChannel(channel)
         }
       }
     }
@@ -53,28 +80,6 @@ export function LatestCutsTable() {
     )
     setFilteredCuts(filtered)
   }, [cuts, searchTerm])
-
-  async function fetchLatestCuts() {
-    try {
-      if (!supabase) {
-        console.error("Supabase client not configured")
-        return
-      }
-      
-      const { data, error } = await supabase
-        .from("v_latest_cuts")
-        .select("*")
-        .order("announcement_date", { ascending: false })
-        .limit(25)
-
-      if (error) throw error
-      setCuts(data || [])
-    } catch (error) {
-      console.error("Error fetching cuts:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (loading) {
     return (

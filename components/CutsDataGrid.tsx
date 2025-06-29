@@ -92,8 +92,44 @@ export function CutsDataGrid() {
   const [studentsAffectedFilter, setStudentsAffectedFilter] = useState<string>("all")
   const [hasSourceFilter, setHasSourceFilter] = useState<string>("all")
 
+  async function fetchData() {
+    if (!isSupabaseConfigured) {
+      setError("Supabase not configured")
+      setLoading(false)
+      return
+    }
+
+    try {
+      const client = supabase()
+      if (!client) {
+        setError("Supabase client not available")
+        setLoading(false)
+        return
+      }
+
+      const { data, error } = await client
+        .from("v_latest_cuts")
+        .select("*")
+        .order("announcement_date", { ascending: false })
+
+      if (error) {
+        console.error("Error fetching data:", error)
+        setError(error.message)
+        setLoading(false)
+        return
+      }
+
+      setCuts(data || [])
+      setLoading(false)
+    } catch (err) {
+      console.error("Error:", err)
+      setError(err instanceof Error ? err.message : "An error occurred")
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    fetchCuts()
+    fetchData()
     fetchFilterOptions()
   }, [])
 
@@ -111,94 +147,9 @@ export function CutsDataGrid() {
     hasSourceFilter,
   ])
 
-  async function fetchCuts() {
-    setError(null)
-
-    // Debug: Check if Supabase is configured
-    console.log("🔍 Supabase configured:", isSupabaseConfigured)
-
-    if (!isSupabaseConfigured || !supabase) {
-      console.log("⚠️ Using mock data - Supabase not configured")
-      setCuts(mockCuts)
-      setLoading(false)
-      return
-    }
-
-    try {
-      console.log("📊 Fetching ALL cuts from Supabase (no pagination)...")
-
-      // First, let's check what's in the view
-      const { data: sampleData, error: sampleError } = await supabase
-        .from("v_latest_cuts")
-        .select("announcement_date")
-        .order("announcement_date", { ascending: false })
-        .limit(10)
-
-      if (sampleError) {
-        console.error("❌ Sample query error:", sampleError)
-      } else {
-        console.log(
-          "📅 Sample dates from view:",
-          sampleData?.map((d) => d.announcement_date),
-        )
-      }
-
-      // Now fetch ALL records
-      const { data, error: supabaseError } = await supabase
-        .from("v_latest_cuts")
-        .select("*")
-        .order("announcement_date", { ascending: false })
-
-      if (supabaseError) {
-        console.error("❌ Supabase query error:", supabaseError)
-        throw supabaseError
-      }
-
-      console.log("✅ Successfully fetched", data?.length || 0, "cuts from Supabase")
-
-      // Log date range for debugging
-      if (data && data.length > 0) {
-        const dates = data.map((cut) => cut.announcement_date).sort()
-        console.log("📅 Date range:", dates[0], "to", dates[dates.length - 1])
-
-        // Count 2024 entries specifically
-        const count2024 = data.filter((cut) => cut.announcement_date.startsWith("2024")).length
-        console.log("📊 2024 entries found:", count2024)
-
-        // Show first few 2024 entries
-        const entries2024 = data.filter((cut) => cut.announcement_date.startsWith("2024")).slice(0, 5)
-        console.log(
-          "📋 First 5 2024 entries:",
-          entries2024.map((cut) => ({
-            institution: cut.institution,
-            date: cut.announcement_date,
-            program: cut.program_name,
-          })),
-        )
-
-        // Count by year for better understanding
-        const yearCounts = data.reduce<Record<string, number>>((acc, cut) => {
-          const year = cut.announcement_date.substring(0, 4)
-          acc[year] = (acc[year] || 0) + 1
-          return acc
-        }, {})
-        console.log("📊 Entries by year:", yearCounts)
-      }
-
-      setCuts(data || [])
-    } catch (err) {
-      console.error("❌ Error fetching cuts:", err)
-      setError(err instanceof Error ? err.message : "Failed to load data")
-
-      console.log("⚠️ Falling back to mock data due to error")
-      setCuts(mockCuts)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   async function fetchFilterOptions() {
-    if (!isSupabaseConfigured || !supabase) {
+    const client = supabase()
+    if (!isSupabaseConfigured || !client) {
       setFilterOptions({
         states: ["CA", "TX", "NY", "FL"],
         institutions: ["Example University", "State College"],
@@ -219,25 +170,25 @@ export function CutsDataGrid() {
         { data: sourcePublicationsData },
         { data: controlsData },
       ] = await Promise.all([
-        supabase.from("v_latest_cuts").select("state").order("state"),
-        supabase.from("v_latest_cuts").select("institution").order("institution"),
-        supabase.from("v_latest_cuts").select("program_name").order("program_name"),
-        supabase.from("v_latest_cuts").select("effective_term").order("effective_term"),
-        supabase.from("v_latest_cuts").select("source_publication").order("source_publication"),
-        supabase.from("v_latest_cuts").select("control").order("control"),
+        client.from("v_latest_cuts").select("state").order("state"),
+        client.from("v_latest_cuts").select("institution").order("institution"),
+        client.from("v_latest_cuts").select("program_name").order("program_name"),
+        client.from("v_latest_cuts").select("effective_term").order("effective_term"),
+        client.from("v_latest_cuts").select("source_publication").order("source_publication"),
+        client.from("v_latest_cuts").select("control").order("control"),
       ])
 
       setFilterOptions({
-        states: Array.from(new Set(statesData?.map((item) => item.state).filter(Boolean) || [])),
-        institutions: Array.from(new Set(institutionsData?.map((item) => item.institution).filter(Boolean) || [])),
-        programs: Array.from(new Set(programsData?.map((item) => item.program_name).filter(Boolean) || [])),
+        states: Array.from(new Set(statesData?.map((item: any) => item.state).filter(Boolean) || [])),
+        institutions: Array.from(new Set(institutionsData?.map((item: any) => item.institution).filter(Boolean) || [])),
+        programs: Array.from(new Set(programsData?.map((item: any) => item.program_name).filter(Boolean) || [])),
         effectiveTerms: Array.from(
-          new Set(effectiveTermsData?.map((item) => item.effective_term).filter(Boolean) || []),
+          new Set(effectiveTermsData?.map((item: any) => item.effective_term).filter(Boolean) || []),
         ),
         sourcePublications: Array.from(
-          new Set(sourcePublicationsData?.map((item) => item.source_publication).filter(Boolean) || []),
+          new Set(sourcePublicationsData?.map((item: any) => item.source_publication).filter(Boolean) || []),
         ),
-        controls: Array.from(new Set(controlsData?.map((item) => item.control).filter(Boolean) || [])),
+        controls: Array.from(new Set(controlsData?.map((item: any) => item.control).filter(Boolean) || [])),
       })
     } catch (error) {
       console.error("❌ Error fetching filter options:", error)
@@ -505,7 +456,11 @@ export function CutsDataGrid() {
           <AlertCircle className="h-4 w-4" aria-hidden="true" />
           <AlertDescription>
             Data connection issue: {error}.
-            <Button variant="link" className="p-0 h-auto ml-2" onClick={() => fetchCuts()}>
+            <Button variant="link" className="p-0 h-auto ml-2" onClick={() => {
+              setError(null)
+              setLoading(true)
+              fetchData()
+            }}>
               Retry
             </Button>
           </AlertDescription>
