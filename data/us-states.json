@@ -1,0 +1,57 @@
+{
+  "type": "Topology",
+  "objects": {
+    "states": {
+      "type": "GeometryCollection",
+      "geometries": [
+        {
+          "type": "Polygon",
+          "properties": {
+            "NAME": "Alabama",
+            "STATE": "AL"
+          },
+          "arcs": [[0]]
+        },
+        {
+          "type": "Polygon",
+          "properties": {
+            "NAME": "Alaska",
+            "STATE": "AK"
+          },
+          "arcs": [[1]]
+        },
+        {
+          "type": "Polygon",
+          "properties": {
+            "NAME": "Arizona",
+            "STATE": "AZ"
+          },
+          "arcs": [[2]]
+        },
+        {
+          "type": "Polygon",
+          "properties": {
+            "NAME": "Arkansas",
+            "STATE": "AR"
+          },
+          "arcs": [[3]]
+        },
+        {
+          "type": "Polygon",
+          "properties": {
+            "NAME": "California",
+            "STATE": "CA"
+          },
+          "arcs": [[4]]
+        }
+      ]
+    }
+  },
+  "arcs": [
+    [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+    [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]
+  ]
+}

@@ -1,0 +1,867 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { ExternalLink, Search, Download, AlertCircle, Filter, X, Database } from "lucide-react"
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient"
+import type { Cut } from "@/types/supabase"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+const cutTypeColors = {
+  program_suspension: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+  teach_out: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
+  department_closure: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  campus_closure: "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300",
+  institution_closure: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+}
+
+// Mock data as fallback only
+const mockCuts: Cut[] = [
+  {
+    id: "1",
+    institution: "Example University",
+    program_name: "Liberal Arts Program",
+    state: "CA",
+    cut_type: "program_suspension",
+    announcement_date: "2024-03-15",
+    effective_term: "Fall 2024",
+    students_affected: 150,
+    faculty_affected: 8,
+    notes: "Program suspended due to budget constraints",
+    source_url: "https://example.com/news",
+    source_publication: "University Times",
+    created_at: "2024-03-15T10:00:00Z",
+    updated_at: "2024-03-15T10:00:00Z",
+  },
+  {
+    id: "2",
+    institution: "State College",
+    program_name: "Philosophy Department",
+    state: "TX",
+    cut_type: "department_closure",
+    announcement_date: "2024-03-10",
+    effective_term: "Spring 2025",
+    students_affected: 75,
+    faculty_affected: 12,
+    notes: "Department closure effective next semester",
+    source_url: "https://example.com/announcement",
+    source_publication: "State College News",
+    created_at: "2024-03-10T09:00:00Z",
+    updated_at: "2024-03-10T09:00:00Z",
+  },
+]
+
+interface FilterOptions {
+  states: string[]
+  institutions: string[]
+  programs: string[]
+  effectiveTerms: string[]
+  sourcePublications: string[]
+}
+
+export function CutsDataGrid() {
+  const [cuts, setCuts] = useState<Cut[]>([])
+  const [filteredCuts, setFilteredCuts] = useState<Cut[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    states: [],
+    institutions: [],
+    programs: [],
+    effectiveTerms: [],
+    sourcePublications: [],
+  })
+
+  // Filter states - reduced to 8 filters
+  const [searchTerm, setSearchTerm] = useState("")
+  const [stateFilter, setStateFilter] = useState<string>("all")
+  const [cutTypeFilter, setCutTypeFilter] = useState<string>("all")
+  const [institutionFilter, setInstitutionFilter] = useState<string>("all")
+  const [programFilter, setProgramFilter] = useState<string>("all")
+  const [dateRangeFilter, setDateRangeFilter] = useState<string>("all")
+  const [studentsAffectedFilter, setStudentsAffectedFilter] = useState<string>("all")
+  const [hasSourceFilter, setHasSourceFilter] = useState<string>("all")
+
+  useEffect(() => {
+    fetchCuts()
+    fetchFilterOptions()
+  }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [
+    cuts,
+    searchTerm,
+    stateFilter,
+    cutTypeFilter,
+    institutionFilter,
+    programFilter,
+    dateRangeFilter,
+    studentsAffectedFilter,
+    hasSourceFilter,
+  ])
+
+  async function fetchCuts() {
+    setError(null)
+
+    // Debug: Check if Supabase is configured
+    console.log("🔍 Supabase configured:", isSupabaseConfigured)
+
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("⚠️ Using mock data - Supabase not configured")
+      setCuts(mockCuts)
+      setLoading(false)
+      return
+    }
+
+    try {
+      console.log("📊 Fetching ALL cuts from Supabase (no pagination)...")
+
+      // First, let's check what's in the view
+      const { data: sampleData, error: sampleError } = await supabase
+        .from("v_latest_cuts")
+        .select("announcement_date")
+        .order("announcement_date", { ascending: false })
+        .limit(10)
+
+      if (sampleError) {
+        console.error("❌ Sample query error:", sampleError)
+      } else {
+        console.log(
+          "📅 Sample dates from view:",
+          sampleData?.map((d) => d.announcement_date),
+        )
+      }
+
+      // Now fetch ALL records
+      const { data, error: supabaseError } = await supabase
+        .from("v_latest_cuts")
+        .select("*")
+        .order("announcement_date", { ascending: false })
+
+      if (supabaseError) {
+        console.error("❌ Supabase query error:", supabaseError)
+        throw supabaseError
+      }
+
+      console.log("✅ Successfully fetched", data?.length || 0, "cuts from Supabase")
+
+      // Log date range for debugging
+      if (data && data.length > 0) {
+        const dates = data.map((cut) => cut.announcement_date).sort()
+        console.log("📅 Date range:", dates[0], "to", dates[dates.length - 1])
+
+        // Count 2024 entries specifically
+        const count2024 = data.filter((cut) => cut.announcement_date.startsWith("2024")).length
+        console.log("📊 2024 entries found:", count2024)
+
+        // Show first few 2024 entries
+        const entries2024 = data.filter((cut) => cut.announcement_date.startsWith("2024")).slice(0, 5)
+        console.log(
+          "📋 First 5 2024 entries:",
+          entries2024.map((cut) => ({
+            institution: cut.institution,
+            date: cut.announcement_date,
+            program: cut.program_name,
+          })),
+        )
+
+        // Count by year for better understanding
+        const yearCounts = data.reduce<Record<string, number>>((acc, cut) => {
+          const year = cut.announcement_date.substring(0, 4)
+          acc[year] = (acc[year] || 0) + 1
+          return acc
+        }, {})
+        console.log("📊 Entries by year:", yearCounts)
+      }
+
+      setCuts(data || [])
+    } catch (err) {
+      console.error("❌ Error fetching cuts:", err)
+      setError(err instanceof Error ? err.message : "Failed to load data")
+
+      console.log("⚠️ Falling back to mock data due to error")
+      setCuts(mockCuts)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function fetchFilterOptions() {
+    if (!isSupabaseConfigured || !supabase) {
+      setFilterOptions({
+        states: ["CA", "TX", "NY", "FL"],
+        institutions: ["Example University", "State College"],
+        programs: ["Liberal Arts", "Philosophy"],
+        effectiveTerms: ["Fall 2024", "Spring 2025"],
+        sourcePublications: ["University Times", "State College News"],
+      })
+      return
+    }
+
+    try {
+      const [
+        { data: statesData },
+        { data: institutionsData },
+        { data: programsData },
+        { data: effectiveTermsData },
+        { data: sourcePublicationsData },
+      ] = await Promise.all([
+        supabase.from("v_latest_cuts").select("state").order("state"),
+        supabase.from("v_latest_cuts").select("institution").order("institution"),
+        supabase.from("v_latest_cuts").select("program_name").order("program_name"),
+        supabase.from("v_latest_cuts").select("effective_term").order("effective_term"),
+        supabase.from("v_latest_cuts").select("source_publication").order("source_publication"),
+      ])
+
+      setFilterOptions({
+        states: Array.from(new Set(statesData?.map((item) => item.state).filter(Boolean) || [])),
+        institutions: Array.from(new Set(institutionsData?.map((item) => item.institution).filter(Boolean) || [])),
+        programs: Array.from(new Set(programsData?.map((item) => item.program_name).filter(Boolean) || [])),
+        effectiveTerms: Array.from(
+          new Set(effectiveTermsData?.map((item) => item.effective_term).filter(Boolean) || []),
+        ),
+        sourcePublications: Array.from(
+          new Set(sourcePublicationsData?.map((item) => item.source_publication).filter(Boolean) || []),
+        ),
+      })
+    } catch (error) {
+      console.error("❌ Error fetching filter options:", error)
+    }
+  }
+
+  function applyFilters() {
+    let filtered = cuts
+
+    console.log("🔍 Starting filter process with", cuts.length, "total cuts")
+
+    // Count 2024 entries before filtering
+    const count2024Before = cuts.filter((cut) => cut.announcement_date.startsWith("2024")).length
+    console.log("📊 2024 entries before filtering:", count2024Before)
+
+    // Search filter
+    if (searchTerm) {
+      const beforeSearch = filtered.length
+      filtered = filtered.filter(
+        (cut) =>
+          cut.institution.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (cut.program_name && cut.program_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (cut.notes && cut.notes.toLowerCase().includes(searchTerm.toLowerCase())),
+      )
+      console.log(`🔍 Search filter: ${beforeSearch} → ${filtered.length}`)
+    }
+
+    // State filter
+    if (stateFilter !== "all") {
+      const beforeState = filtered.length
+      filtered = filtered.filter((cut) => cut.state === stateFilter)
+      console.log(`🔍 State filter (${stateFilter}): ${beforeState} → ${filtered.length}`)
+    }
+
+    // Cut type filter
+    if (cutTypeFilter !== "all") {
+      const beforeType = filtered.length
+      filtered = filtered.filter((cut) => cut.cut_type === cutTypeFilter)
+      console.log(`🔍 Cut type filter (${cutTypeFilter}): ${beforeType} → ${filtered.length}`)
+    }
+
+    // Institution filter
+    if (institutionFilter !== "all") {
+      const beforeInstitution = filtered.length
+      filtered = filtered.filter((cut) => cut.institution === institutionFilter)
+      console.log(`🔍 Institution filter: ${beforeInstitution} → ${filtered.length}`)
+    }
+
+    // Program filter
+    if (programFilter !== "all") {
+      const beforeProgram = filtered.length
+      filtered = filtered.filter((cut) => cut.program_name === programFilter)
+      console.log(`🔍 Program filter: ${beforeProgram} → ${filtered.length}`)
+    }
+
+    // Date range filter - THIS IS KEY FOR 2024 DATA
+    if (dateRangeFilter !== "all") {
+      const beforeDate = filtered.length
+      const now = new Date()
+      const cutoffDate = new Date()
+
+      switch (dateRangeFilter) {
+        case "last_30_days":
+          cutoffDate.setDate(now.getDate() - 30)
+          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
+          break
+        case "last_90_days":
+          cutoffDate.setDate(now.getDate() - 90)
+          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
+          break
+        case "last_6_months":
+          cutoffDate.setMonth(now.getMonth() - 6)
+          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
+          break
+        case "last_year":
+          cutoffDate.setFullYear(now.getFullYear() - 1)
+          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
+          break
+        case "2024":
+          filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2024"))
+          console.log(`🔍 2024 filter applied: ${beforeDate} → ${filtered.length}`)
+          break
+        case "2023":
+          filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2023"))
+          break
+      }
+      console.log(`🔍 Date range filter (${dateRangeFilter}): ${beforeDate} → ${filtered.length}`)
+    }
+
+    // Students affected filter
+    if (studentsAffectedFilter !== "all") {
+      const beforeStudents = filtered.length
+      filtered = filtered.filter((cut) => {
+        const students = cut.students_affected || 0
+        switch (studentsAffectedFilter) {
+          case "1_25":
+            return students >= 1 && students <= 25
+          case "26_50":
+            return students >= 26 && students <= 50
+          case "51_100":
+            return students >= 51 && students <= 100
+          case "101_250":
+            return students >= 101 && students <= 250
+          case "251_500":
+            return students >= 251 && students <= 500
+          case "500_plus":
+            return students > 500
+          case "unknown":
+            return cut.students_affected === null
+          default:
+            return true
+        }
+      })
+      console.log(`🔍 Students affected filter: ${beforeStudents} → ${filtered.length}`)
+    }
+
+    // Has source filter
+    if (hasSourceFilter !== "all") {
+      const beforeSource = filtered.length
+      if (hasSourceFilter === "with_source") {
+        filtered = filtered.filter((cut) => cut.source_url)
+      } else if (hasSourceFilter === "without_source") {
+        filtered = filtered.filter((cut) => !cut.source_url)
+      }
+      console.log(`🔍 Source filter: ${beforeSource} → ${filtered.length}`)
+    }
+
+    // Count 2024 entries after filtering
+    const count2024After = filtered.filter((cut) => cut.announcement_date.startsWith("2024")).length
+    console.log("📊 2024 entries after filtering:", count2024After)
+
+    console.log("✅ Final filtered results:", filtered.length, "cuts")
+    setFilteredCuts(filtered)
+  }
+
+  function clearAllFilters() {
+    console.log("🧹 Clearing all filters")
+    setSearchTerm("")
+    setStateFilter("all")
+    setCutTypeFilter("all")
+    setInstitutionFilter("all")
+    setProgramFilter("all")
+    setDateRangeFilter("all")
+    setStudentsAffectedFilter("all")
+    setHasSourceFilter("all")
+  }
+
+  function showOnly2024() {
+    console.log("📅 Showing only 2024 data")
+    clearAllFilters()
+    setDateRangeFilter("2024")
+  }
+
+  async function downloadCSV() {
+    try {
+      const headers = [
+        "Institution",
+        "Program Name",
+        "State",
+        "Cut Type",
+        "Announcement Date",
+        "Effective Term",
+        "Students Affected",
+        "Faculty Affected",
+        "Notes",
+        "Source URL",
+        "Source Publication",
+        "Created At",
+        "Updated At",
+      ]
+
+      const csvContent = [
+        headers.join(","),
+        ...filteredCuts.map((cut) =>
+          [
+            `"${cut.institution.replace(/"/g, '""')}"`,
+            cut.program_name ? `"${cut.program_name.replace(/"/g, '""')}"` : "",
+            cut.state,
+            cut.cut_type,
+            cut.announcement_date,
+            cut.effective_term || "",
+            cut.students_affected || "",
+            cut.faculty_affected || "",
+            cut.notes ? `"${cut.notes.replace(/"/g, '""')}"` : "",
+            cut.source_url || "",
+            cut.source_publication ? `"${cut.source_publication.replace(/"/g, '""')}"` : "",
+            cut.created_at,
+            cut.updated_at,
+          ].join(","),
+        ),
+      ].join("\n")
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `college-cuts-filtered-${new Date().toISOString().split("T")[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error("Error downloading CSV:", error)
+      alert("Failed to download CSV. Please try again.")
+    }
+  }
+
+  const activeFiltersCount = [
+    searchTerm,
+    stateFilter !== "all" ? stateFilter : null,
+    cutTypeFilter !== "all" ? cutTypeFilter : null,
+    institutionFilter !== "all" ? institutionFilter : null,
+    programFilter !== "all" ? programFilter : null,
+    dateRangeFilter !== "all" ? dateRangeFilter : null,
+    studentsAffectedFilter !== "all" ? studentsAffectedFilter : null,
+    hasSourceFilter !== "all" ? hasSourceFilter : null,
+  ].filter(Boolean).length
+
+  // Calculate year breakdown for display
+  const yearBreakdown = cuts.reduce<Record<string, number>>((acc, cut) => {
+    const year = cut.announcement_date.substring(0, 4)
+    acc[year] = (acc[year] || 0) + 1
+    return acc
+  }, {})
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-10" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <div className="space-y-2">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <Alert className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Data connection issue: {error}.
+            <Button variant="link" className="p-0 h-auto ml-2" onClick={() => fetchCuts()}>
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Enhanced Debug Info */}
+      {cuts.length > 0 && (
+        <Alert className="bg-blue-50 border-blue-200">
+          <Database className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-2">
+              <div>
+                <strong>📊 Data Summary:</strong> Loaded {cuts.length} total cuts
+              </div>
+              <div>
+                <strong>📅 By Year:</strong>{" "}
+                {Object.entries(yearBreakdown)
+                  .sort(([a], [b]) => b.localeCompare(a))
+                  .map(([year, count]) => `${year}: ${count}`)
+                  .join(" | ")}
+              </div>
+              <div>
+                <strong>🔍 Currently Showing:</strong> {filteredCuts.length} cuts
+                {dateRangeFilter !== "all" && ` (filtered to ${dateRangeFilter})`}
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button size="sm" variant="outline" onClick={showOnly2024}>
+                  Show Only 2024 Data
+                </Button>
+                <Button size="sm" variant="outline" onClick={clearAllFilters}>
+                  Show All Data
+                </Button>
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Professional Filter Panel with Titles and Selected Filters */}
+      <Card className="shadow-lg border-gray-200">
+        <CardHeader className="pb-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Filter className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold text-gray-900">Advanced Filters</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">Refine your search with multiple criteria</p>
+              </div>
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
+                  {activeFiltersCount} active
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              {activeFiltersCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Clear All
+                </Button>
+              )}
+              <Button
+                onClick={downloadCSV}
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300"
+              >
+                <Download className="h-3 w-3 mr-1" />
+                Export ({filteredCuts.length})
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="pt-6 space-y-6">
+          {/* Selected Filters Display */}
+          {activeFiltersCount > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm font-medium text-blue-900">Active Filters</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {searchTerm && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Search: "{searchTerm}"
+                  </Badge>
+                )}
+                {stateFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    State: {stateFilter}
+                  </Badge>
+                )}
+                {cutTypeFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Type: {cutTypeFilter.replace("_", " ")}
+                  </Badge>
+                )}
+                {institutionFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Institution:{" "}
+                    {institutionFilter.length > 20 ? `${institutionFilter.substring(0, 20)}...` : institutionFilter}
+                  </Badge>
+                )}
+                {programFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Program: {programFilter.length > 20 ? `${programFilter.substring(0, 20)}...` : programFilter}
+                  </Badge>
+                )}
+                {dateRangeFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Date: {dateRangeFilter.replace("_", " ")}
+                  </Badge>
+                )}
+                {studentsAffectedFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Students: {studentsAffectedFilter.replace("_", "-")}
+                  </Badge>
+                )}
+                {hasSourceFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                    Source: {hasSourceFilter === "with_source" ? "With Link" : "No Link"}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Search Filter */}
+          <div className="text-center">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Search</h3>
+            <div className="flex items-center gap-2 max-w-md mx-auto">
+              <Search className="h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search institutions, programs, notes..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-9 text-sm flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Filter Grid with Titles */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* State Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">State</h3>
+                <Select value={stateFilter} onValueChange={setStateFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All States" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All States</SelectItem>
+                    {filterOptions.states.map((state) => (
+                      <SelectItem key={state} value={state}>
+                        {state}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Cut Type Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Cut Type</h3>
+                <Select value={cutTypeFilter} onValueChange={setCutTypeFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="program_suspension">Program Suspension</SelectItem>
+                    <SelectItem value="teach_out">Teach Out</SelectItem>
+                    <SelectItem value="department_closure">Department Closure</SelectItem>
+                    <SelectItem value="campus_closure">Campus Closure</SelectItem>
+                    <SelectItem value="institution_closure">Institution Closure</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Institution Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Institution</h3>
+                <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Institutions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Institutions</SelectItem>
+                    {filterOptions.institutions.slice(0, 50).map((institution) => (
+                      <SelectItem key={institution} value={institution}>
+                        {institution.length > 25 ? `${institution.substring(0, 25)}...` : institution}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Program Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Program</h3>
+                <Select value={programFilter} onValueChange={setProgramFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Programs" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Programs</SelectItem>
+                    {filterOptions.programs.slice(0, 50).map((program) => (
+                      <SelectItem key={program} value={program}>
+                        {program.length > 25 ? `${program.substring(0, 25)}...` : program}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Date Range Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Date Range</h3>
+                <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="last_30_days">Last 30 Days</SelectItem>
+                    <SelectItem value="last_90_days">Last 90 Days</SelectItem>
+                    <SelectItem value="last_6_months">Last 6 Months</SelectItem>
+                    <SelectItem value="last_year">Last Year</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2023">2023</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Students Affected Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Students Affected</h3>
+                <Select value={studentsAffectedFilter} onValueChange={setStudentsAffectedFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Ranges" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Ranges</SelectItem>
+                    <SelectItem value="1_25">1-25 Students</SelectItem>
+                    <SelectItem value="26_50">26-50 Students</SelectItem>
+                    <SelectItem value="51_100">51-100 Students</SelectItem>
+                    <SelectItem value="101_250">101-250 Students</SelectItem>
+                    <SelectItem value="251_500">251-500 Students</SelectItem>
+                    <SelectItem value="500_plus">500+ Students</SelectItem>
+                    <SelectItem value="unknown">Unknown</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Source Filter */}
+              <div className="text-center">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Source Link</h3>
+                <Select value={hasSourceFilter} onValueChange={setHasSourceFilter}>
+                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Sources" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sources</SelectItem>
+                    <SelectItem value="with_source">With Source Link</SelectItem>
+                    <SelectItem value="without_source">No Source Link</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Results Summary */}
+          <div className="flex items-center justify-center text-sm text-gray-600 pt-4 border-t border-gray-200">
+            <div className="bg-gray-50 px-4 py-2 rounded-full border">
+              Showing <span className="font-semibold text-gray-900">{filteredCuts.length}</span> of{" "}
+              <span className="font-semibold text-gray-900">{cuts.length}</span> total cuts
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Table */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Institution</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Program</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">State</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Cut Type</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Students</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Faculty</th>
+                  <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCuts.map((cut, index) => (
+                  <tr
+                    key={cut.id}
+                    className={`border-b transition-colors hover:bg-muted/50 ${index % 2 === 0 ? "bg-background" : "bg-muted/25"}`}
+                  >
+                    <td className="p-4 align-middle">
+                      <Link href={`/cut/${cut.id}`} className="hover:underline">
+                        {new Date(cut.announcement_date).toLocaleDateString()}
+                      </Link>
+                    </td>
+                    <td className="p-4 align-middle">
+                      <Link href={`/cut/${cut.id}`} className="hover:underline font-medium">
+                        {cut.institution}
+                      </Link>
+                    </td>
+                    <td className="p-4 align-middle">
+                      <Link href={`/cut/${cut.id}`} className="hover:underline">
+                        {cut.program_name || "N/A"}
+                      </Link>
+                    </td>
+                    <td className="p-4 align-middle">{cut.state}</td>
+                    <td className="p-4 align-middle">
+                      <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
+                    </td>
+                    <td className="p-4 align-middle">
+                      {cut.students_affected ? cut.students_affected.toLocaleString() : "—"}
+                    </td>
+                    <td className="p-4 align-middle">
+                      {cut.faculty_affected ? cut.faculty_affected.toLocaleString() : "—"}
+                    </td>
+                    <td className="p-4 align-middle">
+                      {cut.source_url && (
+                        <a
+                          href={cut.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {filteredCuts.length === 0 && !loading && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <Filter className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg font-semibold mb-2">No cuts found</h3>
+            <p className="text-muted-foreground mb-4">Try adjusting your filters to see more results.</p>
+            {activeFiltersCount > 0 && (
+              <Button variant="outline" onClick={clearAllFilters}>
+                Clear All Filters
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
