@@ -476,22 +476,22 @@ export function CutsDataGrid() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" aria-label="Loading program cuts data">
         <Card>
           <CardHeader>
-            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-6 w-48" aria-label="Loading filter panel" />
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="h-10" />
+                <Skeleton key={i} className="h-10" aria-label={`Loading filter ${i + 1}`} />
               ))}
             </div>
           </CardContent>
         </Card>
         <div className="space-y-2">
           {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" />
+            <Skeleton key={i} className="h-16 w-full" aria-label={`Loading data row ${i + 1}`} />
           ))}
         </div>
       </div>
@@ -501,8 +501,8 @@ export function CutsDataGrid() {
   return (
     <div className="space-y-6">
       {error && (
-        <Alert className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800">
-          <AlertCircle className="h-4 w-4" />
+        <Alert className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800" role="alert">
+          <AlertCircle className="h-4 w-4" aria-hidden="true" />
           <AlertDescription>
             Data connection issue: {error}.
             <Button variant="link" className="p-0 h-auto ml-2" onClick={() => fetchCuts()}>
@@ -518,7 +518,7 @@ export function CutsDataGrid() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Filter className="h-5 w-5 text-blue-600" />
+                <Filter className="h-5 w-5 text-blue-600" aria-hidden="true" />
               </div>
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900">Advanced Filters</CardTitle>
@@ -537,8 +537,9 @@ export function CutsDataGrid() {
                   size="sm"
                   onClick={clearAllFilters}
                   className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                  aria-label="Clear all filters"
                 >
-                  <X className="h-3 w-3 mr-1" />
+                  <X className="h-3 w-3 mr-1" aria-hidden="true" />
                   Clear All
                 </Button>
               )}
@@ -547,8 +548,9 @@ export function CutsDataGrid() {
                 variant="outline"
                 size="sm"
                 className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                aria-label={`Export ${filteredCuts.length} cuts to CSV`}
               >
-                <Download className="h-3 w-3 mr-1" />
+                <Download className="h-3 w-3 mr-1" aria-hidden="true" />
                 Export ({filteredCuts.length})
               </Button>
             </div>

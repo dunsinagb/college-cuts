@@ -25,15 +25,12 @@ export function Footer() {
                 <span className="text-xs text-muted-foreground -mt-1">Tracker</span>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Real-time monitoring of program cuts and institutional changes across higher education.
-            </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
             <h4 className="font-semibold text-base">Quick Links</h4>
-            <div className="space-y-3">
+          <div className="space-y-3">
               {quickLinks.map((link) => {
                 const Icon = link.icon
                 return (
@@ -44,7 +41,7 @@ export function Footer() {
                   >
                     <Icon className="h-4 w-4 group-hover:scale-110 transition-transform" />
                     <span>{link.label}</span>
-                  </Link>
+              </Link>
                 )
               })}
             </div>
@@ -53,7 +50,7 @@ export function Footer() {
           {/* Resources */}
           <div className="space-y-4">
             <h4 className="font-semibold text-base">Resources</h4>
-            <div className="space-y-3">
+          <div className="space-y-3">
               <Link href="/about" className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
                 <Info className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span>Methodology</span>
@@ -77,7 +74,7 @@ export function Footer() {
           {/* Data Info */}
           <div className="space-y-4">
             <h4 className="font-semibold text-base">Data Coverage</h4>
-            <div className="space-y-3">
+          <div className="space-y-3">
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                 <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
                 <span>Started from 2024</span>

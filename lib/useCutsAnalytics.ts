@@ -145,8 +145,8 @@ export function useCutsAnalytics() {
       .channel("analytics-updates")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "program_cuts" },
-        () => {
+        { event: "*", schema: "public", table: "v_latest_cuts" },
+        (payload) => {
           // Mutate SWR cache when data changes
           mutate()
         }

@@ -31,10 +31,10 @@ export function Header() {
         <div className="flex items-center justify-between w-full max-w-4xl">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <Link href="/" className="flex items-center space-x-3 group">
+            <Link href="/" className="flex items-center space-x-3 group" aria-label="CollegeCuts Tracker Home">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                <GraduationCap className="h-8 w-8 relative z-10 text-primary-foreground" />
+                <GraduationCap className="h-8 w-8 relative z-10 text-primary-foreground" aria-hidden="true" />
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-xl gradient-text">CollegeCuts</span>
@@ -44,7 +44,7 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center space-x-1" role="navigation" aria-label="Main navigation">
             {navItems.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href)
@@ -57,8 +57,9 @@ export function Header() {
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "hover:bg-accent hover:text-accent-foreground"
                   }`}
+                  aria-current={active ? "page" : undefined}
                 >
-                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} />
+                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
                   <span>{item.label}</span>
                 </Link>
               )
@@ -71,16 +72,23 @@ export function Header() {
             size="sm"
             className="md:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </Button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t bg-background/95 backdrop-blur-md">
+        <div 
+          id="mobile-menu"
+          className="md:hidden border-t bg-background/95 backdrop-blur-md"
+          role="navigation"
+          aria-label="Mobile navigation"
+        >
           <nav className="py-4 space-y-2 max-w-4xl mx-auto">
             {navItems.map((item) => {
               const Icon = item.icon
@@ -95,8 +103,9 @@ export function Header() {
                       : "hover:bg-accent hover:text-accent-foreground"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
+                  aria-current={active ? "page" : undefined}
                 >
-                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} />
+                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
                   <span>{item.label}</span>
                 </Link>
               )

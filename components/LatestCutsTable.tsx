@@ -29,17 +29,17 @@ export function LatestCutsTable() {
 
     // Subscribe to realtime updates
     if (supabase) {
-      const channel = supabase
-        .channel("public:program_cuts")
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "program_cuts" }, (payload) => {
-          // Refetch data when new cuts are added
-          fetchLatestCuts()
-        })
-        .subscribe()
+    const channel = supabase
+      .channel("public:v_latest_cuts")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "v_latest_cuts" }, (payload) => {
+        // Refetch data when new cuts are added
+        fetchLatestCuts()
+      })
+      .subscribe()
 
-      return () => {
+    return () => {
         if (supabase) {
-          supabase.removeChannel(channel)
+      supabase.removeChannel(channel)
         }
       }
     }

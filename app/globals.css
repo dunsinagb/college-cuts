@@ -57,6 +57,21 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   /* Custom scrollbar */
@@ -74,6 +89,55 @@
 
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/50;
+  }
+
+  /* Enhanced focus styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary ring-2 ring-primary/20;
+  }
+
+  /* Focus styles for buttons and interactive elements */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary ring-2 ring-primary/20;
+  }
+
+  /* Skip to content link */
+  .skip-link {
+    @apply absolute -top-10 left-6 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50 font-medium;
+    transition: top 0.3s ease;
+  }
+
+  .skip-link:focus {
+    @apply top-6;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .gradient-text {
+      @apply text-primary;
+      background: none;
+      -webkit-background-clip: unset;
+      -webkit-text-fill-color: unset;
+      background-clip: unset;
+    }
+    
+    .card-hover:hover {
+      @apply shadow-lg border-2 border-primary/50;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .card-hover:hover {
+      @apply transform-none;
+    }
+    
+    .group-hover\:scale-110 {
+      @apply scale-100;
+    }
   }
 }
 
@@ -128,5 +192,59 @@
 
   .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  /* Screen reader only text */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* High contrast focus indicators */
+  .focus-visible\:ring-2:focus-visible {
+    @apply ring-2 ring-primary/20;
+  }
+
+  /* Improved button accessibility */
+  .btn-accessible {
+    @apply relative;
+  }
+
+  .btn-accessible:focus-visible::after {
+    content: '';
+    @apply absolute inset-0 border-2 border-primary rounded-md;
+    pointer-events: none;
+  }
+
+  /* Better color contrast for badges */
+  .badge-accessible {
+    @apply font-medium;
+  }
+
+  /* Improved link accessibility */
+  .link-accessible {
+    @apply underline-offset-4 hover:underline focus-visible:underline;
+  }
+
+  /* Status indicators for screen readers */
+  .status-live {
+    @apply relative;
+  }
+
+  .status-live::before {
+    content: 'Live data';
+    @apply sr-only;
   }
 }

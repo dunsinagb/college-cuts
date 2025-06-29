@@ -103,7 +103,7 @@ export function StateMap() {
     return "#93c5fd" // blue-300
   }
 
-  const handleMouseEnter = (geo: any, event: React.MouseEvent) => {
+  const handleMouseEnter = (geo: any, event: React.MouseEvent<SVGElement>) => {
     const stateName = geo.properties.NAME
     const stateCode = stateAbbreviations[stateName]
     const cuts = stateCutCounts[stateCode] || 0
@@ -134,8 +134,8 @@ export function StateMap() {
         <ComposableMap projection="geoAlbersUsa" className="w-full h-96">
           <ZoomableGroup>
             <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
+              {({ geographies }: { geographies: any[] }) =>
+                geographies.map((geo: any) => (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}

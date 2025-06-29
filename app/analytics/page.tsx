@@ -1,43 +1,45 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { CutsTrend } from "@/components/analytics/CutsTrend"
-import { ControlBreakdown } from "@/components/analytics/ControlBreakdown"
-import { StateChoropleth } from "@/components/analytics/StateChoropleth"
-import { CutTypeDonut } from "@/components/analytics/CutTypeDonut"
+
+const CutsTrend = dynamic(() => import("@/components/analytics/CutsTrend").then(mod => ({ default: mod.CutsTrend })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
+const ControlBreakdown = dynamic(() => import("@/components/analytics/ControlBreakdown").then(mod => ({ default: mod.ControlBreakdown })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
+const StateChoropleth = dynamic(() => import("@/components/analytics/StateChoropleth").then(mod => ({ default: mod.StateChoropleth })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
+const CutTypeDonut = dynamic(() => import("@/components/analytics/CutTypeDonut").then(mod => ({ default: mod.CutTypeDonut })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 
 function AnalyticsPageContent() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-8">
         {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">Analytics Dashboard</h1>
+        <section className="text-center space-y-4" aria-labelledby="analytics-title">
+          <h1 id="analytics-title" className="text-4xl font-bold tracking-tight">Analytics Dashboard</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Comprehensive insights into program cuts across higher education institutions. 
             Explore trends, patterns, and regional impacts with real-time data.
           </p>
-        </div>
+        </section>
 
         {/* Analytics Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-            <CutsTrend />
-          </Suspense>
-          
-          <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-            <ControlBreakdown />
-          </Suspense>
-          
-          <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-            <StateChoropleth />
-          </Suspense>
-          
-          <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-            <CutTypeDonut />
-          </Suspense>
-        </div>
+        <section aria-labelledby="analytics-grid-title">
+          <h2 id="analytics-grid-title" className="sr-only">Analytics Visualizations</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="region" aria-label="Analytics charts and visualizations">
+            <div role="region" aria-label="Cuts trend over time">
+              <CutsTrend />
+            </div>
+            <div role="region" aria-label="Cuts by institution control type">
+              <ControlBreakdown />
+            </div>
+            <div role="region" aria-label="Cuts by state map">
+              <StateChoropleth />
+            </div>
+            <div role="region" aria-label="Cuts by type distribution">
+              <CutTypeDonut />
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   )
@@ -49,15 +51,19 @@ export default function AnalyticsPage() {
       fallback={
         <div className="container mx-auto px-4 py-8">
           <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <Skeleton className="h-10 w-96 mx-auto" />
-              <Skeleton className="h-6 w-[500px] mx-auto" />
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-80 w-full" />
-              ))}
-            </div>
+            <section className="text-center space-y-4" aria-labelledby="loading-title">
+              <h1 id="loading-title" className="sr-only">Loading Analytics Dashboard</h1>
+              <Skeleton className="h-10 w-96 mx-auto" aria-label="Loading page title" />
+              <Skeleton className="h-6 w-[500px] mx-auto" aria-label="Loading page description" />
+            </section>
+            <section aria-labelledby="loading-charts-title">
+              <h2 id="loading-charts-title" className="sr-only">Loading Analytics Charts</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="region" aria-label="Loading analytics visualizations">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-80 w-full" aria-label={`Loading chart ${i + 1}`} />
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       }

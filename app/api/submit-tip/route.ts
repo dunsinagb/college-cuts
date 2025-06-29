@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { resend } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,30 +28,21 @@ ${name ? `Contact Name: ${name}` : ''}
 Submitted at: ${new Date().toISOString()}
     `.trim()
 
-    // For now, we'll log the email content since we don't have email service configured
-    // In production, you would integrate with a service like SendGrid, Resend, or similar
-    console.log('Email would be sent to agbolaboridunsin@gmail.com:')
-    console.log(emailContent)
+    // Send email using Resend
+    try {
+      await resend.emails.send({
+        from: 'CollegeCuts Tracker <onboarding@resend.dev>',
+        to: ['agbolaboridunsin@gmail.com'],
+        subject: 'New Program Cut Tip Submission',
+        text: emailContent,
+        html: emailContent.replace(/\n/g, '<br>'),
+      })
 
-    // TODO: Integrate with email service (SendGrid, Resend, etc.)
-    // Example with a hypothetical email service:
-    // await emailService.send({
-    //   to: 'agbolaboridunsin@gmail.com',
-    //   subject: 'New Program Cut Tip Submission',
-    //   text: emailContent,
-    //   html: emailContent.replace(/\n/g, '<br>')
-    // })
-
-    // Store in database if needed
-    // await supabase.from('tip_submissions').insert({
-    //   institution,
-    //   cut_details: cutDetails,
-    //   source_info: sourceInfo,
-    //   relationship,
-    //   contact_email: email,
-    //   contact_name: name,
-    //   status: 'pending'
-    // })
+      console.log('Email sent successfully to agbolaboridunsin@gmail.com')
+    } catch (emailError) {
+      console.error('Failed to send email:', emailError)
+      // Don't fail the request if email fails, just log it
+    }
 
     return NextResponse.json(
       { 

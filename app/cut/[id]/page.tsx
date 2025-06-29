@@ -12,7 +12,7 @@ const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
-const cutTypeColors = {
+const cutTypeColors: Record<string, string> = {
   program_suspension: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
   teach_out: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
   department_closure: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",

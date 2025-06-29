@@ -4,18 +4,27 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/supabase"
 
 /**
- * Force fresh environment variable reading
+ * Get Supabase configuration with fallback methods
  */
 const getSupabaseConfig = () => {
-  // Only access env vars on client side
-  if (typeof window === "undefined") {
-    return { supabaseUrl: null, supabaseAnon: null }
+  // Method 1: Direct environment variable access
+  let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  let supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Method 2: Try to get from window.__NEXT_DATA__ if available
+  if (typeof window !== "undefined" && window.__NEXT_DATA__?.props?.envVars) {
+    if (!supabaseUrl) supabaseUrl = window.__NEXT_DATA__.props.envVars.NEXT_PUBLIC_SUPABASE_URL
+    if (!supabaseAnon) supabaseAnon = window.__NEXT_DATA__.props.envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  // Method 3: Try to get from a global variable if set
+  if (typeof window !== "undefined" && (window as any).__SUPABASE_CONFIG__) {
+    const config = (window as any).__SUPABASE_CONFIG__
+    if (!supabaseUrl) supabaseUrl = config.NEXT_PUBLIC_SUPABASE_URL
+    if (!supabaseAnon) supabaseAnon = config.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  }
 
-  // Debug logging with timestamp to see fresh reads
+  // Debug logging
   console.log(`🔍 Supabase Environment Check [${new Date().toISOString()}]:`)
   console.log("URL exists:", !!supabaseUrl)
   console.log("Key exists:", !!supabaseAnon)
@@ -51,10 +60,16 @@ export const isSupabaseConfigured = (() => {
   return configured
 })()
 
-// Create the Supabase client with fresh config - only on client side
-export const supabase: SupabaseClient<Database> | null = (() => {
+// Create a lazy Supabase client
+let supabaseClient: SupabaseClient<Database> | null = null
+
+export function getSupabaseClient(): SupabaseClient<Database> | null {
   if (typeof window === "undefined") {
     return null
+  }
+
+  if (supabaseClient) {
+    return supabaseClient
   }
 
   try {
@@ -66,16 +81,20 @@ export const supabase: SupabaseClient<Database> | null = (() => {
     }
 
     console.log("✅ Creating Supabase client with valid credentials")
-    return createClient<Database>(supabaseUrl, supabaseAnon, {
+    supabaseClient = createClient<Database>(supabaseUrl, supabaseAnon, {
       auth: {
         persistSession: false,
       },
     })
+    return supabaseClient
   } catch (error) {
     console.error("❌ Failed to create Supabase client:", error)
     return null
   }
-})()
+}
+
+// Export the lazy client for backward compatibility
+export const supabase = getSupabaseClient()
 
 // Debug function to check connection
 export async function testSupabaseConnection() {
@@ -102,7 +121,8 @@ export async function testSupabaseConnection() {
     }
   }
 
-  if (!supabase) {
+  const client = getSupabaseClient()
+  if (!client) {
     return {
       success: false,
       error: "Supabase client not initialized.",
@@ -112,7 +132,7 @@ export async function testSupabaseConnection() {
   try {
     console.log("🧪 Testing Supabase connection...")
 
-    const { count, error } = await supabase.from("v_latest_cuts").select("*", { count: "exact", head: true })
+    const { count, error } = await client.from("v_latest_cuts").select("*", { count: "exact", head: true })
 
     if (error) {
       console.error("❌ Supabase query error:", error)

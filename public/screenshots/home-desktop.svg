@@ -1,0 +1,7 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#f8fafc"/>
+  <rect x="20" y="20" width="1240" height="60" fill="#0f172a" rx="8"/>
+  <text x="640" y="55" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">Homepage</text>
+  <rect x="20" y="100" width="1240" height="580" fill="#e2e8f0" rx="8"/>
+  <text x="640" y="360" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="18">Screenshot Placeholder</text>
+</svg>

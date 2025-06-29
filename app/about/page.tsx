@@ -36,10 +36,6 @@ export default function AboutPage() {
               <Database className="w-3 h-3 mr-1" />
               Real-time Updates
             </Badge>
-            <Badge variant="secondary" className="text-sm">
-              <Shield className="w-3 h-3 mr-1" />
-              Verified Data
-            </Badge>
           </div>
         </div>
 
@@ -209,10 +205,7 @@ export default function AboutPage() {
                   Submit a Tip →
                 </Link>
                 <div className="text-sm text-muted-foreground">
-                  For media inquiries, data partnerships, or general questions, contact us at{" "}
-                  <a href="mailto:agbolaboridunsin@gmail.com" className="text-blue-600 hover:underline">
-                    agbolaboridunsin@gmail.com
-                  </a>
+                  For media inquiries, data partnerships, or general questions, please use the submit tip form above.
                 </div>
               </div>
             </CardContent>
