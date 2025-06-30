@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { resend } from '@/lib/resend'
+import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
 
-export async function POST(request: NextRequest) {
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+export async function POST() {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'CollegeCuts Tracker <onboarding@resend.dev>',
-      to: ['agbolaboridunsin@gmail.com'],
+      from: 'CollegeCuts <noreply@collegecuts.com>',
+      to: ['test@example.com'],
       subject: 'Test Email from CollegeCuts',
-      text: 'This is a test email to verify Resend is working correctly.',
-      html: '<p>This is a test email to verify Resend is working correctly.</p>',
+      html: '<p>This is a test email from CollegeCuts application.</p>',
     })
 
     if (error) {

@@ -184,7 +184,7 @@ export default function DebugPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span>Contains "supabase.co"</span>
+                <span>Contains &quot;supabase.co&quot;</span>
                 <div className="flex items-center gap-2">
                   {supabaseUrl.includes("supabase.co") ? (
                     <>
@@ -200,7 +200,7 @@ export default function DebugPage() {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span>Starts with "https://"</span>
+                <span>Starts with &quot;https://&quot;</span>
                 <div className="flex items-center gap-2">
                   {supabaseUrl.startsWith("https://") ? (
                     <>
@@ -330,6 +330,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
             </div>
           </CardContent>
         </Card>
+
+        <div className="text-sm text-gray-600">
+          <strong>Note:</strong> This shows the current environment variables. Be careful not to expose sensitive data.
+        </div>
       </div>
     </div>
   )

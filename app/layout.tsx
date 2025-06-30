@@ -1,13 +1,10 @@
-import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Header } from "@/components/Header"
+import "./globals.css"
+import { Toaster } from "@/components/ui/toaster"
 import { Footer } from "@/components/Footer"
+import { Header } from "@/components/Header"
 import { PerformanceOptimizer } from "@/components/PerformanceOptimizer"
 import { OfflineIndicator } from "@/components/OfflineIndicator"
-import "./globals.css"
-import { Inter } from "next/font/google"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "CollegeCuts Tracker",
@@ -47,24 +44,11 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "CollegeCuts",
   },
-  mobileWebApp: {
-    capable: true,
-  },
   applicationName: "CollegeCuts",
   formatDetection: {
     telephone: false,
   },
-  msApplication: {
-    TileColor: "#0f172a",
-    TileImage: "/icons/icon-192x192.svg",
-  },
   themeColor: "#0f172a",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
 }
 
 export const viewport: Viewport = {
@@ -144,6 +128,7 @@ export default function RootLayout({
             <Footer />
           </footer>
         </div>
+        <Toaster />
       </body>
     </html>
   )
