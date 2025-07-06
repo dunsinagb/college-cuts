@@ -57,7 +57,7 @@ export default function AboutPage() {
               <p className="text-muted-foreground">
                 Our database continues to grow as we document the ongoing transformation of higher education, 
                 providing transparency and insights for students, faculty, and stakeholders.
-              </p>
+        </p>
             </CardContent>
           </Card>
 
@@ -107,24 +107,24 @@ export default function AboutPage() {
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     Local and national news reports
-                  </li>
+          </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     State higher education board communications
-                  </li>
+          </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     Accreditation body notifications
-                  </li>
+          </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     Faculty senate minutes and internal communications
-                  </li>
+          </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                     Community submissions and verified tips
-                  </li>
-                </ul>
+          </li>
+        </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-3">Cut Categories</h3>
@@ -242,11 +242,11 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              While we strive for accuracy and completeness, information may not be fully current due to the rapidly 
+          While we strive for accuracy and completeness, information may not be fully current due to the rapidly
               changing nature of institutional decisions. Always verify with official institutional sources for the 
               most up-to-date information regarding program availability and institutional status. This tracker is 
               for informational purposes and should not be the sole source for academic or career planning decisions.
-            </p>
+        </p>
           </CardContent>
         </Card>
 
@@ -254,7 +254,7 @@ export default function AboutPage() {
         <div className="text-center mt-12 pt-8 border-t">
           <p className="text-sm text-muted-foreground">
             Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Data coverage: Started from 2024
-          </p>
+        </p>
         </div>
       </div>
     </div>

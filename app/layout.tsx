@@ -107,7 +107,6 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: "#0f172a",
   alternates: {
     canonical: 'https://collegecuts.com'
   },
