@@ -1,8 +1,11 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { RefreshCw } from "lucide-react"
+import { useCutsAnalytics } from "@/lib/useCutsAnalytics"
 
 const CutsTrend = dynamic(() => import("@/components/analytics/CutsTrend").then(mod => ({ default: mod.CutsTrend })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 const ControlBreakdown = dynamic(() => import("@/components/analytics/ControlBreakdown").then(mod => ({ default: mod.ControlBreakdown })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
@@ -10,6 +13,14 @@ const StateChoropleth = dynamic(() => import("@/components/analytics/StateChorop
 const CutTypeDonut = dynamic(() => import("@/components/analytics/CutTypeDonut").then(mod => ({ default: mod.CutTypeDonut })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 
 function AnalyticsPageContent() {
+  const { manualRefresh, isLoading } = useCutsAnalytics()
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+
+  const handleRefresh = async () => {
+    manualRefresh()
+    setLastRefresh(new Date())
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-8">
@@ -20,6 +31,21 @@ function AnalyticsPageContent() {
             Comprehensive insights into program cuts across higher education institutions. 
             Explore trends, patterns, and regional impacts with real-time data.
           </p>
+          <div className="flex items-center justify-center gap-4">
+            <Button 
+              onClick={handleRefresh} 
+              disabled={isLoading}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh Data
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Last updated: {lastRefresh.toLocaleTimeString()}
+            </span>
+          </div>
         </section>
 
         {/* Analytics Grid */}

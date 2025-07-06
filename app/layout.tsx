@@ -118,7 +118,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <div className="relative flex min-h-screen flex-col">
-          <header className="mx-auto max-w-5xl w-full px-4" role="banner">
+          <header role="banner">
             <Header />
           </header>
           <main id="main-content" className="flex-1 w-full max-w-[var(--max-width)] mx-auto" role="main">

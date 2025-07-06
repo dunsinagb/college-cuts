@@ -550,8 +550,8 @@ export default function HomePage() {
                 ))}
           </div>
 
-          <div className="text-center">
-            <Button asChild variant="outline" size="lg" className="glass card-hover">
+          <div className="text-center mt-6">
+            <Button asChild variant="default" size="lg">
               <Link href="/cuts" className="flex items-center gap-2">
                 View All Cuts
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
