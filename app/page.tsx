@@ -395,9 +395,7 @@ export default function HomePage() {
             </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-              Real-time monitoring of program cuts, department closures, and institutional changes across higher
-              education. Keeping students, faculty, and communities informed about the evolving landscape of American
-              colleges and universities.
+              Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States. Monitor institutional changes, find affected programs, and track students and faculty impacted by higher education restructuring and budget cuts.
             </p>
           </div>
 
@@ -436,7 +434,7 @@ export default function HomePage() {
 
         {/* Key Metrics */}
         <section aria-labelledby="metrics-title">
-          <h2 id="metrics-title" className="sr-only">Key Performance Indicators</h2>
+          <h2 id="metrics-title" className="sr-only">College Cuts Statistics and Key Performance Indicators</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <EnhancedKpiCard
               title="Total Program Cuts"
@@ -473,8 +471,8 @@ export default function HomePage() {
         <section aria-labelledby="latest-cuts-title">
           <div className="text-center sm:text-left">
             <div className="space-y-2">
-              <h2 id="latest-cuts-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest Program Cuts</h2>
-              <p className="text-muted-foreground">Most recent announcements and institutional changes</p>
+              <h2 id="latest-cuts-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Cuts & Closures</h2>
+              <p className="text-muted-foreground">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
             </div>
           </div>
 
