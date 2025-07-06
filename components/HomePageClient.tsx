@@ -26,6 +26,7 @@ const cutTypeColors = {
   department_closure: "bg-red-100 text-red-800 border-red-200 hover:bg-red-200",
   campus_closure: "bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200",
   institution_closure: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
+  staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
 }
 
 // Mock data as fallback only

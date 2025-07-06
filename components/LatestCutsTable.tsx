@@ -11,11 +11,12 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const cutTypeColors = {
-  program_suspension: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  teach_out: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-  department_closure: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-  campus_closure: "bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300",
-  institution_closure: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+  program_suspension: "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
+  teach_out: "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200",
+  department_closure: "bg-red-100 text-red-800 border-red-200 hover:bg-red-200",
+  campus_closure: "bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200",
+  institution_closure: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
+  staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
 }
 
 export function LatestCutsTable() {
