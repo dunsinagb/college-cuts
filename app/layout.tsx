@@ -222,13 +222,13 @@ export default function RootLayout({
         </a>
         <div className="relative flex min-h-screen flex-col">
           <header role="banner">
-            <Header />
+          <Header />
           </header>
           <main id="main-content" className="flex-1 w-full max-w-[var(--max-width)] mx-auto" role="main">
             {children}
           </main>
           <footer className="mx-auto max-w-5xl w-full px-4" role="contentinfo">
-            <Footer />
+          <Footer />
           </footer>
         </div>
         <Toaster />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send, BarChart3 } from "lucide-react"
@@ -8,14 +8,30 @@ import { Button } from "@/components/ui/button"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
   const pathname = usePathname()
 
+  // Check subscription status on mount
+  useEffect(() => {
+    const checkSubscription = () => {
+      const cookies = document.cookie.split(';')
+      const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+      setIsSubscribed(ccSubCookie?.includes('1') || false)
+    }
+    
+    checkSubscription()
+    
+    // Listen for cookie changes
+    const interval = setInterval(checkSubscription, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   const navItems = [
-    { href: "/", label: "Dashboard", icon: TrendingUp },
-    { href: "/cuts", label: "All Cuts", icon: AlertTriangle },
-    { href: "/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/about", label: "About", icon: Info },
-    { href: "/submit-tip", label: "Submit Tip", icon: Send },
+    { href: "/", label: "Dashboard", icon: TrendingUp, public: true },
+    { href: "/cuts", label: "All Cuts", icon: AlertTriangle, public: false },
+    { href: "/analytics", label: "Analytics", icon: BarChart3, public: false },
+    { href: "/about", label: "About", icon: Info, public: true },
+    { href: "/submit-tip", label: "Submit Tip", icon: Send, public: false },
   ]
 
   const isActive = (href: string) => {
@@ -45,6 +61,9 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1 ml-auto" role="navigation" aria-label="Main navigation">
           {navItems.map((item) => {
+            // Only show item if it's public or user is subscribed
+            if (!item.public && !isSubscribed) return null
+            
             const Icon = item.icon
             const active = isActive(item.href)
             return (
@@ -89,6 +108,9 @@ export function Header() {
         >
           <nav className="py-4 space-y-2 max-w-4xl mx-auto">
             {navItems.map((item) => {
+              // Only show item if it's public or user is subscribed
+              if (!item.public && !isSubscribed) return null
+              
               const Icon = item.icon
               const active = isActive(item.href)
               return (

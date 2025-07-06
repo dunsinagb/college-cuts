@@ -3,13 +3,15 @@
 import { useState, useEffect } from "react"
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabaseClient"
 import { EnhancedKpiCard } from "@/components/EnhancedKpiCard"
-import { GraduationCap, Building2, Users, MapPin, AlertTriangle, TrendingUp, Clock, RefreshCw, ArrowRight, Activity } from "lucide-react"
+import { GraduationCap, Building2, Users, MapPin, AlertTriangle, TrendingUp, Clock, RefreshCw, ArrowRight, Activity, Mail, CheckCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { Cut } from "@/types/supabase"
 
 interface KpiData {
@@ -135,12 +137,26 @@ export function HomePageClient() {
   const [mounted, setMounted] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
+  
+  // Subscription state
+  const [email, setEmail] = useState('')
+  const [subscribing, setSubscribing] = useState(false)
+  const [subscriptionMessage, setSubscriptionMessage] = useState('')
+  const [isSubscribed, setIsSubscribed] = useState(false)
 
   useEffect(() => {
     setMounted(true)
     console.log("🔍 HomePage mounted, checking Supabase configuration...")
     console.log("🔍 isSupabaseConfigured:", isSupabaseConfigured)
     console.log("🔍 supabase client:", !!getSupabaseClient())
+    
+    // Check subscription status
+    const checkSubscription = () => {
+      const cookies = document.cookie.split(';')
+      const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+      setIsSubscribed(ccSubCookie?.includes('1') || false)
+    }
+    checkSubscription()
   }, [])
 
   useEffect(() => {
@@ -202,7 +218,7 @@ export function HomePageClient() {
             schema: "public",
             table: "v_latest_cuts", // Using the correct view name
           },
-          (payload) => {
+          (payload: any) => {
             console.log("🔴 Real-time update received:", payload)
             // Refresh data when changes occur
             refreshData()
@@ -287,7 +303,7 @@ export function HomePageClient() {
         throw studentsError
       }
 
-      const totalStudentsAffected = studentsData.reduce((sum, item) => sum + (item.students_affected || 0), 0)
+      const totalStudentsAffected = studentsData.reduce((sum: number, item: { students_affected?: number }) => sum + (item.students_affected || 0), 0)
       console.log("✅ Total students affected:", totalStudentsAffected)
 
       // Fetch most affected state
@@ -302,7 +318,7 @@ export function HomePageClient() {
       }
 
       // Count occurrences of each state
-      const stateCounts = stateData.reduce((acc, item) => {
+      const stateCounts = stateData.reduce((acc: Record<string, number>, item: { state: string }) => {
         acc[item.state] = (acc[item.state] || 0) + 1
         return acc
       }, {} as Record<string, number>)
@@ -363,6 +379,36 @@ export function HomePageClient() {
       setLatestCuts(mockLatestCuts)
     } finally {
       setCutsLoading(false)
+    }
+  }
+
+  async function handleSubscribe(e: React.FormEvent) {
+    e.preventDefault()
+    setSubscribing(true)
+    setSubscriptionMessage('')
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      if (response.ok) {
+        setSubscriptionMessage('Success! You now have full access.')
+        setIsSubscribed(true)
+        setEmail('')
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      } else {
+        const data = await response.json()
+        setSubscriptionMessage(data.error || 'Please enter a valid email')
+      }
+    } catch (error) {
+      setSubscriptionMessage('Something went wrong. Please try again.')
+    } finally {
+      setSubscribing(false)
     }
   }
 
@@ -433,6 +479,52 @@ export function HomePageClient() {
           </div>
         </section>
 
+        {/* Subscription Gate */}
+        {!isSubscribed && (
+          <section aria-labelledby="subscription-title">
+            <Card className="gradient-border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <CardContent className="p-6 sm:p-8 flex flex-col items-center justify-center gap-4">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 mb-2">
+                  <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h2 id="subscription-title" className="text-2xl sm:text-3xl font-bold text-center">Unlock Full Access</h2>
+                <p className="text-muted-foreground text-base text-center mb-2">Subscribe to access the full database and analytics.</p>
+                <form onSubmit={handleSubscribe} className="w-full max-w-md flex gap-2">
+                  <Input
+                    type="email"
+                    required
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1 text-base px-4 py-3"
+                    disabled={subscribing}
+                    aria-label="Email address"
+                  />
+                  <Button 
+                    type="submit" 
+                    disabled={subscribing}
+                    className="px-6 text-base font-semibold"
+                  >
+                    {subscribing ? '...' : 'Subscribe'}
+                  </Button>
+                </form>
+                {subscriptionMessage && (
+                  <Alert className={`w-full max-w-md ${subscriptionMessage.includes('Success') ? 'border-green-200 bg-green-50 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:bg-red-900/20'}`}>
+                    {subscriptionMessage.includes('Success') ? (
+                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                    )}
+                    <AlertDescription className={subscriptionMessage.includes('Success') ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}>
+                      {subscriptionMessage}
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
         {/* Key Metrics */}
         <section aria-labelledby="metrics-title">
           <h2 id="metrics-title" className="sr-only">College Cuts Statistics and Key Performance Indicators</h2>
@@ -479,7 +571,7 @@ export function HomePageClient() {
 
           <div className="space-y-4" role="list" aria-label="Latest program cuts">
             {cutsLoading
-              ? Array.from({ length: 5 }).map((_, i) => (
+              ? Array.from({ length: 5 }).map((_: unknown, i: number) => (
                   <Card key={i} className="card-hover" role="listitem">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between">
@@ -495,7 +587,7 @@ export function HomePageClient() {
                     </CardContent>
                   </Card>
                 ))
-              : latestCuts.map((cut, index) => (
+              : latestCuts.map((cut, index: number) => (
                   <Card key={cut.id} className="card-hover group" role="listitem">
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex items-center justify-between">
