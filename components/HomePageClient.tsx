@@ -143,6 +143,7 @@ export function HomePageClient() {
   const [subscribing, setSubscribing] = useState(false)
   const [subscriptionMessage, setSubscriptionMessage] = useState('')
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [showSubscriptionGate, setShowSubscriptionGate] = useState(true)
 
   useEffect(() => {
     setMounted(true)
@@ -398,8 +399,12 @@ export function HomePageClient() {
         setSubscriptionMessage('Success! You now have full access.')
         setIsSubscribed(true)
         setEmail('')
+        
+        // Smooth transition: show success message briefly, then fade out subscription gate
         setTimeout(() => {
-          window.location.reload()
+          setSubscriptionMessage('')
+          // Trigger a custom event to notify other components of subscription change
+          window.dispatchEvent(new CustomEvent('subscriptionChanged', { detail: { subscribed: true } }))
         }, 2000)
       } else {
         const data = await response.json()
@@ -479,9 +484,14 @@ export function HomePageClient() {
           </div>
         </section>
 
-        {/* Subscription Gate */}
+        {/* Subscription Gate with smooth transition */}
         {!isSubscribed && (
-          <section aria-labelledby="subscription-title">
+          <section 
+            aria-labelledby="subscription-title"
+            className={`transition-all duration-1000 ease-in-out ${
+              subscriptionMessage.includes('Success') ? 'opacity-0 transform scale-95' : 'opacity-100 transform scale-100'
+            }`}
+          >
             <Card className="gradient-border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
               <CardContent className="p-6 sm:p-8 flex flex-col items-center justify-center gap-4">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 mb-2">
@@ -509,7 +519,11 @@ export function HomePageClient() {
                   </Button>
                 </form>
                 {subscriptionMessage && (
-                  <Alert className={`w-full max-w-md ${subscriptionMessage.includes('Success') ? 'border-green-200 bg-green-50 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:bg-red-900/20'}`}>
+                  <Alert className={`w-full max-w-md transition-all duration-500 ${
+                    subscriptionMessage.includes('Success') 
+                      ? 'border-green-200 bg-green-50 dark:bg-green-900/20 scale-105' 
+                      : 'border-red-200 bg-red-50 dark:bg-red-900/20'
+                  }`}>
                     {subscriptionMessage.includes('Success') ? (
                       <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                     ) : (

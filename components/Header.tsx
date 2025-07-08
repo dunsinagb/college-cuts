@@ -11,7 +11,7 @@ export function Header() {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const pathname = usePathname()
 
-  // Check subscription status on mount
+  // Check subscription status on mount and listen for changes
   useEffect(() => {
     const checkSubscription = () => {
       const cookies = document.cookie.split(';')
@@ -23,7 +23,20 @@ export function Header() {
     
     // Listen for cookie changes
     const interval = setInterval(checkSubscription, 1000)
-    return () => clearInterval(interval)
+    
+    // Listen for custom subscription change events
+    const handleSubscriptionChange = (event: CustomEvent) => {
+      if (event.detail?.subscribed) {
+        setIsSubscribed(true)
+      }
+    }
+    
+    window.addEventListener('subscriptionChanged', handleSubscriptionChange as EventListener)
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('subscriptionChanged', handleSubscriptionChange as EventListener)
+    }
   }, [])
 
   const navItems = [
