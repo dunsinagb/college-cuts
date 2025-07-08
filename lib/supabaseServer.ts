@@ -6,16 +6,25 @@ import type { Database } from "@/types/supabase"
  */
 export function createServerSupabaseClient(): SupabaseClient<Database> | null {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  if (!supabaseUrl || !supabaseAnon) {
-    console.warn("⚠️ Supabase environment variables not found on server")
+  if (!supabaseUrl) {
+    console.warn("⚠️ Supabase URL not found on server")
+    return null
+  }
+
+  // Prefer service role key for admin operations, fallback to anon key
+  const supabaseKey = supabaseServiceKey || supabaseAnon
+
+  if (!supabaseKey) {
+    console.warn("⚠️ No Supabase key found on server")
     return null
   }
 
   try {
     console.log("✅ Creating server-side Supabase client")
-    return createClient<Database>(supabaseUrl, supabaseAnon, {
+    return createClient<Database>(supabaseUrl, supabaseKey, {
       auth: {
         persistSession: false,
       },

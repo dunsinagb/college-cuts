@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send, BarChart3 } from "lucide-react"
+import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send, BarChart3, Briefcase } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
@@ -30,6 +30,7 @@ export function Header() {
     { href: "/", label: "Dashboard", icon: TrendingUp, public: true },
     { href: "/cuts", label: "All Cuts", icon: AlertTriangle, public: false },
     { href: "/analytics", label: "Analytics", icon: BarChart3, public: false },
+    { href: "/job-outlook", label: "Job Outlook", icon: Briefcase, public: false },
     { href: "/about", label: "About", icon: Info, public: true },
     { href: "/submit-tip", label: "Submit Tip", icon: Send, public: false },
   ]
@@ -70,11 +71,11 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                  active
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 group
+                  ${active
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "hover:bg-accent hover:text-accent-foreground"
-                }`}
+                    : "hover:bg-accent hover:text-primary"
+                  }`}
                 aria-current={active ? "page" : undefined}
               >
                 <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
@@ -117,11 +118,11 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                    active
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-xs font-medium transition-all duration-200 group
+                    ${active
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "hover:bg-accent hover:text-accent-foreground"
-                  }`}
+                      : "hover:bg-accent hover:text-primary"
+                    }`}
                   onClick={() => setIsMenuOpen(false)}
                   aria-current={active ? "page" : undefined}
                 >

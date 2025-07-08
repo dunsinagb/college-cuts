@@ -59,12 +59,12 @@ export function LatestCutsTable() {
       const channel = client
         .channel("public:v_latest_cuts")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "v_latest_cuts" }, (payload: any) => {
-          // Refetch data when new cuts are added
-          fetchLatestCuts()
-        })
-        .subscribe()
+        // Refetch data when new cuts are added
+        fetchLatestCuts()
+      })
+      .subscribe()
 
-      return () => {
+    return () => {
         const currentClient = supabase()
         if (currentClient) {
           currentClient.removeChannel(channel)

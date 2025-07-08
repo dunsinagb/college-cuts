@@ -526,130 +526,134 @@ export function HomePageClient() {
         )}
 
         {/* Key Metrics */}
-        <section aria-labelledby="metrics-title">
-          <h2 id="metrics-title" className="sr-only">College Cuts Statistics and Key Performance Indicators</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <EnhancedKpiCard
-              title="Total Program Cuts"
-              value={kpiData?.totalCuts || 0}
-              subtitle="confirmed closures & suspensions"
-              icon={GraduationCap}
-              loading={loading}
-            />
-            <EnhancedKpiCard
-              title="Institutions Affected"
-              value={kpiData?.institutionsImpacted || 0}
-              subtitle="colleges & universities"
-              icon={Building2}
-              loading={loading}
-            />
-            <EnhancedKpiCard
-              title="Students Impacted"
-              value={kpiData?.studentsAffected ? kpiData.studentsAffected.toLocaleString() : ""}
-              subtitle="enrollment affected"
-              icon={Users}
-              loading={loading}
-            />
-            <EnhancedKpiCard
-              title="Most Affected State"
-              value={kpiData?.mostAffectedState || ""}
-              subtitle="by number of cuts"
-              icon={MapPin}
-              loading={loading}
-            />
-          </div>
-        </section>
+        <div className="container mx-auto px-4 py-8">
+          <section aria-labelledby="metrics-title">
+            <h2 id="metrics-title" className="sr-only">College Cuts Statistics and Key Performance Indicators</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <EnhancedKpiCard
+                title="Total Program Cuts"
+                value={kpiData?.totalCuts || 0}
+                subtitle="confirmed closures & suspensions"
+                icon={GraduationCap}
+                loading={loading}
+              />
+              <EnhancedKpiCard
+                title="Institutions Affected"
+                value={kpiData?.institutionsImpacted || 0}
+                subtitle="colleges & universities"
+                icon={Building2}
+                loading={loading}
+              />
+              <EnhancedKpiCard
+                title="Students Impacted"
+                value={kpiData?.studentsAffected ? kpiData.studentsAffected.toLocaleString() : ""}
+                subtitle="enrollment affected"
+                icon={Users}
+                loading={loading}
+              />
+              <EnhancedKpiCard
+                title="Most Affected State"
+                value={kpiData?.mostAffectedState || ""}
+                subtitle="by number of cuts"
+                icon={MapPin}
+                loading={loading}
+              />
+            </div>
+          </section>
+        </div>
 
         {/* Latest 5 Cuts */}
-        <section aria-labelledby="latest-cuts-title">
-          <div className="text-center sm:text-left">
-            <div className="space-y-2">
-              <h2 id="latest-cuts-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Cuts & Closures</h2>
-              <p className="text-muted-foreground">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
+        <div className="container mx-auto px-4 py-8">
+          <section aria-labelledby="latest-cuts-title">
+            <div className="text-center sm:text-left">
+              <div className="space-y-2">
+                <h2 id="latest-cuts-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Cuts & Closures</h2>
+                <p className="text-muted-foreground">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-4" role="list" aria-label="Latest program cuts">
-            {cutsLoading
-              ? Array.from({ length: 5 }).map((_: unknown, i: number) => (
-                  <Card key={i} className="card-hover" role="listitem">
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-3 flex-1">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <Skeleton className="h-6 w-32 sm:w-48" />
-                            <Skeleton className="h-6 w-16 sm:w-24" />
+            <div className="space-y-4" role="list" aria-label="Latest program cuts">
+              {cutsLoading
+                ? Array.from({ length: 5 }).map((_: unknown, i: number) => (
+                    <Card key={i} className="card-hover" role="listitem">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-3 flex-1">
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <Skeleton className="h-6 w-32 sm:w-48" />
+                              <Skeleton className="h-6 w-16 sm:w-24" />
+                            </div>
+                            <Skeleton className="h-4 w-48 sm:w-64" />
                           </div>
-                          <Skeleton className="h-4 w-48 sm:w-64" />
+                          <Skeleton className="h-5 w-5" />
                         </div>
-                        <Skeleton className="h-5 w-5" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              : latestCuts.map((cut, index: number) => (
-                  <Card key={cut.id} className="card-hover group" role="listitem">
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <Link
-                              href={`/cut/${cut.id}`}
-                              className="font-semibold text-base sm:text-lg hover:text-primary transition-colors group-hover:underline"
-                            >
-                              {cut.institution}
-                            </Link>
-                            <Badge className={`${cutTypeColors[cut.cut_type]} border transition-colors text-xs`} variant="secondary">
-                              {cut.cut_type.replace("_", " ")}
-                            </Badge>
+                      </CardContent>
+                    </Card>
+                  ))
+                : latestCuts.map((cut, index: number) => (
+                    <Card key={cut.id} className="card-hover group" role="listitem">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 space-y-3">
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <Link
+                                href={`/cut/${cut.id}`}
+                                className="font-semibold text-base sm:text-lg hover:text-primary transition-colors group-hover:underline"
+                              >
+                                {cut.institution}
+                              </Link>
+                              <Badge className={`${cutTypeColors[cut.cut_type]} border transition-colors text-xs`} variant="secondary">
+                                {cut.cut_type.replace("_", " ")}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                              {cut.program_name && (
+                                <>
+                                  <span className="font-medium">{cut.program_name}</span>
+                                  <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
+                                </>
+                              )}
+                              <span>{cut.state}</span>
+                              <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
+                              <span>{new Date(cut.announcement_date).toLocaleDateString()}</span>
+                              {cut.students_affected && (
+                                <>
+                                  <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
+                                  <span>{cut.students_affected.toLocaleString()} students affected</span>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
-                            {cut.program_name && (
-                              <>
-                                <span className="font-medium">{cut.program_name}</span>
-                                <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
-                              </>
+                          <div className="flex items-center gap-3">
+                            {cut.source_url && (
+                              <a
+                                href={cut.source_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:text-primary/80 p-2 hover:bg-primary/10 rounded-lg transition-colors"
+                                title="View source"
+                                aria-label={`View source for ${cut.institution} announcement`}
+                              >
+                                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                              </a>
                             )}
-                            <span>{cut.state}</span>
-                            <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
-                            <span>{new Date(cut.announcement_date).toLocaleDateString()}</span>
-                            {cut.students_affected && (
-                              <>
-                                <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
-                                <span>{cut.students_affected.toLocaleString()} students affected</span>
-                              </>
-                            )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          {cut.source_url && (
-                            <a
-                              href={cut.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:text-primary/80 p-2 hover:bg-primary/10 rounded-lg transition-colors"
-                              title="View source"
-                              aria-label={`View source for ${cut.institution} announcement`}
-                            >
-                              <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-          </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+            </div>
 
-          <div className="text-center mt-6">
-            <Button asChild variant="default" size="lg">
-              <Link href="/cuts" className="flex items-center gap-2">
-                View All Cuts
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
-        </section>
+            <div className="text-center mt-6">
+              <Button asChild variant="default" size="lg">
+                <Link href="/cuts" className="flex items-center gap-2">
+                  View All Cuts
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+          </section>
+        </div>
 
         {/* Call to Action */}
         <section aria-labelledby="cta-title">
