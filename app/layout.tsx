@@ -179,26 +179,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebApplication",
-              "name": "CollegeCuts Tracker",
-              "description": "Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States",
-              "url": "https://collegecuts.com",
-              "applicationCategory": "EducationalApplication",
-              "operatingSystem": "Web Browser",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-              },
-              "author": {
-                "@type": "Organization",
-                "name": "CollegeCuts Team"
-              },
-              "keywords": "college cuts tracker, university program cuts, higher education closures, academic program suspension, department closure tracking",
-              "audience": {
-                "@type": "Audience",
-                "audienceType": "Students, Faculty, Researchers, Journalists"
-              }
+              "@type": "Organization",
+              "url": "https://college-cuts.com",
+              "logo": "https://college-cuts.com/icons/icon-192x192.svg"
             })
           }}
         />
