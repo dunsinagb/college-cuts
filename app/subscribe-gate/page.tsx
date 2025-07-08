@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,7 +13,17 @@ export default function SubscribeGate() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
+  const [redirectTo, setRedirectTo] = useState('/cuts')
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    // Get the intended destination from URL parameters
+    const redirect = searchParams.get('redirect')
+    if (redirect) {
+      setRedirectTo(redirect)
+    }
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -24,14 +34,14 @@ export default function SubscribeGate() {
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, redirect: redirectTo })
       })
 
       if (response.ok) {
         setIsSuccess(true)
-        setMessage('Success! Redirecting you to the full data...')
+        setMessage('Success! Redirecting you to your destination...')
         setTimeout(() => {
-          router.push('/cuts')
+          router.push(redirectTo)
         }, 1500)
       } else {
         const data = await response.json()

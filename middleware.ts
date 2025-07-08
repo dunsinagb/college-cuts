@@ -14,6 +14,8 @@ export function middleware(req: NextRequest) {
 
   const url = req.nextUrl.clone()
   url.pathname = '/subscribe-gate'
+  // Preserve the intended destination
+  url.searchParams.set('redirect', req.nextUrl.pathname + req.nextUrl.search)
   return NextResponse.redirect(url)
 }
 
