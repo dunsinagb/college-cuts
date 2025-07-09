@@ -1,5 +1,5 @@
 'use client'
-
+import { Suspense } from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AlertCircle, CheckCircle, Mail } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
-export default function SubscribeGate() {
+function SubscribeGate() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -114,5 +114,13 @@ export default function SubscribeGate() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function SubscribeGatePage() {
+  return (
+    <Suspense>
+      <SubscribeGate />
+    </Suspense>
   )
 } 
