@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { GraduationCap, TrendingUp, AlertTriangle, Info, Send, ExternalLink } from "lucide-react"
+import { GraduationCap, TrendingUp, AlertTriangle, Info, Send, ExternalLink, Linkedin } from "lucide-react"
 
 export function Footer() {
   const quickLinks = [
@@ -67,6 +67,15 @@ export function Footer() {
               >
                 <ExternalLink className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span>GitHub</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/company/college-cuts"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+              >
+                <Linkedin className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span>LinkedIn</span>
               </a>
             </div>
           </div>

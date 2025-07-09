@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send, BarChart3, Briefcase } from "lucide-react"
+import { Menu, X, GraduationCap, TrendingUp, AlertTriangle, Info, Send, BarChart3, Briefcase, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Header() {
@@ -16,131 +16,90 @@ export function Header() {
     const checkSubscription = () => {
       const cookies = document.cookie.split(';')
       const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
-      setIsSubscribed(ccSubCookie?.includes('1') || false)
+      setIsSubscribed(ccSubCookie?.includes('=1') || false)
     }
-    
+
     checkSubscription()
-    
-    // Listen for cookie changes
-    const interval = setInterval(checkSubscription, 1000)
-    
-    // Listen for custom subscription change events
-    const handleSubscriptionChange = (event: CustomEvent) => {
-      if (event.detail?.subscribed) {
-        setIsSubscribed(true)
-      }
+
+    // Listen for subscription changes
+    const handleSubscriptionChange = () => {
+      checkSubscription()
     }
-    
-    window.addEventListener('subscriptionChanged', handleSubscriptionChange as EventListener)
-    
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('subscriptionChanged', handleSubscriptionChange as EventListener)
-    }
+
+    window.addEventListener('subscriptionChanged', handleSubscriptionChange)
+    return () => window.removeEventListener('subscriptionChanged', handleSubscriptionChange)
   }, [])
 
-  const navItems = [
-    { href: "/", label: "Dashboard", icon: TrendingUp, public: true },
-    { href: "/cuts", label: "All Cuts", icon: AlertTriangle, public: false },
-    { href: "/analytics", label: "Analytics", icon: BarChart3, public: false },
-    { href: "/job-outlook", label: "Job Outlook", icon: Briefcase, public: false },
-    { href: "/about", label: "About", icon: Info, public: true },
-    { href: "/submit-tip", label: "Submit Tip", icon: Send, public: false },
+  const navigation = [
+    { href: "/", label: "Dashboard", icon: TrendingUp },
+    { href: "/cuts", label: "All Cuts", icon: AlertTriangle },
+    ...(isSubscribed ? [
+      { href: "/job-outlook", label: "Job Outlook", icon: Briefcase },
+      { href: "/teach-out", label: "Teach-Out Finder", icon: Search },
+    ] : []),
+    { href: "/about", label: "About", icon: Info },
+    { href: "/submit-tip", label: "Submit Tip", icon: Send },
   ]
 
-  const isActive = (href: string) => {
-    if (href === "/") {
-      return pathname === "/"
-    }
-    return pathname.startsWith(href)
-  }
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="flex items-center justify-between w-full h-20 px-4 md:px-8">
-        {/* Logo */}
-        <div className="flex items-center space-x-4 min-w-0">
-          <Link href="/" className="flex items-center space-x-3 group" aria-label="CollegeCuts Tracker Home">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-lg blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
-              <GraduationCap className="h-8 w-8 relative z-10 text-primary-foreground" aria-hidden="true" />
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-bold text-xl gradient-text truncate">CollegeCuts</span>
-              <span className="text-xs text-muted-foreground -mt-1 truncate">Tracker</span>
-            </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 flex">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <GraduationCap className="h-6 w-6" />
+            <span className="hidden font-bold sm:inline-block">CollegeCuts</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1 ml-auto" role="navigation" aria-label="Main navigation">
-          {navItems.map((item) => {
-            // Only show item if it's public or user is subscribed
-            if (!item.public && !isSubscribed) return null
-            
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          {navigation.map((item) => {
             const Icon = item.icon
-            const active = isActive(item.href)
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 group
-                  ${active
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "hover:bg-accent hover:text-primary"
-                  }`}
-                aria-current={active ? "page" : undefined}
+                className={`flex items-center gap-2 transition-colors hover:text-foreground/80 ${
+                  pathname === item.href ? "text-foreground" : "text-foreground/60"
+                }`}
               >
-                <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
-                <span>{item.label}</span>
+                <Icon className="h-4 w-4" />
+                {item.label}
               </Link>
             )
           })}
         </nav>
 
         {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="md:hidden ml-auto"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-menu"
-        >
-          {isMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
-        </Button>
+        <div className="flex flex-1 items-center justify-end md:hidden">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="mr-2"
+          >
+            {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div 
-          id="mobile-menu"
-          className="md:hidden border-t bg-background/95 backdrop-blur-md"
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
-          <nav className="py-4 space-y-2 max-w-4xl mx-auto">
-            {navItems.map((item) => {
-              // Only show item if it's public or user is subscribed
-              if (!item.public && !isSubscribed) return null
-              
+        <div className="md:hidden border-t bg-background">
+          <nav className="container py-4 space-y-2">
+            {navigation.map((item) => {
               const Icon = item.icon
-              const active = isActive(item.href)
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-xs font-medium transition-all duration-200 group
-                    ${active
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "hover:bg-accent hover:text-primary"
-                    }`}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors hover:bg-muted rounded-md ${
+                    pathname === item.href ? "bg-muted" : ""
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
-                  aria-current={active ? "page" : undefined}
                 >
-                  <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <Icon className="h-4 w-4" />
+                  {item.label}
                 </Link>
               )
             })}
