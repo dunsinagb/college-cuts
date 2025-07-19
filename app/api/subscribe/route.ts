@@ -27,13 +27,21 @@ export async function POST(req: Request) {
 
     // Success → set cookie
     const res = NextResponse.json({ ok: true })
+    
+    // Set cookie with more explicit options
     res.cookies.set('cc_sub', '1', { 
       path: '/', 
       maxAge: 60 * 60 * 24 * 365, // 1 year
       httpOnly: false, // Allow client-side access
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      sameSite: 'lax',
+      domain: undefined // Let browser set the domain
     })
+    
+    console.log('🍪 Cookie set: cc_sub=1')
+    
+    // Also set a response header to help with debugging
+    res.headers.set('X-Subscription-Status', 'active')
     
     return res
   } catch (error) {

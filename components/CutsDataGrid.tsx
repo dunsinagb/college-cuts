@@ -91,7 +91,8 @@ export function CutsDataGrid() {
   const [controlFilter, setControlFilter] = useState<string>("all")
   const [dateRangeFilter, setDateRangeFilter] = useState<string>("all")
   const [studentsAffectedFilter, setStudentsAffectedFilter] = useState<string>("all")
-  const [hasSourceFilter, setHasSourceFilter] = useState<string>("all")
+  const [facultyAffectedFilter, setFacultyAffectedFilter] = useState<string>("all")
+  const [showOnlyWithNumbers, setShowOnlyWithNumbers] = useState<boolean>(false)
 
   async function fetchData() {
     if (!isSupabaseConfigured) {
@@ -145,7 +146,8 @@ export function CutsDataGrid() {
     controlFilter,
     dateRangeFilter,
     studentsAffectedFilter,
-    hasSourceFilter,
+    facultyAffectedFilter,
+    showOnlyWithNumbers,
   ])
 
   async function fetchFilterOptions() {
@@ -317,15 +319,45 @@ export function CutsDataGrid() {
       console.log(`🔍 Students affected filter: ${beforeStudents} → ${filtered.length}`)
     }
 
-    // Has source filter
-    if (hasSourceFilter !== "all") {
-      const beforeSource = filtered.length
-      if (hasSourceFilter === "with_source") {
-        filtered = filtered.filter((cut) => cut.source_url)
-      } else if (hasSourceFilter === "without_source") {
-        filtered = filtered.filter((cut) => !cut.source_url)
-      }
-      console.log(`🔍 Source filter: ${beforeSource} → ${filtered.length}`)
+    // Faculty affected filter
+    if (facultyAffectedFilter !== "all") {
+      const beforeFaculty = filtered.length
+      filtered = filtered.filter((cut) => {
+        const faculty = cut.faculty_affected || 0
+        switch (facultyAffectedFilter) {
+          case "1_10":
+            return faculty >= 1 && faculty <= 10
+          case "11_25":
+            return faculty >= 11 && faculty <= 25
+          case "26_50":
+            return faculty >= 26 && faculty <= 50
+          case "51_100":
+            return faculty >= 51 && faculty <= 100
+          case "101_250":
+            return faculty >= 101 && faculty <= 250
+          case "251_500":
+            return faculty >= 251 && faculty <= 500
+          case "501_1000":
+            return faculty >= 501 && faculty <= 1000
+          case "1000_plus":
+            return faculty > 1000
+          case "unknown":
+            return cut.faculty_affected === null
+          default:
+            return true
+        }
+      })
+      console.log(`🔍 Faculty affected filter: ${beforeFaculty} → ${filtered.length}`)
+    }
+
+    // Show only cuts with numbers filter
+    if (showOnlyWithNumbers) {
+      const beforeNumbers = filtered.length
+      filtered = filtered.filter((cut) => {
+        return (cut.students_affected && cut.students_affected > 0) || 
+               (cut.faculty_affected && cut.faculty_affected > 0)
+      })
+      console.log(`🔍 Show only with numbers filter: ${beforeNumbers} → ${filtered.length}`)
     }
 
     // Count 2024 entries after filtering
@@ -345,7 +377,8 @@ export function CutsDataGrid() {
     setControlFilter("all")
     setDateRangeFilter("all")
     setStudentsAffectedFilter("all")
-    setHasSourceFilter("all")
+    setFacultyAffectedFilter("all")
+    setShowOnlyWithNumbers(false)
   }
 
   function showOnly2024() {
@@ -358,12 +391,12 @@ export function CutsDataGrid() {
     try {
       const headers = [
         "Institution",
-        "Program Name",
         "State",
         "Cut Type",
         "Announcement Date",
         "Effective Term",
         "Students Affected",
+        "Faculty Affected",
         "Control",
         "Notes",
         "Source URL",
@@ -377,12 +410,12 @@ export function CutsDataGrid() {
         ...filteredCuts.map((cut) =>
           [
             `"${cut.institution.replace(/"/g, '""')}"`,
-            cut.program_name ? `"${cut.program_name.replace(/"/g, '""')}"` : "",
             cut.state,
             cut.cut_type,
             cut.announcement_date,
             cut.effective_term || "",
             cut.students_affected || "",
+            cut.faculty_affected || "",
             cut.control || "",
             cut.notes ? `"${cut.notes.replace(/"/g, '""')}"` : "",
             cut.source_url || "",
@@ -416,7 +449,8 @@ export function CutsDataGrid() {
     controlFilter !== "all" ? controlFilter : null,
     dateRangeFilter !== "all" ? dateRangeFilter : null,
     studentsAffectedFilter !== "all" ? studentsAffectedFilter : null,
-    hasSourceFilter !== "all" ? hasSourceFilter : null,
+    facultyAffectedFilter !== "all" ? facultyAffectedFilter : null,
+    showOnlyWithNumbers ? "with-numbers" : null,
   ].filter(Boolean).length
 
   // Calculate year breakdown for display
@@ -470,125 +504,92 @@ export function CutsDataGrid() {
 
       {/* Professional Filter Panel with Titles and Selected Filters */}
       <Card className="shadow-lg border-gray-200">
-        <CardHeader className="pb-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Filter className="h-5 w-5 text-blue-600" aria-hidden="true" />
-              </div>
-              <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">Advanced Filters</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">Refine your search with multiple criteria</p>
-              </div>
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
-                  {activeFiltersCount} active
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center gap-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Filter className="h-4 w-4" />
+              Advanced Filters
+            </CardTitle>
               {activeFiltersCount > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={clearAllFilters}
-                  className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300"
-                  aria-label="Clear all filters"
+                className="h-7 text-xs bg-white hover:bg-gray-50 border-gray-300"
                 >
-                  <X className="h-3 w-3 mr-1" aria-hidden="true" />
+                <X className="h-3 w-3 mr-1" />
                   Clear All
-                </Button>
-              )}
-              <Button
-                onClick={downloadCSV}
-                variant="outline"
-                size="sm"
-                className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300"
-                aria-label={`Export ${filteredCuts.length} cuts to CSV`}
-              >
-                <Download className="h-3 w-3 mr-1" aria-hidden="true" />
-                Export ({filteredCuts.length})
               </Button>
-            </div>
+            )}
           </div>
         </CardHeader>
-
-        <CardContent className="pt-6 space-y-6">
+        <CardContent className="pt-3 space-y-4">
           {/* Selected Filters Display */}
           {activeFiltersCount > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
                 <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium text-blue-900">Active Filters</span>
+                <span className="text-xs font-medium text-blue-900">Active Filters</span>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1">
                 {searchTerm && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     Search: "{searchTerm}"
                   </Badge>
                 )}
                 {stateFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     State: {stateFilter}
                   </Badge>
                 )}
                 {cutTypeFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     Type: {cutTypeFilter.replace("_", " ")}
                   </Badge>
                 )}
                 {institutionFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     Institution:{" "}
                     {institutionFilter.length > 20 ? `${institutionFilter.substring(0, 20)}...` : institutionFilter}
                   </Badge>
                 )}
                 {controlFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     Control: {controlFilter}
                   </Badge>
                 )}
                 {dateRangeFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     Date: {dateRangeFilter.replace("_", " ")}
                   </Badge>
                 )}
                 {studentsAffectedFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
                     Students: {studentsAffectedFilter.replace("_", "-")}
                   </Badge>
                 )}
-                {hasSourceFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800">
-                    Source: {hasSourceFilter === "with_source" ? "With Link" : "No Link"}
+                {facultyAffectedFilter !== "all" && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
+                    Faculty: {facultyAffectedFilter.replace("_", "-")}
+                  </Badge>
+                )}
+                {showOnlyWithNumbers && (
+                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
+                    With Numbers Only
                   </Badge>
                 )}
               </div>
             </div>
           )}
 
-          {/* Search Filter */}
-          <div className="text-center">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Search</h3>
-            <div className="flex items-center gap-2 max-w-md mx-auto">
-              <Search className="h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search institutions, programs, notes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-9 text-sm flex-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
           {/* Filter Grid with Titles */}
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
               {/* State Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">State</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">State</h3>
                 <Select value={stateFilter} onValueChange={setStateFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All States" />
                   </SelectTrigger>
                   <SelectContent>
@@ -604,9 +605,9 @@ export function CutsDataGrid() {
 
               {/* Cut Type Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Cut Type</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Cut Type</h3>
                 <Select value={cutTypeFilter} onValueChange={setCutTypeFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
@@ -623,9 +624,9 @@ export function CutsDataGrid() {
 
               {/* Institution Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Institution</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Institution</h3>
                 <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Institutions" />
                   </SelectTrigger>
                   <SelectContent>
@@ -641,9 +642,9 @@ export function CutsDataGrid() {
 
               {/* Control Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Control</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Control</h3>
                 <Select value={controlFilter} onValueChange={setControlFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
@@ -655,15 +656,13 @@ export function CutsDataGrid() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Date Range Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Date Range</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Date Range</h3>
                 <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Time" />
                   </SelectTrigger>
                   <SelectContent>
@@ -682,9 +681,9 @@ export function CutsDataGrid() {
 
               {/* Students Affected Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Students Affected</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Students</h3>
                 <Select value={studentsAffectedFilter} onValueChange={setStudentsAffectedFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Ranges" />
                   </SelectTrigger>
                   <SelectContent>
@@ -702,25 +701,72 @@ export function CutsDataGrid() {
                 </Select>
               </div>
 
-              {/* Source Filter */}
+              {/* Faculty Affected Filter */}
               <div className="text-center">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Source Link</h3>
-                <Select value={hasSourceFilter} onValueChange={setHasSourceFilter}>
-                  <SelectTrigger className="h-9 text-sm border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Sources" />
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Faculty</h3>
+                <Select value={facultyAffectedFilter} onValueChange={setFacultyAffectedFilter}>
+                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Ranges" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Sources</SelectItem>
-                    <SelectItem value="with_source">With Source Link</SelectItem>
-                    <SelectItem value="without_source">No Source Link</SelectItem>
+                    <SelectItem value="all">All Ranges</SelectItem>
+                    <SelectItem value="1_10">1-10 Faculty</SelectItem>
+                    <SelectItem value="11_25">11-25 Faculty</SelectItem>
+                    <SelectItem value="26_50">26-50 Faculty</SelectItem>
+                    <SelectItem value="51_100">51-100 Faculty</SelectItem>
+                    <SelectItem value="101_250">101-250 Faculty</SelectItem>
+                    <SelectItem value="251_500">251-500 Faculty</SelectItem>
+                    <SelectItem value="501_1000">501-1,000 Faculty</SelectItem>
+                    <SelectItem value="1000_plus">1,000+ Faculty</SelectItem>
+                    <SelectItem value="unknown">Unknown</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+            
+            {/* Search and Toggle Row */}
+            <div className="flex items-center justify-between gap-4">
+              {/* Search Filter */}
+              <div className="flex-1 max-w-md">
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Search</h3>
+                <div className="flex items-center gap-2">
+                  <Search className="h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search institutions, programs, notes..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-8 text-sm border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              
+              {/* Toggle for showing only cuts with numbers */}
+              <div className="text-center">
+                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Data Filter</h3>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-xs text-gray-600">Show all cuts</span>
+                  <button
+                    onClick={() => setShowOnlyWithNumbers(!showOnlyWithNumbers)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                      showOnlyWithNumbers ? 'bg-blue-600' : 'bg-gray-200'
+                    }`}
+                    role="switch"
+                    aria-checked={showOnlyWithNumbers}
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                        showOnlyWithNumbers ? 'translate-x-5' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                  <span className="text-xs text-gray-600">With numbers only</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Results Summary */}
-          <div className="flex items-center justify-center text-sm text-gray-600 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-center text-sm text-gray-600 pt-3 border-t border-gray-200">
             <div className="bg-gray-50 px-4 py-2 rounded-full border">
               Showing <span className="font-semibold text-gray-900">{filteredCuts.length}</span> of{" "}
               <span className="font-semibold text-gray-900">{cuts.length}</span> total cuts
@@ -737,13 +783,13 @@ export function CutsDataGrid() {
               <thead>
                 <tr className="border-b bg-muted/50">
                   <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Institution</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium w-64">Program</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Control</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">State</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Cut Type</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Students</th>
-                  <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Institution</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Control</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">State</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Cut Type</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Students</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Faculty</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Source</th>
                 </tr>
               </thead>
               <tbody>
@@ -757,25 +803,23 @@ export function CutsDataGrid() {
                         {new Date(cut.announcement_date).toLocaleDateString()}
                       </Link>
                     </td>
-                    <td className="whitespace-nowrap">
+                    <td className="whitespace-nowrap text-center">
                       <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {cut.institution}
                       </span>
                     </td>
-                    <td className="max-w-xs w-64">
-                      <span className="block text-xs leading-tight text-gray-600 dark:text-gray-300 line-clamp-2">
-                        {cut.program_name}
-                      </span>
-                    </td>
-                    <td className="p-4 align-middle">{cut.control || "—"}</td>
-                    <td className="p-4 align-middle">{cut.state}</td>
-                    <td className="p-4 align-middle">
+                    <td className="p-4 text-center align-middle">{cut.control || "—"}</td>
+                    <td className="p-4 text-center align-middle">{cut.state}</td>
+                    <td className="p-4 text-center align-middle">
                       <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
                     </td>
-                    <td className="p-4 align-middle">
+                    <td className="p-4 text-center align-middle">
                       {cut.students_affected ? cut.students_affected.toLocaleString() : "—"}
                     </td>
-                    <td className="p-4 align-middle">
+                    <td className="p-4 text-center align-middle">
+                      {cut.faculty_affected ? cut.faculty_affected.toLocaleString() : "—"}
+                    </td>
+                    <td className="p-4 text-center align-middle">
                       {cut.source_url && (
                         <a
                           href={cut.source_url}

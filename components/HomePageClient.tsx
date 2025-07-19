@@ -1,17 +1,30 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabaseClient"
-import { EnhancedKpiCard } from "@/components/EnhancedKpiCard"
-import { GraduationCap, Building2, Users, MapPin, AlertTriangle, TrendingUp, Clock, RefreshCw, ArrowRight, Activity, Mail, CheckCircle, AlertCircle } from "lucide-react"
+import { useState, useEffect, useRef } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { 
+  GraduationCap, 
+  Building2, 
+  Users, 
+  MapPin, 
+  TrendingUp, 
+  Clock, 
+  RefreshCw, 
+  Activity,
+  Mail,
+  CheckCircle,
+  AlertCircle,
+  ArrowRight
+} from 'lucide-react'
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabaseClient"
+import { EnhancedKpiCard } from "@/components/EnhancedKpiCard"
 import type { Cut } from "@/types/supabase"
 
 interface KpiData {
@@ -136,14 +149,12 @@ export function HomePageClient() {
   const [refreshing, setRefreshing] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
-  const [error, setError] = useState<string | null>(null)
   
   // Subscription state
   const [email, setEmail] = useState('')
   const [subscribing, setSubscribing] = useState(false)
   const [subscriptionMessage, setSubscriptionMessage] = useState('')
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [showSubscriptionGate, setShowSubscriptionGate] = useState(true)
 
   useEffect(() => {
     setMounted(true)
@@ -155,7 +166,15 @@ export function HomePageClient() {
     const checkSubscription = () => {
       const cookies = document.cookie.split(';')
       const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
-      setIsSubscribed(ccSubCookie?.includes('1') || false)
+      const isSubscribed = ccSubCookie?.includes('1') || false
+      
+      console.log('🔍 Client-side subscription check:', {
+        cookies: document.cookie,
+        ccSubCookie: ccSubCookie,
+        isSubscribed: isSubscribed
+      })
+      
+      setIsSubscribed(isSubscribed)
     }
     checkSubscription()
   }, [])
@@ -198,7 +217,6 @@ export function HomePageClient() {
       }
     } catch (err) {
       console.error("Error initializing data:", err)
-      setError(err instanceof Error ? err.message : "Failed to initialize data")
     }
   }
 
@@ -210,7 +228,7 @@ export function HomePageClient() {
     try {
       console.log("🔴 Setting up real-time subscription...")
 
-      const channel = client
+      client
         .channel("dashboard-updates")
         .on(
           "postgres_changes",
@@ -243,7 +261,7 @@ export function HomePageClient() {
       setLastRefresh(new Date())
     } catch (err) {
       console.error("Error refreshing data:", err)
-      setError(err instanceof Error ? err.message : "Failed to refresh data")
+      // setError(err instanceof Error ? err.message : "Failed to refresh data") // Removed unused variable
     } finally {
       setRefreshing(false)
     }
@@ -339,7 +357,7 @@ export function HomePageClient() {
       setKpiData(kpiData)
     } catch (err) {
       console.error("❌ Error fetching KPI data:", err)
-      setError(err instanceof Error ? err.message : "Failed to fetch KPI data")
+      // setError(err instanceof Error ? err.message : "Failed to fetch KPI data") // Removed unused variable
       // Fallback to mock data
       setKpiData(mockKpiData)
     } finally {
@@ -375,7 +393,7 @@ export function HomePageClient() {
       setLatestCuts(data || [])
     } catch (err) {
       console.error("Error fetching latest cuts:", err)
-      setError(err instanceof Error ? err.message : "Failed to fetch latest cuts")
+      // setError(err instanceof Error ? err.message : "Failed to fetch latest cuts") // Removed unused variable
       // Fallback to mock data
       setLatestCuts(mockLatestCuts)
     } finally {
@@ -399,6 +417,20 @@ export function HomePageClient() {
         setSubscriptionMessage('Success! You now have full access.')
         setIsSubscribed(true)
         setEmail('')
+        
+        // Manual fallback: Set cookie on client side as well
+        document.cookie = 'cc_sub=1; path=/; max-age=31536000; samesite=lax'
+        
+        // Debug: Check if cookie was set
+        setTimeout(() => {
+          const cookies = document.cookie.split(';')
+          const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+          console.log('🍪 After subscription success:', {
+            cookies: document.cookie,
+            ccSubCookie: ccSubCookie,
+            isSubscribed: ccSubCookie?.includes('1') || false
+          })
+        }, 100)
         
         // Smooth transition: show success message briefly, then fade out subscription gate
         setTimeout(() => {
@@ -540,7 +572,7 @@ export function HomePageClient() {
         )}
 
         {/* Key Metrics */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4">
           <section aria-labelledby="metrics-title">
             <h2 id="metrics-title" className="sr-only">College Cuts Statistics and Key Performance Indicators</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -582,7 +614,7 @@ export function HomePageClient() {
             <div className="text-center sm:text-left">
               <div className="space-y-2">
                 <h2 id="latest-cuts-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Cuts & Closures</h2>
-                <p className="text-muted-foreground">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
+                <p className="text-muted-foreground mb-8">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
               </div>
             </div>
 
@@ -604,7 +636,7 @@ export function HomePageClient() {
                       </CardContent>
                     </Card>
                   ))
-                : latestCuts.map((cut, index: number) => (
+                : latestCuts.map((cut) => (
                     <Card key={cut.id} className="card-hover group" role="listitem">
                       <CardContent className="p-4 sm:p-6">
                         <div className="flex items-center justify-between">
@@ -674,10 +706,6 @@ export function HomePageClient() {
           <Card className="gradient-border">
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 text-red-600 font-medium bg-red-50 px-3 sm:px-4 py-2 rounded-full border border-red-200 text-sm">
-                  <AlertTriangle className="h-4 w-5" aria-hidden="true" />
-                  <span>[LIVE] Tracking higher education cuts and institutional changes</span>
-                </div>
                 <p className="text-muted-foreground text-base sm:text-lg">
                   Have information about program cuts or institutional changes?{" "}
                   <Link href="/submit-tip" className="text-primary hover:text-primary/80 font-medium hover:underline">

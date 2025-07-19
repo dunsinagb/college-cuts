@@ -123,28 +123,20 @@ export default function SubmitTipPage() {
     setIsLoading(true)
 
     try {
-      const client = supabase()
-      if (!client) {
-        throw new Error("Supabase client not available")
-      }
-
-      const { error } = await client.from("tips").insert({
-        institution: formData.institution,
-        program: formData.cutDetails,
-        cut_type: formData.relationship,
-        announcement_date: formData.sourceInfo,
-        effective_term: formData.sourceInfo,
-        students_affected: formData.sourceInfo ? parseInt(formData.sourceInfo) : null,
-        source_url: formData.sourceInfo ? formData.sourceInfo : null,
-        notes: formData.sourceInfo ? formData.sourceInfo : null,
-        contact_email: formData.email,
+      const response = await fetch('/api/submit-tip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       })
 
-      if (error) {
-        console.error("Error submitting tip:", error)
-        throw new Error(error.message)
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to submit tip')
       }
 
+      const result = await response.json()
       setIsSubmitted(true)
     } catch (error) {
       console.error("Error submitting tip:", error)

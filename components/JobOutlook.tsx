@@ -30,16 +30,27 @@ import * as XLSX from 'xlsx';
 type SortField = 'title' | 'entry_education' | 'median_wage' | 'employment_level' | 'annual_openings' | 'unemployment_rate';
 type SortDirection = 'asc' | 'desc' | null;
 
+// Extended interface for jobs with related majors information
+interface JobWithRelatedMajors extends MajorJobMatch {
+  relatedMajors: string[];
+  hasVariations: boolean;
+}
+
 export function JobOutlook() {
-  const [major, setMajor] = useState('');
+  const [major, setMajor] = useState('Computer Science');
   const [educationFilter, setEducationFilter] = useState('all');
   const [salaryFilter, setSalaryFilter] = useState('all');
-  const [filteredJobs, setFilteredJobs] = useState<MajorJobMatch[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<JobWithRelatedMajors[]>([]);
   const [sortField, setSortField] = useState<SortField>('title');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const tableRef = useRef<HTMLTableElement>(null);
   
   const { jobs, loading, error, fetchJobs } = useJobOutlook();
+
+  // Load Computer Science data by default
+  useEffect(() => {
+    fetchJobs('Computer Science');
+  }, [fetchJobs]);
 
   // Apply filters and sorting whenever jobs, filters, or sort changes
   useEffect(() => {
@@ -70,8 +81,50 @@ export function JobOutlook() {
       return true;
     });
 
+    // Group jobs by title and collect related majors
+    const jobGroups = filtered.reduce((acc, job) => {
+      if (!acc[job.title]) {
+        acc[job.title] = {
+          job: job,
+          relatedMajors: [major],
+          variations: [job]
+        };
+      } else {
+        acc[job.title].variations.push(job);
+        // Keep track of which major this variation came from
+        if (!acc[job.title].relatedMajors.includes(major)) {
+          acc[job.title].relatedMajors.push(major);
+        }
+      }
+      return acc;
+    }, {} as Record<string, { job: MajorJobMatch; relatedMajors: string[]; variations: MajorJobMatch[] }>);
+
+    // For each job title, select the best representative data
+    const consolidatedJobs = Object.values(jobGroups).map(group => {
+      // If there are multiple variations, select the one with the most complete data
+      if (group.variations.length > 1) {
+        const bestJob = group.variations.reduce((best, current) => {
+          const bestNulls = Object.values(best).filter(v => v === null || v === undefined).length;
+          const currentNulls = Object.values(current).filter(v => v === null || v === undefined).length;
+          return currentNulls < bestNulls ? current : best;
+        });
+        
+        return {
+          ...bestJob,
+          relatedMajors: group.relatedMajors,
+          hasVariations: true
+        };
+      }
+      
+      return {
+        ...group.job,
+        relatedMajors: group.relatedMajors,
+        hasVariations: false
+      };
+    });
+
     // Apply sorting
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...consolidatedJobs].sort((a, b) => {
       let aValue: any = a[sortField];
       let bValue: any = b[sortField];
 
@@ -97,9 +150,9 @@ export function JobOutlook() {
       }
     });
     
-    console.log(`✅ Filtered and sorted ${jobs.length} jobs to ${sorted.length} jobs`);
+    console.log(`✅ Filtered and sorted ${jobs.length} jobs to ${sorted.length} unique jobs`);
     setFilteredJobs(sorted);
-  }, [jobs, educationFilter, salaryFilter, sortField, sortDirection]);
+  }, [jobs, educationFilter, salaryFilter, sortField, sortDirection, major]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -159,30 +212,6 @@ export function JobOutlook() {
     return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanTitle)}`;
   };
 
-  // Function to create unique job identifier to differentiate duplicates
-  const getUniqueJobId = (job: MajorJobMatch, index: number) => {
-    // Create a unique identifier based on SOC, title, and index
-    return `${job.soc}-${job.title.replace(/[^a-zA-Z0-9]/g, '')}-${index}`;
-  };
-
-  // Function to format job title with duplicate indicator
-  const formatJobTitle = (job: MajorJobMatch, index: number, allJobs: MajorJobMatch[]) => {
-    const sameTitleJobs = allJobs.filter(j => j.title === job.title);
-    
-    if (sameTitleJobs.length > 1) {
-      // Find the position of this job among duplicates (1-based)
-      const duplicateIndex = sameTitleJobs.findIndex(j => 
-        j.soc === job.soc && 
-        j.median_wage === job.median_wage && 
-        j.employment_level === job.employment_level
-      ) + 1;
-      
-      return `${job.title} (${duplicateIndex})`;
-    }
-    
-    return job.title;
-  };
-
   const formatSalary = (salary: number | null) => {
     if (!salary) return 'N/A';
     return `$${salary.toLocaleString()}`;
@@ -215,6 +244,54 @@ export function JobOutlook() {
             Discover median salaries, employment levels, and annual job openings for occupations related to your major.
           </p>
         </div>
+
+        {/* Data Source Information */}
+        <Card className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-gray-800">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Data Source & Methodology
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4 text-blue-600" />
+                  U.S. Bureau of Labor Statistics (BLS)
+                </h4>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Job outlook data is sourced directly from the BLS API, providing real-time access to:
+                </p>
+                <ul className="text-sm text-gray-600 space-y-1 ml-4">
+                  <li>• Median annual wages and salary data</li>
+                  <li>• Employment levels and growth projections</li>
+                  <li>• Annual job openings and replacement needs</li>
+                  <li>• Educational requirements for occupations</li>
+                  <li>• State-specific wage data for major markets</li>
+                </ul>
+              </div>
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                  Professional Notes
+                </h4>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• <strong>Data Currency:</strong> BLS data is updated quarterly and reflects the most recent labor market conditions</li>
+                  <li>• <strong>Methodology:</strong> Uses Standard Occupational Classification (SOC) codes for accurate job matching</li>
+                  <li>• <strong>Coverage:</strong> Includes all major occupation categories across the U.S. economy</li>
+                  <li>• <strong>Reliability:</strong> Government-sourced data ensures accuracy and consistency</li>
+                  <li>• <strong>Limitations:</strong> Some emerging roles may use placeholder data when BLS series are unavailable</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>💡 Tip:</strong> You can search for any major to explore related career opportunities.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
         {/* Search Section */}
         <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
@@ -223,7 +300,7 @@ export function JobOutlook() {
               Search by Major
             </CardTitle>
             <CardDescription>
-              Enter your major to explore related career opportunities and salary data
+              Computer Science data is loaded by default. Enter any major to explore related career opportunities and salary data.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -419,11 +496,9 @@ export function JobOutlook() {
                     Export
                   </Button>
                 </div>
-                {jobs.filter(j => jobs.filter(j2 => j2.title === j.title).length > 1).length > 0 && (
-                  <CardDescription className="text-sm text-blue-600">
-                    💡 Jobs with numbers in parentheses (e.g., "Software Developers (1)") are duplicates with different data from various majors.
+                <CardDescription className="text-sm text-gray-600">
+                  Showing {filteredJobs.length} unique occupations related to {major}
                   </CardDescription>
-                )}
               </CardHeader>
               <CardContent>
                 {filteredJobs.length === 0 ? (
@@ -496,8 +571,8 @@ export function JobOutlook() {
                       </TableHeader>
                       <TableBody>
                         {filteredJobs.map((job, index) => (
-                          <TableRow key={getUniqueJobId(job, index)}>
-                            <TableCell className="font-medium">{formatJobTitle(job, index, jobs)}</TableCell>
+                          <TableRow key={`${job.soc}-${job.title.replace(/[^a-zA-Z0-9]/g, '')}`}>
+                            <TableCell className="font-medium">{job.title}</TableCell>
                             <TableCell>
                               {job.entry_education || 'N/A'}
                             </TableCell>
@@ -517,6 +592,7 @@ export function JobOutlook() {
                               <Button
                                 variant="outline"
                                 size="sm"
+                                className="h-7 px-2 text-xs"
                                 onClick={() => window.open(getLinkedInUrl(job.title), '_blank')}
                               >
                                 <ExternalLink className="h-3 w-3 mr-1" />

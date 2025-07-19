@@ -207,7 +207,7 @@ export default function RootLayout({
           <header role="banner">
           <Header />
           </header>
-          <main id="main-content" className="flex-1 w-full max-w-[var(--max-width)] mx-auto" role="main">
+          <main id="main-content" className="flex-1 w-full max-w-[var(--max-width)] mx-auto pt-20" role="main">
             {children}
           </main>
           <footer className="mx-auto max-w-5xl w-full px-4" role="contentinfo">

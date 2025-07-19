@@ -101,9 +101,9 @@ export default async function CutDetailsPage({
               <div>
                 <span className="font-medium">State:</span> {cut.state}
               </div>
-              {cut.program_name && (
+              {cut.notes && (
                 <div>
-                  <span className="font-medium">Program:</span> {cut.program_name}
+                  <span className="font-medium">Notes:</span> {cut.notes}
                 </div>
               )}
             </CardContent>
@@ -115,30 +115,26 @@ export default async function CutDetailsPage({
                 <CardTitle>Source Information</CardTitle>
               </CardHeader>
               <CardContent>
+                <div className="space-y-2">
+                  {cut.publication && (
+                    <div>
+                      <span className="font-medium">Publication:</span> {cut.publication}
+                    </div>
+                  )}
                 <a
                   href={cut.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
-                  {cut.source_publication || "View Source"}
+                    View Source
                   <ExternalLink className="h-4 w-4 ml-2" />
                 </a>
+                </div>
               </CardContent>
             </Card>
           )}
         </div>
-
-        {cut.notes && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Additional Notes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose dark:prose-invert max-w-none">{cut.notes}</div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   )

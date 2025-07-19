@@ -56,7 +56,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm" style={{ position: 'fixed', top: 0 }}>
       <div className="flex items-center justify-between w-full h-20 px-4 md:px-8">
         {/* Logo */}
         <div className="flex items-center space-x-4 min-w-0">
