@@ -391,6 +391,7 @@ export function CutsDataGrid() {
     try {
       const headers = [
         "Institution",
+        "Program Name",
         "State",
         "Cut Type",
         "Announcement Date",
@@ -409,7 +410,8 @@ export function CutsDataGrid() {
         headers.join(","),
         ...filteredCuts.map((cut) =>
           [
-            `"${cut.institution.replace(/"/g, '""')}"`,
+            `"${cut.institution.replace(/"/g, '""')}`,
+            cut.program_name ? `"${cut.program_name.replace(/"/g, '""')}"` : "",
             cut.state,
             cut.cut_type,
             cut.announcement_date,
@@ -519,8 +521,8 @@ export function CutsDataGrid() {
                 >
                 <X className="h-3 w-3 mr-1" />
                   Clear All
-              </Button>
-            )}
+                </Button>
+              )}
           </div>
         </CardHeader>
         <CardContent className="pt-3 space-y-4">
@@ -765,12 +767,22 @@ export function CutsDataGrid() {
             </div>
           </div>
 
-          {/* Results Summary */}
-          <div className="flex items-center justify-center text-sm text-gray-600 pt-3 border-t border-gray-200">
+          {/* Results Summary and Export Button */}
+          <div className="flex items-center justify-between text-sm text-gray-600 pt-3 border-t border-gray-200">
             <div className="bg-gray-50 px-4 py-2 rounded-full border">
               Showing <span className="font-semibold text-gray-900">{filteredCuts.length}</span> of{" "}
               <span className="font-semibold text-gray-900">{cuts.length}</span> total cuts
             </div>
+            <Button
+              onClick={downloadCSV}
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300 ml-4"
+              aria-label={`Export ${filteredCuts.length} cuts to CSV`}
+            >
+              <Download className="h-3 w-3 mr-1" aria-hidden="true" />
+              Export ({filteredCuts.length})
+            </Button>
           </div>
         </CardContent>
       </Card>

@@ -237,17 +237,6 @@ export default function SubmitTipPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Screenshot (optional)</label>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      ex. of internal memo or email. Used for verification; will not be made public
-                    </p>
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-                      <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">Drop files here or click to upload</p>
-                    </div>
-                  </div>
-
-                  <div>
                     <label htmlFor="relationship" className="block text-sm font-medium mb-2">
                       What is your relationship to this organization? <span className="text-red-500">*</span>
                     </label>
