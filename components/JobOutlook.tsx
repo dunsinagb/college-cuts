@@ -189,21 +189,38 @@ export function JobOutlook() {
 
   // Export function
   const exportToCSV = () => {
-    const data = filteredJobs.map(job => ({
-      title: job.title,
-      soc: job.soc,
-      median_wage: job.median_wage,
-      employment_level: job.employment_level,
-      annual_openings: job.annual_openings,
-      entry_education: job.entry_education,
-      unemployment_rate: job.unemployment_rate,
-      major: major
-    }));
+    const headers = [
+      'Job Title',
+      'Required Education',
+      'Median Salary',
+      'Employment Level',
+      'Annual Openings',
+      'Unemployment Rate'
+    ];
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Job Outlook Data');
-    XLSX.writeFile(wb, `job-outlook-${major}.xlsx`);
+    const data = filteredJobs.map(job => [
+      job.title,
+      job.entry_education || 'N/A',
+      formatSalary(job.median_wage),
+      formatEmployment(job.employment_level),
+      formatOpenings(job.annual_openings),
+      job.unemployment_rate ? `${job.unemployment_rate.toFixed(2)}%` : 'N/A'
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `job-outlook-${major}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   };
 
   const getLinkedInUrl = (jobTitle: string) => {

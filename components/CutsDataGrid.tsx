@@ -390,40 +390,36 @@ export function CutsDataGrid() {
   async function downloadCSV() {
     try {
       const headers = [
+        "Date",
         "Institution",
-        "Program Name",
+        "Control",
         "State",
         "Cut Type",
-        "Announcement Date",
-        "Effective Term",
-        "Students Affected",
-        "Faculty Affected",
-        "Control",
-        "Notes",
-        "Source URL",
-        "Source Publication",
-        "Created At",
-        "Updated At",
+        "Students",
+        "Faculty",
+        "Source"
       ]
 
       const csvContent = [
         headers.join(","),
         ...filteredCuts.map((cut) =>
           [
-            `"${cut.institution.replace(/"/g, '""')}`,
-            cut.program_name ? `"${cut.program_name.replace(/"/g, '""')}"` : "",
-            cut.state,
-            cut.cut_type,
-            cut.announcement_date,
-            cut.effective_term || "",
-            cut.students_affected || "",
-            cut.faculty_affected || "",
-            cut.control || "",
-            cut.notes ? `"${cut.notes.replace(/"/g, '""')}"` : "",
-            cut.source_url || "",
-            cut.source_publication ? `"${cut.source_publication.replace(/"/g, '""')}"` : "",
-            cut.created_at,
-            cut.updated_at,
+            // Date (formatted as in table)
+            `"${new Date(cut.announcement_date).toLocaleDateString().replace(/"/g, '""')}"`,
+            // Institution
+            `"${(cut.institution || '').replace(/"/g, '""')}"`,
+            // Control
+            `"${(cut.control || '').replace(/"/g, '""')}"`,
+            // State
+            `"${(cut.state || '').replace(/"/g, '""')}"`,
+            // Cut Type
+            `"${(cut.cut_type || '').replace(/"/g, '""').replace("_", " ")}"`,
+            // Students
+            `"${cut.students_affected ? cut.students_affected.toLocaleString() : ''}"`,
+            // Faculty
+            `"${cut.faculty_affected ? cut.faculty_affected.toLocaleString() : ''}"`,
+            // Source (URL)
+            `"${(cut.source_url || '').replace(/"/g, '""')}"`
           ].join(","),
         ),
       ].join("\n")
