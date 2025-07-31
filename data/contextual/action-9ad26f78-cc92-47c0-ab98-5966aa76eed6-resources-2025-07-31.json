@@ -1,32 +1,24 @@
 {
   "transferAssistance": [
     {
-      "title": "UT System Transfer Services",
-      "url": "https://www.utsystem.edu",
+      "title": "National Student Clearinghouse",
+      "url": "https://www.studentclearinghouse.org",
       "description": "Transfer assistance for UT system students affected by program changes",
       "institution": "University of Southern California",
       "state": "CA",
       "relevanceScore": 15,
-      "source": "UT System"
+      "source": "National Student Clearinghouse"
     }
   ],
   "careerCounseling": [
     {
       "title": "National Career Development Association",
       "url": "https://www.ncda.org",
-      "description": "Career counseling and job placement for laid-off faculty",
-      "state": "CA",
-      "relevanceScore": 15,
-      "source": "Faculty Career Network"
-    },
-    {
-      "title": "UT Career Services",
-      "url": "https://career.utexas.edu",
       "description": "Career counseling and job placement for UT students and faculty",
       "institution": "University of Southern California",
       "state": "CA",
       "relevanceScore": 12,
-      "source": "UT Career Services"
+      "source": "National Career Development Association"
     },
     {
       "title": "CareerOneStop Transition",

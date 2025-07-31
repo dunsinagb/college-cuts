@@ -1,55 +1,38 @@
 {
   "transferAssistance": [
     {
-      "title": "Texas Transfer Network",
-      "url": "https://www.txhighereddata.org/transfer",
-      "description": "Official Texas higher education transfer resources and articulation agreements",
+      "title": "National Student Clearinghouse",
+      "url": "https://www.studentclearinghouse.org",
+      "description": "Official transfer verification and student record services",
       "state": "TX",
       "relevanceScore": 15,
-      "source": "Texas Higher Education Coordinating Board"
-    },
-    {
-      "title": "King's College Transfer Resources",
-      "url": "https://www.tkc.edu",
-      "description": "Transfer assistance for King's College students",
-      "institution": "Texas A&M University–Kingsville",
-      "state": "TX",
-      "relevanceScore": 15,
-      "source": "The King's College"
-    },
-    {
-      "title": "University of Texas Transfer Services",
-      "url": "https://admissions.utexas.edu/transfer",
-      "description": "Transfer assistance and credit evaluation for UT system students",
-      "state": "TX",
-      "relevanceScore": 12,
-      "source": "University of Texas"
+      "source": "National Student Clearinghouse"
     },
     {
       "title": "College Transfer Guide",
       "url": "https://www.collegetransfer.net",
-      "description": "Transfer assistance to programs with strong enrollment",
+      "description": "Step-by-step guidance for transferring credits and programs",
       "state": "TX",
       "relevanceScore": 12,
-      "source": "Transfer Network"
+      "source": "College Transfer Guide"
     }
   ],
   "careerCounseling": [
     {
       "title": "National Career Development Association",
       "url": "https://www.ncda.org",
-      "description": "Career counseling and job placement for laid-off faculty",
-      "state": "TX",
-      "relevanceScore": 15,
-      "source": "Faculty Career Network"
-    },
-    {
-      "title": "Texas Workforce Commission",
-      "url": "https://www.twc.texas.gov",
-      "description": "State career services and job placement assistance",
+      "description": "Professional career counseling resources and guidance for career transitions",
       "state": "TX",
       "relevanceScore": 12,
-      "source": "Texas Government"
+      "source": "National Career Development Association"
+    },
+    {
+      "title": "CareerOneStop",
+      "url": "https://www.careeronestop.org",
+      "description": "Federal career resources and job search assistance",
+      "state": "TX",
+      "relevanceScore": 10,
+      "source": "Federal Government"
     }
   ],
   "legalAid": [
@@ -60,15 +43,15 @@
       "institution": "Texas A&M University–Kingsville",
       "state": "TX",
       "relevanceScore": 12,
-      "source": "Student Rights Organization"
+      "source": "Student Borrower Protection Center"
     },
     {
-      "title": "Texas Legal Services Center",
-      "url": "https://www.tlsc.org",
-      "description": "Free legal assistance for Texas residents",
+      "title": "Legal Services Corporation",
+      "url": "https://www.lsc.gov",
+      "description": "Free legal aid resources for students and families",
       "state": "TX",
       "relevanceScore": 10,
-      "source": "Legal Aid"
+      "source": "Federal Government"
     }
   ],
   "mentalHealth": [

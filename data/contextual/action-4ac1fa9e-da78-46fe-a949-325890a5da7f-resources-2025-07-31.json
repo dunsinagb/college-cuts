@@ -1,50 +1,33 @@
 {
   "transferAssistance": [
     {
-      "title": "New York State Transfer and Articulation Association",
-      "url": "https://www.nystaa.org",
-      "description": "NY transfer resources and articulation agreements",
-      "state": "NY",
-      "relevanceScore": 15,
-      "source": "NYS Transfer Association"
-    },
-    {
-      "title": "King's College Transfer Resources",
-      "url": "https://www.tkc.edu",
-      "description": "Transfer assistance for King's College students",
-      "institution": "The King's College",
-      "state": "NY",
-      "relevanceScore": 15,
-      "source": "The King's College"
-    },
-    {
       "title": "National Student Clearinghouse",
       "url": "https://www.studentclearinghouse.org",
-      "description": "Transfer assistance to accredited institutions",
+      "description": "Official transfer verification and student record services",
       "state": "NY",
-      "relevanceScore": 12,
-      "source": "Transfer Network"
+      "relevanceScore": 15,
+      "source": "National Student Clearinghouse"
     }
   ],
   "careerCounseling": [
     {
-      "title": "New York State Department of Labor",
-      "url": "https://www.labor.ny.gov",
-      "description": "State career services and job placement",
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Professional career counseling resources and guidance for career transitions",
       "state": "NY",
       "relevanceScore": 12,
-      "source": "New York Government"
+      "source": "National Career Development Association"
+    },
+    {
+      "title": "CareerOneStop",
+      "url": "https://www.careeronestop.org",
+      "description": "Federal career resources and job search assistance",
+      "state": "NY",
+      "relevanceScore": 10,
+      "source": "Federal Government"
     }
   ],
   "legalAid": [
-    {
-      "title": "Legal Services Corporation",
-      "url": "https://www.lsc.gov",
-      "description": "Legal assistance for students affected by accreditation issues",
-      "state": "NY",
-      "relevanceScore": 15,
-      "source": "Legal Services"
-    },
     {
       "title": "Student Borrower Protection Center",
       "url": "https://protectborrowers.org",
@@ -52,15 +35,15 @@
       "institution": "The King's College",
       "state": "NY",
       "relevanceScore": 12,
-      "source": "Student Rights Organization"
+      "source": "Student Borrower Protection Center"
     },
     {
-      "title": "Legal Aid Society of New York",
-      "url": "https://www.legalaidnyc.org",
-      "description": "Free legal services for New York residents",
+      "title": "Legal Services Corporation",
+      "url": "https://www.lsc.gov",
+      "description": "Free legal aid resources for students and families",
       "state": "NY",
       "relevanceScore": 10,
-      "source": "Legal Aid"
+      "source": "Federal Government"
     }
   ],
   "mentalHealth": [],
