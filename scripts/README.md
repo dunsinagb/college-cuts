@@ -1,244 +1,138 @@
-# Performance Testing Scripts
+# CollegeCuts Resource Scraper
 
-## Overview
+This directory contains web scraping scripts for gathering contextual resources for students and faculty affected by institutional actions.
 
-This directory contains performance testing utilities for the CollegeCuts application.
+## 🎯 Contextual Resource System
 
-## Performance Test (`performance-test.js`)
+The system now provides **contextual resources** that are specifically tailored to each action's unique situation:
 
-A comprehensive performance testing script that measures latency for API endpoints.
+- **Institution-specific resources** from the actual university websites
+- **State-specific resources** relevant to the geographic location
+- **Action type-specific resources** (program suspension, department closure, etc.)
+- **Primary reason-specific resources** (budget deficit, enrollment decline, etc.)
 
-### Features
+## 📁 Files
 
-- **100 iterations** per endpoint for statistical significance
-- **P50, P90, P95, P99 latency** measurements
-- **Slow request detection** (>300ms threshold)
-- **Error tracking** and reporting
-- **Performance recommendations** based on results
-- **Progress indicators** during long test runs
+### Core Scrapers
 
-### Usage
+- `contextual-resource-scraper.js` - Main contextual resource scraper
+- `advanced-resource-scraper.js` - General resource scraper (fallback)
+- `run-contextual-scraping.js` - Bulk processing script
 
-```bash
-# Test against localhost:3000 (default)
-npm run perf-test
+### Utilities
 
-# Test against specific URL
-BASE_URL=http://localhost:3001 npm run perf-test
+- `update-contextual-resources.sh` - Automated update script
+- `package.json` - Dependencies and scripts
 
-# Test against production
-BASE_URL=https://your-domain.com npm run perf-test
-```
+## 🚀 Usage
 
-## Quick Performance Check (`quick-perf-check.js`)
-
-A lightweight performance check for development and CI/CD pipelines.
-
-### Features
-
-- **10 iterations** per endpoint for fast feedback
-- **P95 latency** measurement only
-- **Quick pass/fail** assessment
-- **Minimal output** for automation
-
-### Usage
+### Install Dependencies
 
 ```bash
-# Quick check against localhost:3000 (default)
-npm run perf-quick
-
-# Quick check against specific URL
-BASE_URL=http://localhost:3001 npm run perf-quick
+cd scripts
+npm install
 ```
 
-## Realtime Message Profiler (`realtime-profile.js`)
+### Scrape Contextual Resources
 
-A specialized script to profile Supabase realtime subscription message sizes and optimize data transmission.
-
-### Features
-
-- **20 test inserts** to measure realtime message sizes
-- **Message size analysis** with min/max/average statistics
-- **Payload structure breakdown** by column
-- **Optimization recommendations** for large messages
-- **Automatic cleanup** of test data
-- **Threshold-based alerts** (>2KB average)
-
-### Usage
+**For July 2025+ actions:**
 
 ```bash
-# Profile realtime messages (requires Supabase env vars)
-npm run realtime-profile
+npm run scrape:recent
 ```
 
-### Output Example
+**For a specific action:**
 
-```
-🚀 Supabase Realtime Message Size Profiler
-==========================================
-Target inserts: 20
-Size threshold: 2 KB
-Supabase URL: https://your-project.supabase.co
-
-🔌 Setting up realtime subscription...
-✅ Realtime subscription active
-
-📝 Inserting 20 test records...
-✅ Insert 1 completed
-✅ Insert 2 completed
-...
-
-📨 Message 1: 1.2 KB
-📨 Message 2: 1.3 KB
-...
-
-📊 Realtime Message Size Analysis
-==================================
-📈 Statistics:
-   Messages received: 20
-   Total size: 25.6 KB
-   Average size: 1.28 KB
-   Min size: 1.2 KB
-   Max size: 1.4 KB
-
-🎯 Threshold Analysis:
-   Average: 1.28 KB
-   Threshold: 2 KB
-✅ Average message size is within acceptable range
-
-📋 Largest Messages:
-   Message 15: 1.4 KB
-   Message 8: 1.35 KB
-   Message 12: 1.33 KB
-
-🔍 Payload Structure Analysis:
-   Total payload size: 1.28 KB
-   Data size: 1.1 KB
-   Columns (9): id, institution, program, cut_type, description, state, control, source, created_at, updated_at
-
-📏 Column Sizes:
-   id: 0.05 KB
-   institution: 0.15 KB
-   program: 0.12 KB
-   cut_type: 0.08 KB
-   description: 0.45 KB
-   state: 0.02 KB
-   control: 0.03 KB
-   source: 0.08 KB
-   created_at: 0.12 KB
-   updated_at: 0.12 KB
+```bash
+npm run scrape:specific action-id-here
 ```
 
-### What it tests
+**Automated updates:**
 
-1. **GET /api/cuts** - Database query performance
-2. **POST /api/submit-tip** - Form submission and email processing
-
-### Output Example
-
-```
-🚀 Performance Test Suite
-========================
-Base URL: http://localhost:3000
-Iterations: 100
-Slow threshold: 300ms
-
-🧪 Testing GET /api/cuts...
-📊 Running 100 iterations...
-   Progress: 100/100
-
-📈 Results:
-   Count: 100 successful requests
-   Min: 45ms
-   Max: 289ms
-   Mean: 156.23ms
-   P50: 142ms
-   P90: 198ms
-   P95: 245ms
-   P99: 289ms
-
-🔧 Recommendations for /api/cuts:
-💡 Consider adding database indexes on:
-   - institution, program, cut_type columns
-   - created_at for time-based queries
-   - state for geographic filtering
-💡 Consider implementing server-side caching with Redis
-💡 Use Supabase connection pooling for better performance
+```bash
+npm run auto:once                    # Run once
+npm run auto:monitor                 # Start monitoring (checks every 60 minutes)
 ```
 
-### Performance Thresholds
+**Manual updates:**
 
-- **Good**: P95 < 200ms
-- **Acceptable**: P95 < 300ms
-- **Needs optimization**: P95 > 300ms
+```bash
+./update-contextual-resources.sh
+```
 
-### Realtime Optimization Recommendations
+## 📊 Contextual Intelligence
 
-When message sizes exceed 2KB average, the script suggests:
+### Action Type Matching
 
-#### 1. 📋 Minimal Column Selection
+- `program_suspension` → Transfer assistance, alternative programs
+- `department_closure` → Career counseling, transfer resources
+- `campus_closure` → Relocation assistance, transfer networks
+- `institution_closure` → Emergency transfer, legal rights
+- `staff_layoff` → Career services, employment assistance
+- `teach_out` → Completion resources, graduation planning
 
-- Only subscribe to essential columns: `id`, `institution`, `program`, `cut_type`, `state`
-- Exclude large text fields like `description` from realtime updates
-- Use separate API calls for detailed data when needed
+### Primary Reason Matching
 
-#### 2. ⏱️ Throttling Strategies
+- `Budget Deficit` → Financial aid, emergency funds
+- `Federal Funding Cuts` → Legal resources, alternative funding
+- `State Mandates` → Legal resources, policy information
+- `Enrollment Decline` → Transfer assistance, alternative programs
+- `Accreditation Issues` → Legal support, transfer to accredited institutions
 
-- Implement debouncing for rapid updates
-- Use batch updates instead of individual inserts
-- Consider polling for less critical updates
+### Geographic Intelligence
 
-#### 3. 🗂️ Data Structure Optimization
+- **Texas**: UT System resources, Texas Transfer Network, Texas Workforce Commission
+- **Illinois**: Illinois Articulation Initiative, Illinois Department of Employment Security
+- **New York**: NYS Transfer Association, NY Department of Labor
+- **Other States**: State-specific resources and legal aid
 
-- Truncate long text fields in realtime payloads
-- Use abbreviated field names
-- Implement delta updates (only changed fields)
+## 🔄 Data Flow
 
-#### 4. 🔧 Technical Optimizations
+1. **Scraper** → Generates contextual resources based on action details
+2. **API Route** (`/api/resources`) → Serves contextual resources with relevance filtering
+3. **ResourceSection Component** → Displays contextual resources on action detail pages
+4. **Fallback System** → Provides general resources if no contextual data exists
 
-- Use Supabase's built-in filtering to reduce payload size
-- Implement client-side caching to reduce redundant data
-- Consider using WebSocket compression if available
+## 📈 Example Contextual Resources
 
-#### 5. 📊 Monitoring
+### University of Texas at Dallas (Department Closure)
 
-- Set up alerts for message size spikes
-- Monitor realtime subscription performance
-- Track bandwidth usage over time
+- **Transfer Assistance**: Texas Transfer Network, UT System Transfer Services
+- **Career Counseling**: Department Closure Career Support, Texas Workforce Commission
+- **Legal Aid**: Texas Legal Services Center
+- **Financial Aid**: Emergency Financial Aid for budget cuts
 
-### Recommendations
+### Northwestern University (Staff Layoff)
 
-The script provides specific recommendations based on performance results:
+- **Career Counseling**: Northwestern Career Services, Faculty Layoff Career Support
+- **Mental Health**: Northwestern Counseling Services, Faculty Mental Health Support
+- **Legal Aid**: Federal Funding Rights, Legal Aid Chicago
+- **Financial Aid**: Alternative Funding Sources for federal cuts
 
-#### For `/api/cuts`:
+### The King's College (Institution Closure)
 
-- Database indexing strategies
-- Caching implementations
-- Connection pooling
-- Query optimization
+- **Transfer Assistance**: NYS Transfer Association, Emergency Transfer Resources
+- **Legal Aid**: Accreditation Legal Support, Institution Closure Legal Rights
+- **Career Counseling**: Emergency Career Support
 
-#### For `/api/submit-tip`:
+## 🎯 Benefits
 
-- Rate limiting
-- Email validation caching
-- Async processing
-- Queue systems
+1. **Highly Relevant**: Each action gets resources specifically tailored to its situation
+2. **Geographic Accuracy**: Resources match the actual state and institution
+3. **Action-Specific Support**: Different types of actions get different types of resources
+4. **Primary Reason Context**: Resources address the underlying cause of the action
+5. **Real-Time Updates**: Resources are generated fresh for each action
 
-### Environment Variables
+## 🔧 Configuration
 
-- `BASE_URL`: Target server URL (default: http://localhost:3000)
-- `ITERATIONS`: Number of test iterations (default: 100 for full test, 10 for quick check)
-- `SLOW_THRESHOLD_MS`: Latency threshold for slow requests (default: 300)
-- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL (required for realtime profiling)
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key (required for realtime profiling)
+The scraper uses environment variables from `../.env`:
 
-### Integration
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-These scripts can be integrated into:
+## �� Output
 
-- CI/CD pipelines for performance regression testing
-- Pre-deployment validation
-- Load testing scenarios
-- Performance monitoring dashboards
-- Development workflow for quick feedback
-- Realtime optimization analysis
+Contextual resources are saved to `../data/contextual/` with filenames like:
+`action-{id}-resources-{date}.json`
+
+Each file contains categorized resources with relevance scores and metadata.

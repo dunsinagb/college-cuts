@@ -1,0 +1,36 @@
+{
+    "name": "college-cuts-resource-scraper",
+    "version": "1.0.0",
+    "description": "Web scraper for gathering contextual resources for affected students and faculty",
+    "main": "contextual-resource-scraper.js",
+    "scripts": {
+        "scrape": "node advanced-resource-scraper.js",
+        "scrape:dev": "node advanced-resource-scraper.js --dev",
+        "scrape:contextual": "node contextual-resource-scraper.js",
+        "scrape:recent": "node run-contextual-scraping.js recent",
+        "scrape:july2025": "node run-contextual-scraping.js recent",
+        "scrape:specific": "node run-contextual-scraping.js specific",
+        "auto:once": "node auto-contextual-updater.js once",
+        "auto:monitor": "node auto-contextual-updater.js monitor"
+    },
+    "dependencies": {
+        "puppeteer": "^21.0.0",
+        "cheerio": "^1.0.0-rc.12",
+        "axios": "^1.6.0",
+        "@supabase/supabase-js": "^2.38.0",
+        "dotenv": "^16.3.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.0"
+    },
+    "keywords": [
+        "web-scraping",
+        "higher-education",
+        "resources",
+        "puppeteer",
+        "contextual",
+        "supabase"
+    ],
+    "author": "CollegeCuts Team",
+    "license": "MIT"
+}
