@@ -1,0 +1,26 @@
+{
+  "transferAssistance": [],
+  "careerCounseling": [
+    {
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Career counseling and job placement for laid-off faculty",
+      "state": "KY",
+      "relevanceScore": 15,
+      "source": "Faculty Career Network"
+    }
+  ],
+  "legalAid": [],
+  "mentalHealth": [
+    {
+      "title": "National Alliance on Mental Illness",
+      "url": "https://www.nami.org",
+      "description": "Mental health support for faculty affected by layoffs",
+      "state": "KY",
+      "relevanceScore": 12,
+      "source": "Faculty Wellness Network"
+    }
+  ],
+  "financialAid": [],
+  "academicSupport": []
+}

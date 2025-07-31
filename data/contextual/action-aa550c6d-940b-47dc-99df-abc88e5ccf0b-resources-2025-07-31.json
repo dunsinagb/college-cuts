@@ -1,0 +1,94 @@
+{
+  "transferAssistance": [
+    {
+      "title": "Texas Transfer Network",
+      "url": "https://www.txhighereddata.org/transfer",
+      "description": "Official Texas higher education transfer resources and articulation agreements",
+      "state": "TX",
+      "relevanceScore": 15,
+      "source": "Texas Higher Education Coordinating Board"
+    },
+    {
+      "title": "UT System Transfer Services",
+      "url": "https://www.utsystem.edu",
+      "description": "Transfer assistance for UT system students affected by program changes",
+      "institution": "University of Texas at Dallas",
+      "state": "TX",
+      "relevanceScore": 15,
+      "source": "UT System"
+    },
+    {
+      "title": "University of Texas Transfer Services",
+      "url": "https://admissions.utexas.edu/transfer",
+      "description": "Transfer assistance and credit evaluation for UT system students",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "University of Texas"
+    },
+    {
+      "title": "College Transfer Guide",
+      "url": "https://www.collegetransfer.net",
+      "description": "Transfer assistance for students in closed departments",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Transfer Network"
+    }
+  ],
+  "careerCounseling": [
+    {
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Career counseling for faculty and students affected by department closures",
+      "state": "TX",
+      "relevanceScore": 15,
+      "source": "Career Support Network"
+    },
+    {
+      "title": "Texas Workforce Commission",
+      "url": "https://www.twc.texas.gov",
+      "description": "State career services and job placement assistance",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Texas Government"
+    },
+    {
+      "title": "UT Career Services",
+      "url": "https://career.utexas.edu",
+      "description": "Career counseling and job placement for UT students and faculty",
+      "institution": "University of Texas at Dallas",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "UT Career Services"
+    },
+    {
+      "title": "CareerOneStop Transition",
+      "url": "https://www.careeronestop.org",
+      "description": "Career counseling for those affected by budget-related changes",
+      "state": "TX",
+      "relevanceScore": 10,
+      "source": "CareerOneStop"
+    }
+  ],
+  "legalAid": [
+    {
+      "title": "Texas Legal Services Center",
+      "url": "https://www.tlsc.org",
+      "description": "Free legal assistance for Texas residents",
+      "state": "TX",
+      "relevanceScore": 10,
+      "source": "Legal Aid"
+    }
+  ],
+  "mentalHealth": [],
+  "financialAid": [
+    {
+      "title": "Federal Student Aid Emergency",
+      "url": "https://studentaid.gov",
+      "description": "Emergency financial assistance for students affected by budget cuts",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Federal Student Aid"
+    }
+  ],
+  "academicSupport": []
+}

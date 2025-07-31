@@ -1,0 +1,35 @@
+{
+  "transferAssistance": [
+    {
+      "title": "National Student Clearinghouse",
+      "url": "https://www.studentclearinghouse.org",
+      "description": "Specialized transfer assistance for suspended programs",
+      "state": "TN",
+      "relevanceScore": 15,
+      "source": "Transfer Network"
+    }
+  ],
+  "careerCounseling": [
+    {
+      "title": "CareerOneStop Transition",
+      "url": "https://www.careeronestop.org",
+      "description": "Career counseling for those affected by budget-related changes",
+      "state": "TN",
+      "relevanceScore": 10,
+      "source": "CareerOneStop"
+    }
+  ],
+  "legalAid": [],
+  "mentalHealth": [],
+  "financialAid": [
+    {
+      "title": "Federal Student Aid Emergency",
+      "url": "https://studentaid.gov",
+      "description": "Emergency financial assistance for students affected by budget cuts",
+      "state": "TN",
+      "relevanceScore": 12,
+      "source": "Federal Student Aid"
+    }
+  ],
+  "academicSupport": []
+}

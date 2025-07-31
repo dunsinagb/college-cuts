@@ -1,0 +1,25 @@
+{
+  "transferAssistance": [
+    {
+      "title": "National Student Clearinghouse",
+      "url": "https://www.studentclearinghouse.org",
+      "description": "Specialized transfer assistance for suspended programs",
+      "state": "IN",
+      "relevanceScore": 15,
+      "source": "Transfer Network"
+    },
+    {
+      "title": "College Transfer Guide",
+      "url": "https://www.collegetransfer.net",
+      "description": "Transfer assistance to programs with strong enrollment",
+      "state": "IN",
+      "relevanceScore": 12,
+      "source": "Transfer Network"
+    }
+  ],
+  "careerCounseling": [],
+  "legalAid": [],
+  "mentalHealth": [],
+  "financialAid": [],
+  "academicSupport": []
+}

@@ -1,0 +1,87 @@
+{
+  "transferAssistance": [
+    {
+      "title": "Illinois Articulation Initiative",
+      "url": "https://www.itransfer.org",
+      "description": "Illinois transfer network and credit transfer resources",
+      "state": "IL",
+      "relevanceScore": 15,
+      "source": "Illinois Board of Higher Education"
+    }
+  ],
+  "careerCounseling": [
+    {
+      "title": "Northwestern Career Services",
+      "url": "https://career.northwestern.edu",
+      "description": "Career counseling and job placement for Northwestern students and faculty",
+      "institution": "Northwestern University",
+      "state": "IL",
+      "relevanceScore": 15,
+      "source": "Northwestern University"
+    },
+    {
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Career counseling and job placement for laid-off faculty",
+      "state": "IL",
+      "relevanceScore": 15,
+      "source": "Faculty Career Network"
+    },
+    {
+      "title": "Illinois Department of Employment Security",
+      "url": "https://www2.illinois.gov/ides",
+      "description": "State employment services and career counseling",
+      "state": "IL",
+      "relevanceScore": 12,
+      "source": "Illinois Government"
+    }
+  ],
+  "legalAid": [
+    {
+      "title": "Student Borrower Protection Center",
+      "url": "https://protectborrowers.org",
+      "description": "Legal resources for students affected by federal funding cuts",
+      "state": "IL",
+      "relevanceScore": 12,
+      "source": "Student Rights Organization"
+    },
+    {
+      "title": "Legal Aid Chicago",
+      "url": "https://www.legalaidchicago.org",
+      "description": "Free legal services for Illinois residents",
+      "state": "IL",
+      "relevanceScore": 10,
+      "source": "Legal Aid"
+    }
+  ],
+  "mentalHealth": [
+    {
+      "title": "Northwestern Counseling Services",
+      "url": "https://www.northwestern.edu/counseling",
+      "description": "Mental health support for Northwestern community",
+      "institution": "Northwestern University",
+      "state": "IL",
+      "relevanceScore": 12,
+      "source": "Northwestern University"
+    },
+    {
+      "title": "National Alliance on Mental Illness",
+      "url": "https://www.nami.org",
+      "description": "Mental health support for faculty affected by layoffs",
+      "state": "IL",
+      "relevanceScore": 12,
+      "source": "Faculty Wellness Network"
+    }
+  ],
+  "financialAid": [
+    {
+      "title": "Federal Student Aid",
+      "url": "https://studentaid.gov",
+      "description": "Alternative funding sources for students affected by federal cuts",
+      "state": "IL",
+      "relevanceScore": 10,
+      "source": "Federal Government"
+    }
+  ],
+  "academicSupport": []
+}

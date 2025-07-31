@@ -1,0 +1,35 @@
+{
+  "transferAssistance": [
+    {
+      "title": "National Student Clearinghouse",
+      "url": "https://www.studentclearinghouse.org",
+      "description": "Specialized transfer assistance for suspended programs",
+      "state": "WI",
+      "relevanceScore": 15,
+      "source": "Transfer Network"
+    }
+  ],
+  "careerCounseling": [],
+  "legalAid": [
+    {
+      "title": "Student Borrower Protection Center",
+      "url": "https://protectborrowers.org",
+      "description": "Legal resources for students affected by federal funding cuts",
+      "state": "WI",
+      "relevanceScore": 12,
+      "source": "Student Rights Organization"
+    }
+  ],
+  "mentalHealth": [],
+  "financialAid": [
+    {
+      "title": "Federal Student Aid",
+      "url": "https://studentaid.gov",
+      "description": "Alternative funding sources for students affected by federal cuts",
+      "state": "WI",
+      "relevanceScore": 10,
+      "source": "Federal Government"
+    }
+  ],
+  "academicSupport": []
+}

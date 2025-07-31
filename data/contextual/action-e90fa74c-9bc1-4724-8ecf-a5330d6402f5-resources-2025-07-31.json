@@ -1,0 +1,86 @@
+{
+  "transferAssistance": [
+    {
+      "title": "Texas Transfer Network",
+      "url": "https://www.txhighereddata.org/transfer",
+      "description": "Official Texas higher education transfer resources and articulation agreements",
+      "state": "TX",
+      "relevanceScore": 15,
+      "source": "Texas Higher Education Coordinating Board"
+    },
+    {
+      "title": "King's College Transfer Resources",
+      "url": "https://www.tkc.edu",
+      "description": "Transfer assistance for King's College students",
+      "institution": "Texas A&M University–Kingsville",
+      "state": "TX",
+      "relevanceScore": 15,
+      "source": "The King's College"
+    },
+    {
+      "title": "University of Texas Transfer Services",
+      "url": "https://admissions.utexas.edu/transfer",
+      "description": "Transfer assistance and credit evaluation for UT system students",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "University of Texas"
+    },
+    {
+      "title": "College Transfer Guide",
+      "url": "https://www.collegetransfer.net",
+      "description": "Transfer assistance to programs with strong enrollment",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Transfer Network"
+    }
+  ],
+  "careerCounseling": [
+    {
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Career counseling and job placement for laid-off faculty",
+      "state": "TX",
+      "relevanceScore": 15,
+      "source": "Faculty Career Network"
+    },
+    {
+      "title": "Texas Workforce Commission",
+      "url": "https://www.twc.texas.gov",
+      "description": "State career services and job placement assistance",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Texas Government"
+    }
+  ],
+  "legalAid": [
+    {
+      "title": "Student Borrower Protection Center",
+      "url": "https://protectborrowers.org",
+      "description": "Legal assistance for students affected by institutional closures",
+      "institution": "Texas A&M University–Kingsville",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Student Rights Organization"
+    },
+    {
+      "title": "Texas Legal Services Center",
+      "url": "https://www.tlsc.org",
+      "description": "Free legal assistance for Texas residents",
+      "state": "TX",
+      "relevanceScore": 10,
+      "source": "Legal Aid"
+    }
+  ],
+  "mentalHealth": [
+    {
+      "title": "National Alliance on Mental Illness",
+      "url": "https://www.nami.org",
+      "description": "Mental health support for faculty affected by layoffs",
+      "state": "TX",
+      "relevanceScore": 12,
+      "source": "Faculty Wellness Network"
+    }
+  ],
+  "financialAid": [],
+  "academicSupport": []
+}

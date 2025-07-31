@@ -1,0 +1,44 @@
+{
+  "transferAssistance": [],
+  "careerCounseling": [
+    {
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Career counseling and job placement for laid-off faculty",
+      "state": "MN",
+      "relevanceScore": 15,
+      "source": "Faculty Career Network"
+    }
+  ],
+  "legalAid": [
+    {
+      "title": "Student Borrower Protection Center",
+      "url": "https://protectborrowers.org",
+      "description": "Legal resources for students affected by federal funding cuts",
+      "state": "MN",
+      "relevanceScore": 12,
+      "source": "Student Rights Organization"
+    }
+  ],
+  "mentalHealth": [
+    {
+      "title": "National Alliance on Mental Illness",
+      "url": "https://www.nami.org",
+      "description": "Mental health support for faculty affected by layoffs",
+      "state": "MN",
+      "relevanceScore": 12,
+      "source": "Faculty Wellness Network"
+    }
+  ],
+  "financialAid": [
+    {
+      "title": "Federal Student Aid",
+      "url": "https://studentaid.gov",
+      "description": "Alternative funding sources for students affected by federal cuts",
+      "state": "MN",
+      "relevanceScore": 10,
+      "source": "Federal Government"
+    }
+  ],
+  "academicSupport": []
+}

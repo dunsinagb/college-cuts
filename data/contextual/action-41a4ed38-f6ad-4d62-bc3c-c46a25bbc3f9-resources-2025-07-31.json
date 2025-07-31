@@ -1,0 +1,43 @@
+{
+  "transferAssistance": [],
+  "careerCounseling": [
+    {
+      "title": "National Career Development Association",
+      "url": "https://www.ncda.org",
+      "description": "Career counseling and job placement for laid-off faculty",
+      "state": "MA",
+      "relevanceScore": 15,
+      "source": "Faculty Career Network"
+    },
+    {
+      "title": "CareerOneStop Transition",
+      "url": "https://www.careeronestop.org",
+      "description": "Career counseling for those affected by budget-related changes",
+      "state": "MA",
+      "relevanceScore": 10,
+      "source": "CareerOneStop"
+    }
+  ],
+  "legalAid": [],
+  "mentalHealth": [
+    {
+      "title": "National Alliance on Mental Illness",
+      "url": "https://www.nami.org",
+      "description": "Mental health support for faculty affected by layoffs",
+      "state": "MA",
+      "relevanceScore": 12,
+      "source": "Faculty Wellness Network"
+    }
+  ],
+  "financialAid": [
+    {
+      "title": "Federal Student Aid Emergency",
+      "url": "https://studentaid.gov",
+      "description": "Emergency financial assistance for students affected by budget cuts",
+      "state": "MA",
+      "relevanceScore": 12,
+      "source": "Federal Student Aid"
+    }
+  ],
+  "academicSupport": []
+}

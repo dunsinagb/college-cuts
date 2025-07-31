@@ -1,0 +1,17 @@
+{
+  "transferAssistance": [
+    {
+      "title": "National Student Clearinghouse",
+      "url": "https://www.studentclearinghouse.org",
+      "description": "Specialized transfer assistance for suspended programs",
+      "state": "IN",
+      "relevanceScore": 15,
+      "source": "Transfer Network"
+    }
+  ],
+  "careerCounseling": [],
+  "legalAid": [],
+  "mentalHealth": [],
+  "financialAid": [],
+  "academicSupport": []
+}
