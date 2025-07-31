@@ -13,6 +13,12 @@ import {
   AlertTriangle
 } from "lucide-react"
 import Link from "next/link"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "About - CollegeCuts Tracker",
+  description: "A comprehensive, real-time database monitoring program actions, department closures, and institutional changes across higher education institutions in the United States.",
+}
 
 export default function AboutPage() {
   return (
@@ -23,9 +29,10 @@ export default function AboutPage() {
           <h1 className="text-4xl font-bold tracking-tight mb-4">
             About CollegeCuts Tracker
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            A comprehensive, real-time database monitoring program cuts, department closures, 
-            and institutional changes across higher education institutions in the United States.
+          <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            We began systematically tracking program actions and institutional changes in 2024, 
+            building the most comprehensive database of its kind. Our mission is to provide 
+            transparency and accountability in higher education restructuring.
           </p>
           <div className="flex justify-center gap-2 mt-4">
             <Badge variant="secondary" className="text-sm">
@@ -50,7 +57,7 @@ export default function AboutPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                We began systematically tracking program cuts and institutional changes in 2024, 
+                We began systematically tracking program actions and institutional changes in 2024, 
                 as colleges and universities face mounting financial pressures, declining enrollment, 
                 and changing educational demands.
               </p>

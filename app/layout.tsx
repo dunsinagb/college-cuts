@@ -7,81 +7,70 @@ import { PerformanceOptimizer } from "@/components/PerformanceOptimizer"
 import { OfflineIndicator } from "@/components/OfflineIndicator"
 
 export const metadata: Metadata = {
-  title: "CollegeCuts Tracker - Monitor University Program Cuts & Closures",
-  description: "Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States. Find affected programs, students, and faculty by state and institution.",
-  generator: 'v0.dev',
+  title: "CollegeCuts Tracker - Monitor University Program Actions & Closures",
+  description: "Tracking program actions and closures in higher education",
   keywords: [
-    // Primary Keywords
+    'higher education',
+    'program actions',
+    'university closures',
+    'academic tracking',
     'college cuts tracker',
-    'university program cuts',
+    'university program actions',
     'higher education closures',
     'academic program suspension',
     'department closure tracking',
     'institutional changes database',
-    
-    // Action/Intent Keywords
-    'track program cuts',
+    'track program actions',
     'monitor university closures',
     'find affected programs',
     'check institutional changes',
-    'search academic cuts',
+    'search academic actions',
     'view education closures',
-    
-    // Geographic Keywords
-    'college cuts by state',
+    'college actions by state',
     'university closures map',
-    'regional education cuts',
-    'state-by-state program cuts',
+    'regional education actions',
+    'state-by-state program actions',
     'local college closures',
-    
-    // Secondary Keywords
-    'students affected by cuts',
+    'students affected by actions',
     'faculty job losses',
-    'academic department cuts',
-    'university budget cuts',
+    'academic department actions',
+    'university budget actions',
     'higher education crisis',
     'college program elimination',
-    'university restructuring',
-    'academic program discontinuation',
-    'department consolidation',
-    'institutional downsizing',
-    
-    // Long-tail Keywords
-    'college cuts 2024',
+    'university closures 2024',
     'university closures 2025',
-    'academic program cuts database',
+    'academic program actions database',
     'higher education tracking tool',
     'college program suspension tracker',
     'university department closure map',
     'affected students database',
     'faculty layoffs tracker',
-    'academic cuts by institution',
-    'higher education changes 2024'
+    'academic actions by institution',
   ],
   authors: [{ name: 'CollegeCuts Team' }],
   robots: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
   manifest: '/manifest.json',
   openGraph: {
-    title: 'CollegeCuts Tracker - Monitor University Program Cuts & Closures',
-    description: 'Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States. Find affected programs, students, and faculty by state and institution.',
-    type: 'website',
+    title: 'CollegeCuts Tracker - Monitor University Program Actions & Closures',
+    description: 'Tracking program actions and closures in higher education',
     url: 'https://collegecuts.com',
-    siteName: 'CollegeCuts Tracker',
-    locale: 'en_US',
+    siteName: 'CollegeCuts',
     images: [
       {
-        url: '/og-image.png',
+        url: 'https://collegecuts.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'CollegeCuts Tracker - University Program Cuts Database'
+        alt: 'CollegeCuts Tracker - University Program Actions Database'
       }
-    ]
+    ],
+    locale: 'en_US',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CollegeCuts Tracker - Monitor University Program Cuts & Closures',
-    description: 'Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States.',
-    images: ['/og-image.png']
+    title: 'CollegeCuts Tracker - Monitor University Program Actions & Closures',
+    description: 'Tracking program actions and closures in higher education',
+    images: ['https://collegecuts.com/og-image.jpg'],
   },
   other: {
     'apple-mobile-web-app-capable': 'yes',

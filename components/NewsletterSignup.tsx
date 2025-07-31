@@ -36,7 +36,7 @@ export function NewsletterSignup() {
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-green-800">Welcome aboard!</h3>
               <p className="text-green-700">
-                You'll receive weekly updates on the latest program cuts and institutional changes.
+                You'll receive weekly updates on the latest program actions and institutional changes.
               </p>
             </div>
           </div>
@@ -60,7 +60,7 @@ export function NewsletterSignup() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-blue-700">
-          Get weekly updates on program cuts, institutional changes, and trend analysis affecting higher education.
+          Get weekly updates on actions, institutional changes, and trend analysis affecting higher education.
         </p>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex gap-2">

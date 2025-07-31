@@ -85,7 +85,7 @@ export function CutTypeDonut() {
             const value = context.parsed || context.raw || 0
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
             const percentage = ((value / total) * 100).toFixed(1)
-            return `${context.label}: ${value} cuts (${percentage}%)`
+            return `${context.label}: ${value} actions (${percentage}%)`
           },
         },
       },
@@ -98,30 +98,30 @@ export function CutTypeDonut() {
   return (
     <div 
       className="rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm"
-      aria-label="Program cuts by cut type distribution"
+      aria-label="Institutional actions by action type distribution"
     >
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-        Cuts by Type
+        Actions by Type
       </h3>
       
       <div className="relative h-64">
         <Doughnut data={chartData} options={options} />
         
         {/* Center total */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
               {totalCuts}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Total Cuts
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+              Total Actions
             </div>
           </div>
         </div>
       </div>
 
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-        Distribution of different types of program cuts
+        Distribution of different types of institutional actions
       </p>
     </div>
   )

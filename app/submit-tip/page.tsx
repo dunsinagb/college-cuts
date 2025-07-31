@@ -175,9 +175,9 @@ export default function SubmitTipPage() {
         <div className="lg:col-span-2">
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Share Program Cut Intel</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Share Program Action Intel</h1>
               <p className="text-muted-foreground mt-2">
-                Seen a list of program cuts or have info about institutional changes?
+                Seen a list of program actions or have info about institutional changes?
               </p>
               <p className="text-sm text-muted-foreground mt-2">
                 Let us know in the form below and help affected students get exposure to alternative programs.
@@ -186,7 +186,7 @@ export default function SubmitTipPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Share program cut intel</CardTitle>
+                <CardTitle>Share program action intel</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -204,10 +204,10 @@ export default function SubmitTipPage() {
 
                   <div>
                     <label htmlFor="cutDetails" className="block text-sm font-medium mb-2">
-                      What program cut intel do you have? <span className="text-red-500">*</span>
+                      What program action intel do you have? <span className="text-red-500">*</span>
                     </label>
                     <p className="text-sm text-muted-foreground mb-2">
-                      ex. # of programs cut, % of programs cut, date of cut announcement, specific programs affected,
+                      ex. # of programs affected, % of programs affected, date of action announcement, specific programs affected,
                       etc.
                     </p>
                     <Textarea
@@ -315,7 +315,7 @@ export default function SubmitTipPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Latest Program Cuts</CardTitle>
+              <CardTitle>Latest Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {cutsLoading ? (
@@ -357,7 +357,7 @@ export default function SubmitTipPage() {
 
               <div className="pt-2">
                 <Link href="/cuts" className="text-sm text-blue-600 hover:underline">
-                  View full list of cuts
+                  View full list of actions
                 </Link>
               </div>
             </CardContent>
@@ -369,7 +369,7 @@ export default function SubmitTipPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Seen a program cut list and want to help the affected students? Share using{" "}
+                Seen a program action list and want to help the affected students? Share using{" "}
                 <Link href="/submit-tip" className="text-green-600 hover:underline">
                   this form
                 </Link>

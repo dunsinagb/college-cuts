@@ -100,7 +100,7 @@ export function ControlBreakdown() {
       aria-label="University counts by institution control type"
     >
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-        Cuts by Control
+        Actions by Control Type
       </h3>
       <div className="h-64">
         <Bar data={chartData} options={options} />

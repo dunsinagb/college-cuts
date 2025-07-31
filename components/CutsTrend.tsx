@@ -51,7 +51,7 @@ export function CutsTrend() {
     }),
     datasets: [
       {
-        label: "Program Cuts",
+        label: "Program Actions",
         data: filteredData.map((item) => item.cuts),
         borderColor: "rgb(59, 130, 246)",
         backgroundColor: "rgba(59, 130, 246, 0.1)",

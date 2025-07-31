@@ -173,7 +173,7 @@ export function LatestCutsTable() {
 
       <div className="flex justify-center">
         <Button asChild>
-          <Link href="/cuts">View All Cuts</Link>
+          <Link href="/cuts">View All Actions</Link>
         </Button>
       </div>
     </div>

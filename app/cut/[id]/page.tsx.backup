@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { Database } from "@/types/supabase"
-import { ResourceSection } from "@/components/ResourceSection"
+import { CategoryBadges } from "@/components/CategoryBadges"
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,7 +39,7 @@ export default async function CutDetailsPage({
         <Button variant="ghost" asChild className="mb-4">
           <Link href="/cuts">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to All Actions
+            Back to All Cuts
           </Link>
         </Button>
 
@@ -51,6 +51,7 @@ export default async function CutDetailsPage({
           <div className="flex flex-wrap gap-2">
             <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
             {cut.effective_term && <Badge variant="outline">Effective: {cut.effective_term}</Badge>}
+            <CategoryBadges notes={cut.notes} maxDisplay={3} />
           </div>
         </div>
 
@@ -136,15 +137,6 @@ export default async function CutDetailsPage({
             </Card>
           )}
         </div>
-
-        <ResourceSection 
-          institution={cut.institution} 
-          state={cut.state} 
-          actionType={cut.cut_type}
-          actionId={cut.id}
-          notes={cut.notes}
-          announcementDate={cut.announcement_date}
-        />
       </div>
     </div>
   )

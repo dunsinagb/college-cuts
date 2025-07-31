@@ -28,10 +28,10 @@ import { EnhancedKpiCard } from "@/components/EnhancedKpiCard"
 import type { Cut } from "@/types/supabase"
 
 interface KpiData {
-  totalCuts: number
+  totalActions: number
   institutionsImpacted: number
-  studentsAffected: number | null
-  mostAffectedState: string
+  statesAffected: number
+  mostImpactedState: string
   lastUpdated: string
 }
 
@@ -46,10 +46,10 @@ const cutTypeColors = {
 
 // Mock data as fallback only
 const mockKpiData: KpiData = {
-  totalCuts: 247,
-  institutionsImpacted: 89,
-  studentsAffected: 15420,
-  mostAffectedState: "CA",
+  totalActions: 96,
+  institutionsImpacted: 90,
+  statesAffected: 25,
+  mostImpactedState: "CA",
   lastUpdated: new Date().toISOString(),
 }
 
@@ -285,17 +285,17 @@ export function HomePageClient() {
     try {
       console.log("📊 Fetching KPI data from Supabase...")
 
-      // Fetch total cuts count
-      const { count: totalCuts, error: cutsError } = await client
+      // Fetch total actions count
+      const { count: totalActions, error: actionsError } = await client
         .from("v_latest_cuts")
         .select("*", { count: "exact", head: true })
 
-      if (cutsError) {
-        console.error("Error fetching total cuts:", cutsError)
-        throw cutsError
+      if (actionsError) {
+        console.error("Error fetching total actions:", actionsError)
+        throw actionsError
       }
 
-      console.log("✅ Total cuts fetched:", totalCuts)
+      console.log("✅ Total actions fetched:", totalActions)
 
       // Fetch unique institutions count
       const { data: institutions, error: institutionsError } = await client
@@ -311,21 +311,7 @@ export function HomePageClient() {
       const uniqueInstitutions = new Set(institutions.map((i) => i.institution)).size
       console.log("✅ Unique institutions:", uniqueInstitutions)
 
-      // Fetch students affected (sum)
-      const { data: studentsData, error: studentsError } = await client
-        .from("v_latest_cuts")
-        .select("students_affected")
-        .not("students_affected", "is", null)
-
-      if (studentsError) {
-        console.error("Error fetching students data:", studentsError)
-        throw studentsError
-      }
-
-      const totalStudentsAffected = studentsData.reduce((sum: number, item: { students_affected?: number }) => sum + (item.students_affected || 0), 0)
-      console.log("✅ Total students affected:", totalStudentsAffected)
-
-      // Fetch most affected state
+      // Fetch unique states count
       const { data: stateData, error: stateError } = await client
         .from("v_latest_cuts")
         .select("state")
@@ -336,20 +322,23 @@ export function HomePageClient() {
         throw stateError
       }
 
-      // Count occurrences of each state
+      const uniqueStates = new Set(stateData.map((s) => s.state)).size
+      console.log("✅ Unique states:", uniqueStates)
+
+      // Count occurrences of each state to find most impacted
       const stateCounts = stateData.reduce((acc: Record<string, number>, item: { state: string }) => {
         acc[item.state] = (acc[item.state] || 0) + 1
         return acc
       }, {} as Record<string, number>)
 
-      const mostAffectedState = Object.entries(stateCounts).reduce((a, b) => (stateCounts[a[0]] > stateCounts[b[0]] ? a : b))[0]
-      console.log("✅ Most affected state:", mostAffectedState)
+      const mostImpactedState = Object.entries(stateCounts).reduce((a, b) => (stateCounts[a[0]] > stateCounts[b[0]] ? a : b))[0]
+      console.log("✅ Most impacted state:", mostImpactedState)
 
       const kpiData: KpiData = {
-        totalCuts: totalCuts || 0,
+        totalActions: totalActions || 0,
         institutionsImpacted: uniqueInstitutions,
-        studentsAffected: totalStudentsAffected > 0 ? totalStudentsAffected : null,
-        mostAffectedState,
+        statesAffected: uniqueStates,
+        mostImpactedState,
         lastUpdated: new Date().toISOString(),
       }
 
@@ -357,7 +346,6 @@ export function HomePageClient() {
       setKpiData(kpiData)
     } catch (err) {
       console.error("❌ Error fetching KPI data:", err)
-      // setError(err instanceof Error ? err.message : "Failed to fetch KPI data") // Removed unused variable
       // Fallback to mock data
       setKpiData(mockKpiData)
     } finally {
@@ -577,30 +565,30 @@ export function HomePageClient() {
             <h2 id="metrics-title" className="sr-only">College Cuts Statistics and Key Performance Indicators</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <EnhancedKpiCard
-                title="Total Program Cuts"
-                value={kpiData?.totalCuts || 0}
-                subtitle="confirmed closures & suspensions"
+                title="Total Actions Taken"
+                value={kpiData?.totalActions || 0}
+                subtitle="program suspensions & closures"
                 icon={GraduationCap}
                 loading={loading}
               />
               <EnhancedKpiCard
-                title="Institutions Affected"
+                title="Institutions Impacted"
                 value={kpiData?.institutionsImpacted || 0}
                 subtitle="colleges & universities"
                 icon={Building2}
                 loading={loading}
               />
               <EnhancedKpiCard
-                title="Students Impacted"
-                value={kpiData?.studentsAffected ? kpiData.studentsAffected.toLocaleString() : ""}
-                subtitle="enrollment affected"
-                icon={Users}
+                title="States Affected"
+                value={kpiData?.statesAffected || 0}
+                subtitle="geographic spread"
+                icon={Activity}
                 loading={loading}
               />
               <EnhancedKpiCard
-                title="Most Affected State"
-                value={kpiData?.mostAffectedState || ""}
-                subtitle="by number of cuts"
+                title="Most Impacted State"
+                value={kpiData?.mostImpactedState || ""}
+                subtitle="by number of actions"
                 icon={MapPin}
                 loading={loading}
               />
@@ -608,17 +596,17 @@ export function HomePageClient() {
           </section>
         </div>
 
-        {/* Latest 5 Cuts */}
+        {/* Latest 5 Actions */}
         <div className="container mx-auto px-4 py-8">
-          <section aria-labelledby="latest-cuts-title">
+          <section aria-labelledby="latest-actions-title">
             <div className="text-center sm:text-left">
               <div className="space-y-2">
-                <h2 id="latest-cuts-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Cuts & Closures</h2>
+                <h2 id="latest-actions-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Actions & Closures</h2>
                 <p className="text-muted-foreground mb-8">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
               </div>
             </div>
 
-            <div className="space-y-4" role="list" aria-label="Latest program cuts">
+            <div className="space-y-4" role="list" aria-label="Latest program actions">
               {cutsLoading
                 ? Array.from({ length: 5 }).map((_: unknown, i: number) => (
                     <Card key={i} className="card-hover" role="listitem">
@@ -693,7 +681,7 @@ export function HomePageClient() {
             <div className="text-center mt-6">
               <Button asChild variant="default" size="lg">
                 <Link href="/cuts" className="flex items-center gap-2">
-                  View All Cuts
+                  View All Actions
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -707,7 +695,7 @@ export function HomePageClient() {
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="space-y-4">
                 <p className="text-muted-foreground text-base sm:text-lg">
-                  Have information about program cuts or institutional changes?{" "}
+                  Have information about program actions or institutional changes?{" "}
                   <Link href="/submit-tip" className="text-primary hover:text-primary/80 font-medium hover:underline">
                     Let me know if you see anything missing!
                   </Link>

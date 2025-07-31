@@ -53,10 +53,10 @@ export function StateChoropleth() {
   return (
     <div 
       className="rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm"
-      aria-label="Program cuts by US state"
+      aria-label="Institutional actions by US state"
     >
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-        Cuts by State
+        Actions by State
       </h3>
       
       {/* Mock map visualization - in real implementation, use react-simple-maps */}
@@ -68,7 +68,7 @@ export function StateChoropleth() {
               <div
                 key={state.id}
                 className="relative group"
-                title={`${state.name}: ${cuts} cuts`}
+                title={`${state.name}: ${cuts} actions`}
               >
                 <div
                   className="w-full h-full rounded border border-gray-200 dark:border-gray-600 flex items-center justify-center text-xs font-medium"
@@ -79,7 +79,7 @@ export function StateChoropleth() {
                   </span>
                 </div>
                 <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                  {state.name}: {cuts} cuts
+                  {state.name}: {cuts} actions
                 </div>
               </div>
             )
@@ -89,7 +89,7 @@ export function StateChoropleth() {
 
       {/* Color legend */}
       <div className="flex items-center justify-center mt-4 space-x-2">
-        <span className="text-xs text-gray-600 dark:text-gray-400">Fewer cuts</span>
+        <span className="text-xs text-gray-600 dark:text-gray-400">Fewer actions</span>
         <div className="flex space-x-1">
           {[0, 0.2, 0.4, 0.6, 0.8, 1].map((intensity) => (
             <div
@@ -99,11 +99,11 @@ export function StateChoropleth() {
             />
           ))}
         </div>
-        <span className="text-xs text-gray-600 dark:text-gray-400">More cuts</span>
+        <span className="text-xs text-gray-600 dark:text-gray-400">More actions</span>
       </div>
 
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-        Geographic distribution of program cuts across US states
+        Geographic distribution of institutional actions across US states
       </p>
     </div>
   )

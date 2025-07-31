@@ -41,7 +41,7 @@ export function Header() {
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: TrendingUp, public: true },
-    { href: "/cuts", label: "All Cuts", icon: AlertTriangle, public: false },
+    { href: "/cuts", label: "All Actions", icon: AlertTriangle, public: false },
     { href: "/analytics", label: "Analytics", icon: BarChart3, public: false },
     { href: "/job-outlook", label: "Job Outlook", icon: Briefcase, public: false },
     { href: "/about", label: "About", icon: Info, public: true },

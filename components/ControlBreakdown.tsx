@@ -25,7 +25,7 @@ export function ControlBreakdown() {
     labels: data.controlBreakdown.map((item) => item.control),
     datasets: [
       {
-        label: "Program Cuts",
+        label: "Program Actions",
         data: data.controlBreakdown.map((item) => item.cuts),
         backgroundColor: [
           "rgba(59, 130, 246, 0.8)", // blue-500

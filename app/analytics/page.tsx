@@ -11,6 +11,7 @@ const CutsTrend = dynamic(() => import("@/components/analytics/CutsTrend").then(
 const ControlBreakdown = dynamic(() => import("@/components/analytics/ControlBreakdown").then(mod => ({ default: mod.ControlBreakdown })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 const StateChoropleth = dynamic(() => import("@/components/analytics/StateChoropleth").then(mod => ({ default: mod.StateChoropleth })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 const CutTypeDonut = dynamic(() => import("@/components/analytics/CutTypeDonut").then(mod => ({ default: mod.CutTypeDonut })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
+const PrimaryReasonChart = dynamic(() => import("@/components/analytics/PrimaryReasonChart").then(mod => ({ default: mod.PrimaryReasonChart })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 
 function AnalyticsPageContent() {
   const { manualRefresh, isLoading } = useCutsAnalytics()
@@ -28,7 +29,7 @@ function AnalyticsPageContent() {
         <section className="text-center space-y-4" aria-labelledby="analytics-title">
           <h1 id="analytics-title" className="text-4xl font-bold tracking-tight">Analytics Dashboard</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive insights into program cuts across higher education institutions. 
+            Comprehensive insights into institutional actions across higher education institutions. 
             Explore trends, patterns, and regional impacts with real-time data.
           </p>
           <div className="flex items-center justify-center gap-4">
@@ -51,18 +52,21 @@ function AnalyticsPageContent() {
         {/* Analytics Grid */}
         <section aria-labelledby="analytics-grid-title">
           <h2 id="analytics-grid-title" className="sr-only">Analytics Visualizations</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="region" aria-label="Analytics charts and visualizations">
-            <div role="region" aria-label="Cuts trend over time">
+          <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto" role="region" aria-label="Analytics charts and visualizations">
+            <div role="region" aria-label="Actions trend over time">
               <CutsTrend />
             </div>
-            <div role="region" aria-label="Cuts by institution control type">
+            <div role="region" aria-label="Actions by institution control type">
               <ControlBreakdown />
             </div>
-            <div role="region" aria-label="Cuts by state map">
+            <div role="region" aria-label="Actions by state map">
               <StateChoropleth />
             </div>
-            <div role="region" aria-label="Cuts by type distribution">
+            <div role="region" aria-label="Actions by type distribution">
               <CutTypeDonut />
+            </div>
+            <div role="region" aria-label="Primary reasons for actions">
+              <PrimaryReasonChart />
             </div>
           </div>
         </section>

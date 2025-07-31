@@ -4,7 +4,7 @@ import { GraduationCap, TrendingUp, AlertTriangle, Info, Send, ExternalLink, Lin
 export function Footer() {
   const quickLinks = [
     { href: "/", label: "Dashboard", icon: TrendingUp },
-    { href: "/cuts", label: "All Cuts", icon: AlertTriangle },
+    { href: "/cuts", label: "All Actions", icon: AlertTriangle },
     { href: "/about", label: "About", icon: Info },
     { href: "/submit-tip", label: "Submit Tip", icon: Send },
   ]
