@@ -6,17 +6,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 // Mock US map data since we don't have the actual topojson file
 // In a real implementation, you would import the US map data
 const mockUSStates = [
-  { id: "CA", name: "California" },
-  { id: "TX", name: "Texas" },
-  { id: "NY", name: "New York" },
-  { id: "FL", name: "Florida" },
-  { id: "IL", name: "Illinois" },
-  { id: "PA", name: "Pennsylvania" },
-  { id: "OH", name: "Ohio" },
-  { id: "MI", name: "Michigan" },
-  { id: "GA", name: "Georgia" },
-  { id: "NC", name: "North Carolina" },
-]
+  "CA", "TX", "NY", "FL", "IL", "PA", "OH", "GA", "NC", "MI",
+  "NJ", "VA", "WA", "AZ", "MA", "TN", "IN", "MO", "MD", "CO",
+  "MN", "WI", "AL", "SC", "LA", "KY", "OR", "OK", "CT", "IA",
+  "UT", "NV", "AR", "MS", "KS", "NM", "NE", "ID", "WV", "HI",
+  "NH", "ME", "RI", "MT", "DE", "SD", "ND", "AK", "VT", "WY"
+].map((s: string) => ({
+  id: s,
+  name: s, // Placeholder, actual names would need a mapping
+}))
 
 export function StateChoropleth() {
   const { data, isLoading } = useCutsAnalytics()
@@ -25,16 +23,16 @@ export function StateChoropleth() {
     return (
       <div className="rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm">
         <Skeleton className="h-6 w-48 mb-4" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-80 w-full" />
       </div>
     )
   }
 
   // Create a map of state data for easy lookup
-  const stateDataMap = data.cutsByState.reduce((acc, state) => {
+  const stateCounts = data.cutsByState.reduce((acc: any, state: any) => {
     acc[state.state] = state.cuts
     return acc
-  }, {} as Record<string, number>)
+  }, {})
 
   // Find max cuts for color scaling
   const maxCuts = Math.max(...data.cutsByState.map(s => s.cuts), 1)
@@ -60,10 +58,10 @@ export function StateChoropleth() {
       </h3>
       
       {/* Mock map visualization - in real implementation, use react-simple-maps */}
-      <div className="h-64 bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      <div className="h-80 bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
         <div className="grid grid-cols-5 gap-2 h-full">
           {mockUSStates.map((state) => {
-            const cuts = stateDataMap[state.id] || 0
+            const cuts = stateCounts[state.id] || 0
             return (
               <div
                 key={state.id}

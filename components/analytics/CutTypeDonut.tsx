@@ -23,7 +23,7 @@ export function CutTypeDonut() {
     return (
       <div className="rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm">
         <Skeleton className="h-6 w-48 mb-4" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-80 w-full" />
       </div>
     )
   }
@@ -104,7 +104,7 @@ export function CutTypeDonut() {
         Actions by Type
       </h3>
       
-      <div className="relative h-64">
+      <div className="relative h-80">
         <Doughnut data={chartData} options={options} />
         
         {/* Center total */}

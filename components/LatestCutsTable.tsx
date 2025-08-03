@@ -19,6 +19,98 @@ const cutTypeColors = {
   staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
 }
 
+const categoryColors = {
+  "Budget Deficit": "bg-red-50 text-red-700 border-red-200",
+  "Enrollment Decline": "bg-blue-50 text-blue-700 border-blue-200",
+  "Federal Funding Cuts": "bg-purple-50 text-purple-700 border-purple-200",
+  "State Mandates": "bg-orange-50 text-orange-700 border-orange-200",
+  "Strategic Restructuring": "bg-gray-50 text-gray-700 border-gray-200",
+  "Accreditation Issues": "bg-yellow-50 text-yellow-700 border-yellow-200",
+  "Financial Mismanagement": "bg-pink-50 text-pink-700 border-pink-200",
+  "Program Performance": "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "Administrative Changes": "bg-teal-50 text-teal-700 border-teal-200",
+  "Market Demand": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "Regulatory Compliance": "bg-amber-50 text-amber-700 border-amber-200",
+  "Technology Integration": "bg-cyan-50 text-cyan-700 border-cyan-200",
+  "Faculty Shortage": "bg-lime-50 text-lime-700 border-lime-200",
+  "Facility Issues": "bg-slate-50 text-slate-700 border-slate-200",
+  "Partnership Changes": "bg-violet-50 text-violet-700 border-violet-200",
+  "Research Funding": "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200",
+  "Student Demand": "bg-sky-50 text-sky-700 border-sky-200",
+  "Operational Efficiency": "bg-stone-50 text-stone-700 border-stone-200",
+  "Quality Standards": "bg-zinc-50 text-zinc-700 border-zinc-200",
+  "External Pressures": "bg-neutral-50 text-neutral-700 border-neutral-200"
+}
+
+function categorizeCut(notes: string | null): string {
+  if (!notes) return "Budget Deficit"
+  
+  const lowerNotes = notes.toLowerCase()
+  
+  if (lowerNotes.includes("budget") || lowerNotes.includes("deficit") || lowerNotes.includes("financial") || lowerNotes.includes("cost")) {
+    return "Budget Deficit"
+  }
+  if (lowerNotes.includes("enrollment") || lowerNotes.includes("decline") || lowerNotes.includes("student") || lowerNotes.includes("admission")) {
+    return "Enrollment Decline"
+  }
+  if (lowerNotes.includes("federal") || lowerNotes.includes("funding") || lowerNotes.includes("government") || lowerNotes.includes("grant")) {
+    return "Federal Funding Cuts"
+  }
+  if (lowerNotes.includes("state") || lowerNotes.includes("mandate") || lowerNotes.includes("legislation") || lowerNotes.includes("law")) {
+    return "State Mandates"
+  }
+  if (lowerNotes.includes("strategic") || lowerNotes.includes("restructuring") || lowerNotes.includes("reorganization") || lowerNotes.includes("realignment")) {
+    return "Strategic Restructuring"
+  }
+  if (lowerNotes.includes("accreditation") || lowerNotes.includes("accredited") || lowerNotes.includes("certification")) {
+    return "Accreditation Issues"
+  }
+  if (lowerNotes.includes("mismanagement") || lowerNotes.includes("fraud") || lowerNotes.includes("scandal")) {
+    return "Financial Mismanagement"
+  }
+  if (lowerNotes.includes("performance") || lowerNotes.includes("quality") || lowerNotes.includes("metrics")) {
+    return "Program Performance"
+  }
+  if (lowerNotes.includes("administrative") || lowerNotes.includes("leadership") || lowerNotes.includes("management")) {
+    return "Administrative Changes"
+  }
+  if (lowerNotes.includes("market") || lowerNotes.includes("demand") || lowerNotes.includes("industry")) {
+    return "Market Demand"
+  }
+  if (lowerNotes.includes("regulatory") || lowerNotes.includes("compliance") || lowerNotes.includes("regulation")) {
+    return "Regulatory Compliance"
+  }
+  if (lowerNotes.includes("technology") || lowerNotes.includes("digital") || lowerNotes.includes("online")) {
+    return "Technology Integration"
+  }
+  if (lowerNotes.includes("faculty") || lowerNotes.includes("professor") || lowerNotes.includes("staffing")) {
+    return "Faculty Shortage"
+  }
+  if (lowerNotes.includes("facility") || lowerNotes.includes("building") || lowerNotes.includes("infrastructure")) {
+    return "Facility Issues"
+  }
+  if (lowerNotes.includes("partnership") || lowerNotes.includes("collaboration") || lowerNotes.includes("alliance")) {
+    return "Partnership Changes"
+  }
+  if (lowerNotes.includes("research") || lowerNotes.includes("funding") || lowerNotes.includes("grant")) {
+    return "Research Funding"
+  }
+  if (lowerNotes.includes("student demand") || lowerNotes.includes("popularity")) {
+    return "Student Demand"
+  }
+  if (lowerNotes.includes("operational") || lowerNotes.includes("efficiency") || lowerNotes.includes("optimization")) {
+    return "Operational Efficiency"
+  }
+  if (lowerNotes.includes("quality") || lowerNotes.includes("standards") || lowerNotes.includes("excellence")) {
+    return "Quality Standards"
+  }
+  if (lowerNotes.includes("external") || lowerNotes.includes("pressure") || lowerNotes.includes("influence")) {
+    return "External Pressures"
+  }
+  
+  return "Budget Deficit"
+}
+
 export function LatestCutsTable() {
   const [cuts, setCuts] = useState<Cut[]>([])
   const [filteredCuts, setFilteredCuts] = useState<Cut[]>([])
@@ -119,7 +211,8 @@ export function LatestCutsTable() {
                 <th className="h-12 px-4 text-left align-middle font-medium">Institution</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">Program</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">State</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Cut Type</th>
+                <th className="h-12 px-4 text-left align-middle font-medium">Action Type</th>
+                <th className="h-12 px-4 text-left align-middle font-medium">Primary Reason</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">Control</th>
                 <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
               </tr>
@@ -148,6 +241,11 @@ export function LatestCutsTable() {
                   <td className="p-4 align-middle">{cut.state}</td>
                   <td className="p-4 align-middle">
                     <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
+                  </td>
+                  <td className="p-4 align-middle">
+                    <Badge className={categoryColors[categorizeCut(cut.notes) as keyof typeof categoryColors]}>
+                      {categorizeCut(cut.notes)}
+                    </Badge>
                   </td>
                   <td className="p-4 align-middle">
                     {cut.control || "—"}

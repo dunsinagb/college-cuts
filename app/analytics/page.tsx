@@ -12,6 +12,7 @@ const ControlBreakdown = dynamic(() => import("@/components/analytics/ControlBre
 const StateChoropleth = dynamic(() => import("@/components/analytics/StateChoropleth").then(mod => ({ default: mod.StateChoropleth })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 const CutTypeDonut = dynamic(() => import("@/components/analytics/CutTypeDonut").then(mod => ({ default: mod.CutTypeDonut })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 const PrimaryReasonChart = dynamic(() => import("@/components/analytics/PrimaryReasonChart").then(mod => ({ default: mod.PrimaryReasonChart })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
+const StateActionsChart = dynamic(() => import("@/components/analytics/StateActionsChart").then(mod => ({ default: mod.StateActionsChart })), { ssr: false, loading: () => <Skeleton className="h-80 w-full" /> })
 
 function AnalyticsPageContent() {
   const { manualRefresh, isLoading } = useCutsAnalytics()
@@ -52,9 +53,12 @@ function AnalyticsPageContent() {
         {/* Analytics Grid */}
         <section aria-labelledby="analytics-grid-title">
           <h2 id="analytics-grid-title" className="sr-only">Analytics Visualizations</h2>
-          <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto" role="region" aria-label="Analytics charts and visualizations">
+          <div className="grid grid-cols-1 gap-8 max-w-4xl mx-auto" role="region" aria-label="Analytics charts and visualizations">
             <div role="region" aria-label="Actions trend over time">
               <CutsTrend />
+            </div>
+            <div role="region" aria-label="Top 10 states by actions">
+              <StateActionsChart />
             </div>
             <div role="region" aria-label="Actions by institution control type">
               <ControlBreakdown />

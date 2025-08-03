@@ -113,7 +113,7 @@ export function PrimaryReasonChart() {
     return (
       <div className="rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm">
         <Skeleton className="h-6 w-48 mb-4" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-80 w-full" />
       </div>
     )
   }
@@ -220,7 +220,7 @@ export function PrimaryReasonChart() {
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
         Primary Reasons for Actions
       </h3>
-      <div className="h-64">
+      <div className="h-80">
         <Bar data={chartData} options={options} />
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">

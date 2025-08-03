@@ -52,6 +52,10 @@ export function Header() {
     if (href === "/") {
       return pathname === "/"
     }
+    // Special case for cut detail pages - they should highlight "All Actions"
+    if (href === "/cuts" && pathname.startsWith("/cut/")) {
+      return true
+    }
     return pathname.startsWith(href)
   }
 

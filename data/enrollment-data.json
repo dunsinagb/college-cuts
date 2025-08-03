@@ -1,0 +1,67 @@
+[
+  {
+    "institution": "University of California, Berkeley",
+    "state": "CA",
+    "sources": [
+      "Wikipedia"
+    ],
+    "enrollment": 45000,
+    "undergraduateEnrollment": null,
+    "graduateEnrollment": null,
+    "institutionType": null,
+    "founded": "1868",
+    "lastUpdated": "2025-08-03T20:20:18.645Z"
+  },
+  {
+    "institution": "University of Texas at Austin",
+    "state": "TX",
+    "sources": [
+      "Wikipedia"
+    ],
+    "enrollment": null,
+    "undergraduateEnrollment": null,
+    "graduateEnrollment": null,
+    "institutionType": null,
+    "founded": null,
+    "lastUpdated": "2025-08-03T20:20:26.045Z"
+  },
+  {
+    "institution": "Penn State University",
+    "state": "PA",
+    "sources": [
+      "Wikipedia"
+    ],
+    "enrollment": 89000,
+    "undergraduateEnrollment": null,
+    "graduateEnrollment": null,
+    "institutionType": "State University",
+    "founded": "1855",
+    "lastUpdated": "2025-08-03T20:20:30.740Z"
+  },
+  {
+    "institution": "University of Michigan",
+    "state": "MI",
+    "sources": [
+      "Wikipedia"
+    ],
+    "enrollment": null,
+    "undergraduateEnrollment": null,
+    "graduateEnrollment": null,
+    "institutionType": null,
+    "founded": "1817",
+    "lastUpdated": "2025-08-03T20:20:35.891Z"
+  },
+  {
+    "institution": "University of Florida",
+    "state": "FL",
+    "sources": [
+      "Wikipedia"
+    ],
+    "enrollment": 54814,
+    "undergraduateEnrollment": null,
+    "graduateEnrollment": null,
+    "institutionType": "State University",
+    "founded": null,
+    "lastUpdated": "2025-08-03T20:20:40.620Z"
+  }
+]

@@ -124,7 +124,7 @@ export function CutsTrend() {
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
         Actions Over Time (2024 vs 2025)
       </h3>
-      <div className="h-64">
+      <div className="h-80">
         <Bar data={chartData} options={options} />
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">

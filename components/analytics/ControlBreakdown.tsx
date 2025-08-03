@@ -35,11 +35,11 @@ export function ControlBreakdown() {
   }
 
   const chartData = {
-    labels: data.cutsByControl.map((item) => item.control),
+    labels: data.cutsByControl.map((item: any) => item.control),
     datasets: [
       {
         label: "Universities",
-        data: data.cutsByControl.map((item) => item.cuts),
+        data: data.cutsByControl.map((item: any) => item.cuts),
         backgroundColor: [
           "rgba(59, 130, 246, 0.8)", // blue-500
           "rgba(16, 185, 129, 0.8)", // emerald-500
@@ -102,7 +102,7 @@ export function ControlBreakdown() {
       <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
         Actions by Control Type
       </h3>
-      <div className="h-64">
+      <div className="h-80">
         <Bar data={chartData} options={options} />
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">

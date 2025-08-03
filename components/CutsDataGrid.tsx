@@ -97,25 +97,87 @@ function categorizeCut(notes: string | null): string {
   // Operational costs
   if (notesLower.includes("operational costs") || notesLower.includes("rising costs") ||
       notesLower.includes("cost constraints") || notesLower.includes("cost-saving") ||
-      notesLower.includes("operational challenges") || notesLower.includes("operational cuts") ||
-      notesLower.includes("facilities") || notesLower.includes("on-campus")) {
+      notesLower.includes("operational challenges") || notesLower.includes("operational cuts")) {
     return "Operational Costs"
   }
   
   // Financial mismanagement
-  if (notesLower.includes("mismanagement") || notesLower.includes("misuse of funds") ||
-      notesLower.includes("endowment mismanagement") || notesLower.includes("gross mismanagement")) {
+  if (notesLower.includes("mismanagement") || notesLower.includes("fraud") ||
+      notesLower.includes("scandal") || notesLower.includes("financial irregularities") ||
+      notesLower.includes("financial misconduct")) {
     return "Financial Mismanagement"
   }
   
   // Accreditation issues
-  if (notesLower.includes("accreditation") || notesLower.includes("probation") ||
-      notesLower.includes("accreditation surrender")) {
+  if (notesLower.includes("accreditation") || notesLower.includes("accredited") ||
+      notesLower.includes("certification") || notesLower.includes("accreditation issues")) {
     return "Accreditation Issues"
   }
   
-  // Default to Budget Deficit for any remaining cases
   return "Budget Deficit"
+}
+
+function determinePersonnelType(cut: any): string {
+  if (!cut.faculty_affected || cut.faculty_affected === 0) {
+    return "—"
+  }
+  
+  const notes = (cut.notes || "").toLowerCase()
+  const programName = (cut.program_name || "").toLowerCase()
+  const cutType = cut.cut_type.toLowerCase()
+  
+  // Keywords that indicate Faculty
+  const facultyKeywords = [
+    "faculty", "professor", "professors", "teaching", "academic", "instructor", "instructors",
+    "lecturer", "lecturers", "adjunct", "adjuncts", "tenure", "tenured", "assistant professor",
+    "associate professor", "full professor", "department chair", "department chairs",
+    "academic staff", "teaching staff", "research faculty", "clinical faculty"
+  ]
+  
+  // Keywords that indicate Staff
+  const staffKeywords = [
+    "staff", "administrative", "administration", "administrator", "administrators",
+    "non-instructional", "non-instructional staff", "support staff", "support personnel",
+    "administrative staff", "professional staff", "classified staff", "unclassified staff",
+    "office staff", "clerical", "clerical staff", "maintenance", "maintenance staff",
+    "custodial", "custodial staff", "security", "security staff", "it staff", "technology staff"
+  ]
+  
+  // Check for faculty keywords
+  const hasFacultyKeywords = facultyKeywords.some(keyword => 
+    notes.includes(keyword) || programName.includes(keyword)
+  )
+  
+  // Check for staff keywords
+  const hasStaffKeywords = staffKeywords.some(keyword => 
+    notes.includes(keyword) || programName.includes(keyword)
+  )
+  
+  // Special cases based on action type
+  if (cutType === "staff_layoff") {
+    return "Staff"
+  }
+  
+  if (cutType === "department_closure" || cutType === "program_suspension") {
+    // These typically affect both faculty and staff, but let's check the context
+    if (hasFacultyKeywords && !hasStaffKeywords) {
+      return "Faculty"
+    } else if (hasStaffKeywords && !hasFacultyKeywords) {
+      return "Staff"
+    } else {
+      return "Faculty/Staff"
+    }
+  }
+  
+  // If we have specific keywords, use them
+  if (hasFacultyKeywords && !hasStaffKeywords) {
+    return "Faculty"
+  } else if (hasStaffKeywords && !hasFacultyKeywords) {
+    return "Staff"
+  }
+  
+  // Default to Faculty/Staff if we can't determine
+  return "Faculty/Staff"
 }
 
 // Mock data as fallback only
@@ -509,7 +571,7 @@ export function CutsDataGrid() {
         "Action Type",
         "Primary Reason",
         "Students",
-        "Faculty",
+        "Faculty/Staff",
         "Source"
       ]
 
@@ -531,8 +593,8 @@ export function CutsDataGrid() {
             `"${categorizeCut(cut.notes).replace(/"/g, '""')}"`,
             // Students
             `"${cut.students_affected ? cut.students_affected.toLocaleString() : ''}"`,
-            // Faculty
-            `"${cut.faculty_affected ? cut.faculty_affected.toLocaleString() : ''}"`,
+            // Faculty/Staff
+            `"${cut.faculty_affected ? `${cut.faculty_affected.toLocaleString()} (${determinePersonnelType(cut)})` : ''}"`,
             // Source (URL)
             `"${(cut.source_url || '').replace(/"/g, '""')}"`
           ].join(","),
@@ -684,7 +746,7 @@ export function CutsDataGrid() {
                 )}
                 {facultyAffectedFilter !== "all" && (
                   <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Faculty: {facultyAffectedFilter.replace("_", "-")}
+                    Faculty/Staff: {facultyAffectedFilter.replace("_", "-")}
                   </Badge>
                 )}
                 {categoryFilter !== "all" && (
@@ -704,12 +766,47 @@ export function CutsDataGrid() {
           {/* Filter Grid with Titles */}
           <div className="space-y-4">
             {/* All Dropdown Filters in One Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-9 gap-2">
+          {/* Search Filter */}
+          <div className="text-center">
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Search</h3>
+                <div className="flex items-center gap-1">
+                  <Search className="h-3 w-3 text-gray-400" />
+              <Input
+                    placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-6 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+              {/* Date Range Filter */}
+              <div className="text-center">
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Date</h3>
+                <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="last_7_days">Last 7 Days</SelectItem>
+                    <SelectItem value="last_30_days">Last 30 Days</SelectItem>
+                    <SelectItem value="last_90_days">Last 90 Days</SelectItem>
+                    <SelectItem value="last_6_months">Last 6 Months</SelectItem>
+                    <SelectItem value="last_year">Last Year</SelectItem>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2023">2023</SelectItem>
+                    <SelectItem value="2022">2022</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* State Filter */}
               <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">State</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">State</h3>
                 <Select value={stateFilter} onValueChange={setStateFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All States" />
                   </SelectTrigger>
                   <SelectContent>
@@ -723,11 +820,47 @@ export function CutsDataGrid() {
                 </Select>
               </div>
 
+              {/* Institution Filter */}
+              <div className="text-center">
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Institution</h3>
+                <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Institutions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Institutions</SelectItem>
+                    {filterOptions.institutions.slice(0, 50).map((institution) => (
+                      <SelectItem key={institution} value={institution}>
+                        {institution.length > 20 ? `${institution.substring(0, 20)}...` : institution}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Control Filter */}
+              <div className="text-center">
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Control</h3>
+                <Select value={controlFilter} onValueChange={setControlFilter}>
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    {filterOptions.controls.map((control) => (
+                      <SelectItem key={control} value={control}>
+                        {control}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Cut Type Filter */}
               <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Action Type</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Action</h3>
                 <Select value={cutTypeFilter} onValueChange={setCutTypeFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
@@ -752,70 +885,31 @@ export function CutsDataGrid() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              {/* Institution Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Institution</h3>
-                <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Institutions" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Institutions</SelectItem>
-                    {filterOptions.institutions.slice(0, 50).map((institution) => (
-                      <SelectItem key={institution} value={institution}>
-                        {institution.length > 25 ? `${institution.substring(0, 25)}...` : institution}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Control Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Control</h3>
-                <Select value={controlFilter} onValueChange={setControlFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    {filterOptions.controls.map((control) => (
-                      <SelectItem key={control} value={control}>
-                        {control}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
             </div>
 
-              {/* Date Range Filter */}
+              {/* Category Filter */}
               <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Date Range</h3>
-                <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Time" />
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Reason</h3>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="last_7_days">Last 7 Days</SelectItem>
-                    <SelectItem value="last_30_days">Last 30 Days</SelectItem>
-                    <SelectItem value="last_90_days">Last 90 Days</SelectItem>
-                    <SelectItem value="last_6_months">Last 6 Months</SelectItem>
-                    <SelectItem value="last_year">Last Year</SelectItem>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                    <SelectItem value="2022">2022</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {filterOptions.categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        <Badge className={categoryColors[category as keyof typeof categoryColors]}>{category}</Badge>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Students Affected Filter */}
               <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Students</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Students</h3>
                 <Select value={studentsAffectedFilter} onValueChange={setStudentsAffectedFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Ranges" />
                   </SelectTrigger>
                   <SelectContent>
@@ -835,82 +929,61 @@ export function CutsDataGrid() {
 
               {/* Faculty Affected Filter */}
               <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Faculty</h3>
+                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Faculty/Staff</h3>
                 <Select value={facultyAffectedFilter} onValueChange={setFacultyAffectedFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
+                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
                     <SelectValue placeholder="All Ranges" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Ranges</SelectItem>
-                    <SelectItem value="1_10">1-10 Faculty</SelectItem>
-                    <SelectItem value="11_25">11-25 Faculty</SelectItem>
-                    <SelectItem value="26_50">26-50 Faculty</SelectItem>
-                    <SelectItem value="51_100">51-100 Faculty</SelectItem>
-                    <SelectItem value="101_250">101-250 Faculty</SelectItem>
-                    <SelectItem value="251_500">251-500 Faculty</SelectItem>
-                    <SelectItem value="501_1000">501-1,000 Faculty</SelectItem>
-                    <SelectItem value="1000_plus">1,000+ Faculty</SelectItem>
+                    <SelectItem value="1_10">1-10 Faculty/Staff</SelectItem>
+                    <SelectItem value="11_25">11-25 Faculty/Staff</SelectItem>
+                    <SelectItem value="26_50">26-50 Faculty/Staff</SelectItem>
+                    <SelectItem value="51_100">51-100 Faculty/Staff</SelectItem>
+                    <SelectItem value="101_250">101-250 Faculty/Staff</SelectItem>
+                    <SelectItem value="251_500">251-500 Faculty/Staff</SelectItem>
+                    <SelectItem value="501_1000">501-1,000 Faculty/Staff</SelectItem>
+                    <SelectItem value="1000_plus">1,000+ Faculty/Staff</SelectItem>
                     <SelectItem value="unknown">Unknown</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Category Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Primary Reason</h3>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {filterOptions.categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        <Badge className={categoryColors[category as keyof typeof categoryColors]}>{category}</Badge>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
             </div>
+
+            {/* Special Filters Row */}
+            <div className="flex items-center justify-between gap-4 mt-2">
+              {/* Show Only With Numbers Toggle */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="showOnlyWithNumbers"
+                  checked={showOnlyWithNumbers}
+                  onChange={(e) => setShowOnlyWithNumbers(e.target.checked)}
+                  className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="showOnlyWithNumbers" className="text-xs font-medium text-gray-700">
+                  Show only actions with numerical impact data
+                </label>
           </div>
 
-            {/* Search and Toggle Row */}
-            <div className="flex items-center justify-between gap-4">
-              {/* Search Filter */}
-              <div className="flex-1 max-w-md">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Search</h3>
-                <div className="flex items-center gap-2">
-                  <Search className="h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search institutions, programs, notes..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-8 text-sm border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              {/* Toggle for showing only cuts with numbers */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Data Filter</h3>
-                <div className="flex items-center justify-center gap-3">
-                  <span className="text-xs text-gray-600">Show all cuts</span>
-                  <button
-                    onClick={() => setShowOnlyWithNumbers(!showOnlyWithNumbers)}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      showOnlyWithNumbers ? 'bg-blue-600' : 'bg-gray-200'
-                    }`}
-                    role="switch"
-                    aria-checked={showOnlyWithNumbers}
-                  >
-                    <span
-                      className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                        showOnlyWithNumbers ? 'translate-x-5' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                  <span className="text-xs text-gray-600">With numbers only</span>
-                </div>
+              {/* Quick Actions */}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={showOnly2024}
+                  variant="outline"
+                  size="sm"
+                  className="h-6 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                >
+                  Show 2024 Only
+                </Button>
+                <Button
+                  onClick={clearAllFilters}
+                  variant="outline"
+                  size="sm"
+                  className="h-6 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                >
+                  Clear All
+                </Button>
               </div>
             </div>
           </div>
@@ -949,7 +1022,7 @@ export function CutsDataGrid() {
                   <th className="h-12 px-4 text-center align-middle font-medium">Action Type</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Primary Reason</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Students</th>
-                  <th className="h-12 px-4 text-center align-middle font-medium">Faculty</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Faculty/Staff</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Source</th>
                 </tr>
               </thead>
@@ -983,7 +1056,12 @@ export function CutsDataGrid() {
                       {cut.students_affected ? cut.students_affected.toLocaleString() : "—"}
                     </td>
                     <td className="p-4 text-center align-middle">
-                      {cut.faculty_affected ? cut.faculty_affected.toLocaleString() : "—"}
+                      {cut.faculty_affected ? (
+                        <div className="flex flex-col items-center">
+                          <span className="font-medium">{cut.faculty_affected.toLocaleString()}</span>
+                          <span className="text-xs text-muted-foreground">{determinePersonnelType(cut)}</span>
+                        </div>
+                      ) : "—"}
                     </td>
                     <td className="p-4 text-center align-middle">
                       {cut.source_url && (

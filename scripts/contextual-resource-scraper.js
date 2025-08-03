@@ -39,104 +39,128 @@ class ContextualResourceScraper {
       'TX': {
         transferAssistance: [
           {
-            title: 'Texas Transfer Network',
-            url: 'https://www.txhighereddata.org/transfer',
-            description: 'Official Texas higher education transfer resources and articulation agreements',
+            title: 'National Student Clearinghouse',
+            url: 'https://www.studentclearinghouse.org',
+            description: 'Official transfer verification and student record services',
             state: 'TX',
             relevanceScore: 15,
-            source: 'Texas Higher Education Coordinating Board'
+            source: 'National Student Clearinghouse'
           },
           {
-            title: 'University of Texas Transfer Services',
-            url: 'https://admissions.utexas.edu/transfer',
-            description: 'Transfer assistance and credit evaluation for UT system students',
+            title: 'College Transfer Guide',
+            url: 'https://www.collegetransfer.net',
+            description: 'Step-by-step guidance for transferring credits and programs',
             state: 'TX',
             relevanceScore: 12,
-            source: 'University of Texas'
+            source: 'College Transfer Guide'
           }
         ],
         careerCounseling: [
           {
-            title: 'Texas Workforce Commission',
-            url: 'https://www.twc.texas.gov',
-            description: 'State career services and job placement assistance',
+            title: 'National Career Development Association',
+            url: 'https://www.ncda.org',
+            description: 'Professional career counseling resources and guidance for career transitions',
             state: 'TX',
             relevanceScore: 12,
-            source: 'Texas Government'
+            source: 'National Career Development Association'
+          },
+          {
+            title: 'CareerOneStop',
+            url: 'https://www.careeronestop.org',
+            description: 'Federal career resources and job search assistance',
+            state: 'TX',
+            relevanceScore: 10,
+            source: 'Federal Government'
           }
         ],
         legalAid: [
           {
-            title: 'Texas Legal Services Center',
-            url: 'https://www.tlsc.org',
-            description: 'Free legal assistance for Texas residents',
+            title: 'Legal Services Corporation',
+            url: 'https://www.lsc.gov',
+            description: 'Free legal aid resources for students and families',
             state: 'TX',
             relevanceScore: 10,
-            source: 'Legal Aid'
+            source: 'Federal Government'
           }
         ]
       },
       'IL': {
         transferAssistance: [
           {
-            title: 'Illinois Articulation Initiative',
-            url: 'https://www.itransfer.org',
-            description: 'Illinois transfer network and credit transfer resources',
+            title: 'National Student Clearinghouse',
+            url: 'https://www.studentclearinghouse.org',
+            description: 'Official transfer verification and student record services',
             state: 'IL',
             relevanceScore: 15,
-            source: 'Illinois Board of Higher Education'
+            source: 'National Student Clearinghouse'
           }
         ],
         careerCounseling: [
           {
-            title: 'Illinois Department of Employment Security',
-            url: 'https://www2.illinois.gov/ides',
-            description: 'State employment services and career counseling',
+            title: 'National Career Development Association',
+            url: 'https://www.ncda.org',
+            description: 'Professional career counseling resources and guidance for career transitions',
             state: 'IL',
             relevanceScore: 12,
-            source: 'Illinois Government'
+            source: 'National Career Development Association'
+          },
+          {
+            title: 'CareerOneStop',
+            url: 'https://www.careeronestop.org',
+            description: 'Federal career resources and job search assistance',
+            state: 'IL',
+            relevanceScore: 10,
+            source: 'Federal Government'
           }
         ],
         legalAid: [
           {
-            title: 'Legal Aid Chicago',
-            url: 'https://www.legalaidchicago.org',
-            description: 'Free legal services for Illinois residents',
+            title: 'Legal Services Corporation',
+            url: 'https://www.lsc.gov',
+            description: 'Free legal aid resources for students and families',
             state: 'IL',
             relevanceScore: 10,
-            source: 'Legal Aid'
+            source: 'Federal Government'
           }
         ]
       },
       'NY': {
         transferAssistance: [
           {
-            title: 'New York State Transfer and Articulation Association',
-            url: 'https://www.nystaa.org',
-            description: 'NY transfer resources and articulation agreements',
+            title: 'National Student Clearinghouse',
+            url: 'https://www.studentclearinghouse.org',
+            description: 'Official transfer verification and student record services',
             state: 'NY',
             relevanceScore: 15,
-            source: 'NYS Transfer Association'
+            source: 'National Student Clearinghouse'
           }
         ],
         careerCounseling: [
           {
-            title: 'New York State Department of Labor',
-            url: 'https://www.labor.ny.gov',
-            description: 'State career services and job placement',
+            title: 'National Career Development Association',
+            url: 'https://www.ncda.org',
+            description: 'Professional career counseling resources and guidance for career transitions',
             state: 'NY',
             relevanceScore: 12,
-            source: 'New York Government'
+            source: 'National Career Development Association'
+          },
+          {
+            title: 'CareerOneStop',
+            url: 'https://www.careeronestop.org',
+            description: 'Federal career resources and job search assistance',
+            state: 'NY',
+            relevanceScore: 10,
+            source: 'Federal Government'
           }
         ],
         legalAid: [
           {
-            title: 'Legal Aid Society of New York',
-            url: 'https://www.legalaidnyc.org',
-            description: 'Free legal services for New York residents',
+            title: 'Legal Services Corporation',
+            url: 'https://www.lsc.gov',
+            description: 'Free legal aid resources for students and families',
             state: 'NY',
             relevanceScore: 10,
-            source: 'Legal Aid'
+            source: 'Federal Government'
           }
         ]
       }
@@ -233,24 +257,24 @@ class ContextualResourceScraper {
     if (institution.includes('university of texas') || institution.includes('ut')) {
       resources.transferAssistance = [
         {
-          title: 'UT System Transfer Services',
-          url: 'https://www.utsystem.edu',
+          title: 'National Student Clearinghouse',
+          url: 'https://www.studentclearinghouse.org',
           description: 'Transfer assistance for UT system students affected by program changes',
           institution: action.institution,
           state: action.state,
           relevanceScore: 15,
-          source: 'UT System'
+          source: 'National Student Clearinghouse'
         }
       ];
       resources.careerCounseling = [
         {
-          title: 'UT Career Services',
-          url: 'https://career.utexas.edu',
+          title: 'National Career Development Association',
+          url: 'https://www.ncda.org',
           description: 'Career counseling and job placement for UT students and faculty',
           institution: action.institution,
           state: action.state,
           relevanceScore: 12,
-          source: 'UT Career Services'
+          source: 'National Career Development Association'
         }
       ];
     }
@@ -259,24 +283,24 @@ class ContextualResourceScraper {
     if (institution.includes('northwestern')) {
       resources.careerCounseling = [
         {
-          title: 'Northwestern Career Services',
-          url: 'https://career.northwestern.edu',
+          title: 'National Career Development Association',
+          url: 'https://www.ncda.org',
           description: 'Career counseling and job placement for Northwestern students and faculty',
           institution: action.institution,
           state: action.state,
           relevanceScore: 15,
-          source: 'Northwestern University'
+          source: 'National Career Development Association'
         }
       ];
       resources.mentalHealth = [
         {
-          title: 'Northwestern Counseling Services',
-          url: 'https://www.northwestern.edu/counseling',
+          title: 'National Alliance on Mental Illness',
+          url: 'https://www.nami.org',
           description: 'Mental health support for Northwestern community',
           institution: action.institution,
           state: action.state,
           relevanceScore: 12,
-          source: 'Northwestern University'
+          source: 'National Alliance on Mental Illness'
         }
       ];
     }
@@ -285,13 +309,13 @@ class ContextualResourceScraper {
     if (institution.includes('king')) {
       resources.transferAssistance = [
         {
-          title: 'King\'s College Transfer Resources',
-          url: 'https://www.tkc.edu',
+          title: 'National Student Clearinghouse',
+          url: 'https://www.studentclearinghouse.org',
           description: 'Transfer assistance for King\'s College students',
           institution: action.institution,
           state: action.state,
           relevanceScore: 15,
-          source: 'The King\'s College'
+          source: 'National Student Clearinghouse'
         }
       ];
       resources.legalAid = [
@@ -302,7 +326,7 @@ class ContextualResourceScraper {
           institution: action.institution,
           state: action.state,
           relevanceScore: 12,
-          source: 'Student Rights Organization'
+          source: 'Student Borrower Protection Center'
         }
       ];
     }

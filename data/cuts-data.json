@@ -1,0 +1,406 @@
+[
+  {
+    "institution": "Moody Bible Institute",
+    "state": "IL"
+  },
+  {
+    "institution": "Barnard College",
+    "state": "NY"
+  },
+  {
+    "institution": "University of Texas at Dallas",
+    "state": "TX"
+  },
+  {
+    "institution": "Northwestern University",
+    "state": "IL"
+  },
+  {
+    "institution": "The King's College",
+    "state": "NY"
+  },
+  {
+    "institution": "Duke University",
+    "state": "NC"
+  },
+  {
+    "institution": "Sullivan University",
+    "state": "KY"
+  },
+  {
+    "institution": "Temple University",
+    "state": "PA"
+  },
+  {
+    "institution": "Texas A&M University–Kingsville",
+    "state": "TX"
+  },
+  {
+    "institution": "University of Minnesota Extension",
+    "state": "MN"
+  },
+  {
+    "institution": "University of Wisconsin-Green Bay",
+    "state": "WI"
+  },
+  {
+    "institution": "University of Southern California",
+    "state": "CA"
+  },
+  {
+    "institution": "University of Tennessee, Knoxville",
+    "state": "TN"
+  },
+  {
+    "institution": "University of Wisconsin–Madison",
+    "state": "WI"
+  },
+  {
+    "institution": "Boston University",
+    "state": "MA"
+  },
+  {
+    "institution": "Ball State University",
+    "state": "IN"
+  },
+  {
+    "institution": "Averett University",
+    "state": "VA"
+  },
+  {
+    "institution": "Indiana University Bloomington",
+    "state": "IN"
+  },
+  {
+    "institution": "Purdue University",
+    "state": "IN"
+  },
+  {
+    "institution": "University of California, Los Angeles",
+    "state": "CA"
+  },
+  {
+    "institution": "Ivy Tech Community College",
+    "state": "IN"
+  },
+  {
+    "institution": "Siena Heights University",
+    "state": "MI"
+  },
+  {
+    "institution": "Western Washington University",
+    "state": "WA"
+  },
+  {
+    "institution": "Whitman College",
+    "state": "WA"
+  },
+  {
+    "institution": "Southern New Hampshire University",
+    "state": "NH"
+  },
+  {
+    "institution": "University of Minnesota",
+    "state": "MN"
+  },
+  {
+    "institution": "Clark University",
+    "state": "MA"
+  },
+  {
+    "institution": "Vanderbilt University Medical Center",
+    "state": "TN"
+  },
+  {
+    "institution": "University of Oregon",
+    "state": "OR"
+  },
+  {
+    "institution": "University of Minnesota System",
+    "state": "MN"
+  },
+  {
+    "institution": "Columbia College Chicago",
+    "state": "IL"
+  },
+  {
+    "institution": "Washington State University",
+    "state": "DC"
+  },
+  {
+    "institution": "University of Akron",
+    "state": "OH"
+  },
+  {
+    "institution": "Marquette University",
+    "state": "WI"
+  },
+  {
+    "institution": "Portland Community College",
+    "state": "OR"
+  },
+  {
+    "institution": "Mercyhurst University",
+    "state": "PA"
+  },
+  {
+    "institution": "Utah Valley University",
+    "state": "UT"
+  },
+  {
+    "institution": "University of California, Los Angeles",
+    "state": "CA"
+  },
+  {
+    "institution": "Ivy Tech Community College",
+    "state": "IN"
+  },
+  {
+    "institution": "Roberts Wesleyan University",
+    "state": "NY"
+  },
+  {
+    "institution": "Buffalo State University",
+    "state": "NY"
+  },
+  {
+    "institution": "University of California, Santa Cruz",
+    "state": "CA"
+  },
+  {
+    "institution": "University of Arizona",
+    "state": "AZ"
+  },
+  {
+    "institution": "Bacone College",
+    "state": "OK"
+  },
+  {
+    "institution": "Johnson & Wales University",
+    "state": "RI"
+  },
+  {
+    "institution": "Columbia University",
+    "state": "NY"
+  },
+  {
+    "institution": "American University",
+    "state": "DC"
+  },
+  {
+    "institution": "Kennesaw State University",
+    "state": "GA"
+  },
+  {
+    "institution": "Limestone University",
+    "state": "SC"
+  },
+  {
+    "institution": "Utah State University",
+    "state": "UT"
+  },
+  {
+    "institution": "St. Andrews University",
+    "state": "NC"
+  },
+  {
+    "institution": "Weber State University",
+    "state": "UT"
+  },
+  {
+    "institution": "University of Toledo",
+    "state": "OH"
+  },
+  {
+    "institution": "Jacksonville University",
+    "state": "FL"
+  },
+  {
+    "institution": "University of Houston",
+    "state": "TX"
+  },
+  {
+    "institution": "St. Norbert College",
+    "state": "WI"
+  },
+  {
+    "institution": "University of Montevallo",
+    "state": "AL"
+  },
+  {
+    "institution": "Johns Hopkins University",
+    "state": "MD"
+  },
+  {
+    "institution": "California Polytechnic State University",
+    "state": "CA"
+  },
+  {
+    "institution": "Northland College",
+    "state": "WI"
+  },
+  {
+    "institution": "Sonoma State University",
+    "state": "CA"
+  },
+  {
+    "institution": "Columbia College Chicago",
+    "state": "IL"
+  },
+  {
+    "institution": "Portland State University",
+    "state": "OR"
+  },
+  {
+    "institution": "Saint Augustine's University",
+    "state": "NC"
+  },
+  {
+    "institution": "Drexel University",
+    "state": "PA"
+  },
+  {
+    "institution": "Boston University",
+    "state": "MA"
+  },
+  {
+    "institution": "Mississippi College",
+    "state": "MS"
+  },
+  {
+    "institution": "Texas A&M University",
+    "state": "TX"
+  },
+  {
+    "institution": "Bard College at Simon's Rock",
+    "state": "MA"
+  },
+  {
+    "institution": "Saint Louis University",
+    "state": "MO"
+  },
+  {
+    "institution": "Tennessee State University",
+    "state": "TN"
+  },
+  {
+    "institution": "Elizabethtown College",
+    "state": "PA"
+  },
+  {
+    "institution": "Wittenberg University",
+    "state": "OH"
+  },
+  {
+    "institution": "Stanford University",
+    "state": "CA"
+  },
+  {
+    "institution": "Emerson College",
+    "state": "MA"
+  },
+  {
+    "institution": "Western Illinois University",
+    "state": "IL"
+  },
+  {
+    "institution": "Lindenwood University",
+    "state": "MO"
+  },
+  {
+    "institution": "Keystone College",
+    "state": "PA"
+  },
+  {
+    "institution": "Eastern Nazarene College",
+    "state": "MA"
+  },
+  {
+    "institution": "Union Institute & University",
+    "state": "OH"
+  },
+  {
+    "institution": "Concordia University Ann Arbor",
+    "state": "MI"
+  },
+  {
+    "institution": "Alverno College",
+    "state": "WI"
+  },
+  {
+    "institution": "Albright College",
+    "state": "PA"
+  },
+  {
+    "institution": "University of Lynchburg",
+    "state": "VA"
+  },
+  {
+    "institution": "University of the Arts",
+    "state": "PA"
+  },
+  {
+    "institution": "St. Catherine University",
+    "state": "MN"
+  },
+  {
+    "institution": "Buffalo State University",
+    "state": "NY"
+  },
+  {
+    "institution": "Eastern Gateway Community College",
+    "state": "OH"
+  },
+  {
+    "institution": "St. Cloud State University",
+    "state": "MN"
+  },
+  {
+    "institution": "Pennsylvania State University",
+    "state": "PA"
+  },
+  {
+    "institution": "University of Wisconsin",
+    "state": "WI"
+  },
+  {
+    "institution": "Fontbonne University",
+    "state": "MO"
+  },
+  {
+    "institution": "Valparaiso University",
+    "state": "IN"
+  },
+  {
+    "institution": "Drake University",
+    "state": "IA"
+  },
+  {
+    "institution": "University of Antelope Valley",
+    "state": "CA"
+  },
+  {
+    "institution": "Texas A&M University at Qatar",
+    "state": "Non-US"
+  },
+  {
+    "institution": "Marietta College",
+    "state": "OH"
+  },
+  {
+    "institution": "University of North Carolina at Greensboro",
+    "state": "NC"
+  },
+  {
+    "institution": "Jamestown Business College",
+    "state": "NY"
+  },
+  {
+    "institution": "University of Wisconsin-Green Bay",
+    "state": "WI"
+  },
+  {
+    "institution": "University of New Hampshire",
+    "state": "NH"
+  }
+]
