@@ -44,6 +44,153 @@ const cutTypeColors = {
   staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
 }
 
+const categoryColors = {
+  "Budget Deficit": "bg-red-50 text-red-700 border-red-200",
+  "Enrollment Decline": "bg-blue-50 text-blue-700 border-blue-200", 
+  "Federal Funding Cuts": "bg-purple-50 text-purple-700 border-purple-200",
+  "State Mandates": "bg-green-50 text-green-700 border-green-200",
+  "Financial Mismanagement": "bg-orange-50 text-orange-700 border-orange-200",
+  "Strategic Restructuring": "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "Political Pressure": "bg-pink-50 text-pink-700 border-pink-200",
+  "Operational Costs": "bg-yellow-50 text-yellow-700 border-yellow-200",
+  "Accreditation Issues": "bg-gray-50 text-gray-700 border-gray-200"
+}
+
+// State abbreviation mapping
+const stateAbbreviations: Record<string, string> = {
+  "Alabama": "AL",
+  "Alaska": "AK", 
+  "Arizona": "AZ",
+  "Arkansas": "AR",
+  "California": "CA",
+  "Colorado": "CO",
+  "Connecticut": "CT",
+  "Delaware": "DE",
+  "Florida": "FL",
+  "Georgia": "GA",
+  "Hawaii": "HI",
+  "Idaho": "ID",
+  "Illinois": "IL",
+  "Indiana": "IN",
+  "Iowa": "IA",
+  "Kansas": "KS",
+  "Kentucky": "KY",
+  "Louisiana": "LA",
+  "Maine": "ME",
+  "Maryland": "MD",
+  "Massachusetts": "MA",
+  "Michigan": "MI",
+  "Minnesota": "MN",
+  "Mississippi": "MS",
+  "Missouri": "MO",
+  "Montana": "MT",
+  "Nebraska": "NE",
+  "Nevada": "NV",
+  "New Hampshire": "NH",
+  "New Jersey": "NJ",
+  "New Mexico": "NM",
+  "New York": "NY",
+  "North Carolina": "NC",
+  "North Dakota": "ND",
+  "Ohio": "OH",
+  "Oklahoma": "OK",
+  "Oregon": "OR",
+  "Pennsylvania": "PA",
+  "Rhode Island": "RI",
+  "South Carolina": "SC",
+  "South Dakota": "SD",
+  "Tennessee": "TN",
+  "Texas": "TX",
+  "Utah": "UT",
+  "Vermont": "VT",
+  "Virginia": "VA",
+  "Washington": "WA",
+  "West Virginia": "WV",
+  "Wisconsin": "WI",
+  "Wyoming": "WY"
+}
+
+function categorizeCut(notes: string | null): string {
+  if (!notes) return "Budget Deficit" // Default for null notes
+  
+  const notesLower = notes.toLowerCase()
+  
+  // Budget and financial issues (highest priority - most common)
+  if (notesLower.includes("budget deficit") || notesLower.includes("budget gap") || 
+      notesLower.includes("budget shortfall") || notesLower.includes("deficit") ||
+      notesLower.includes("financial deficit") || notesLower.includes("operating deficit") ||
+      notesLower.includes("budget constraints") || notesLower.includes("budget cuts") ||
+      notesLower.includes("revenue gap") || notesLower.includes("financial instability") ||
+      notesLower.includes("financial collapse") || notesLower.includes("financial challenges") ||
+      notesLower.includes("financial fragility") || notesLower.includes("financial irregularities")) {
+    return "Budget Deficit"
+  }
+  
+  // Federal funding cuts
+  if (notesLower.includes("federal funding") || notesLower.includes("federal cuts") ||
+      notesLower.includes("federal budget") || notesLower.includes("federal grants") ||
+      notesLower.includes("usaid") || notesLower.includes("federal funding freeze") ||
+      notesLower.includes("federal funding threats") || notesLower.includes("federal budget cuts") ||
+      notesLower.includes("federal funding elimination")) {
+    return "Federal Funding Cuts"
+  }
+  
+  // State mandates and requirements
+  if (notesLower.includes("state mandate") || notesLower.includes("state requirement") ||
+      notesLower.includes("state funding") || notesLower.includes("state-mandated") ||
+      notesLower.includes("graduation thresholds") || notesLower.includes("low-productivity") ||
+      notesLower.includes("state-mandated graduation") || notesLower.includes("degree program thresholds") ||
+      notesLower.includes("indiana state mandate") || notesLower.includes("ohio sb1") ||
+      notesLower.includes("hb 265")) {
+    return "State Mandates"
+  }
+  
+  // Enrollment issues
+  if (notesLower.includes("enrollment decline") || notesLower.includes("declining enrollment") ||
+      notesLower.includes("low enrollment") || notesLower.includes("enrollment woes") ||
+      notesLower.includes("enrollment shortfall") || notesLower.includes("enrollment down")) {
+    return "Enrollment Decline"
+  }
+  
+  // Strategic restructuring
+  if (notesLower.includes("strategic") || notesLower.includes("restructuring") ||
+      notesLower.includes("realignment") || notesLower.includes("mission alignment") ||
+      notesLower.includes("broader restructuring") || notesLower.includes("institution-wide") ||
+      notesLower.includes("voluntary buyouts") || notesLower.includes("voluntary retirement") ||
+      notesLower.includes("buyouts") || notesLower.includes("retirement incentives")) {
+    return "Strategic Restructuring"
+  }
+  
+  // Political pressure
+  if (notesLower.includes("political pressure") || notesLower.includes("state lawmakers") ||
+      notesLower.includes("national security") || notesLower.includes("antisemitism") ||
+      notesLower.includes("chinese communist party") || notesLower.includes("house select committee")) {
+    return "Political Pressure"
+  }
+  
+  // Operational costs
+  if (notesLower.includes("operational costs") || notesLower.includes("rising costs") ||
+      notesLower.includes("cost constraints") || notesLower.includes("cost-saving") ||
+      notesLower.includes("operational challenges") || notesLower.includes("operational cuts")) {
+    return "Operational Costs"
+  }
+  
+  // Financial mismanagement
+  if (notesLower.includes("mismanagement") || notesLower.includes("fraud") ||
+      notesLower.includes("scandal") || notesLower.includes("financial irregularities") ||
+      notesLower.includes("financial misconduct")) {
+    return "Financial Mismanagement"
+  }
+  
+  // Accreditation issues
+  if (notesLower.includes("accreditation") || notesLower.includes("accredited") ||
+      notesLower.includes("certification") || notesLower.includes("accreditation issues")) {
+    return "Accreditation Issues"
+  }
+  
+  return "Budget Deficit"
+}
+
 // Mock data as fallback only
 const mockKpiData: KpiData = {
   totalActions: 96,
@@ -331,8 +478,26 @@ export function HomePageClient() {
         return acc
       }, {} as Record<string, number>)
 
-      const mostImpactedState = Object.entries(stateCounts).reduce((a, b) => (stateCounts[a[0]] > stateCounts[b[0]] ? a : b))[0]
-      console.log("✅ Most impacted state:", mostImpactedState)
+      // Find the maximum count
+      const maxCount = Math.max(...Object.values(stateCounts))
+      
+      // Find all states with the maximum count
+      const mostImpactedStates = Object.entries(stateCounts)
+        .filter(([state, count]) => count === maxCount)
+        .map(([state]) => state)
+        .sort() // Sort alphabetically for consistent display
+      
+      // Convert to abbreviations and format
+      const stateAbbrevs = mostImpactedStates
+        .map(state => stateAbbreviations[state] || state)
+        .sort()
+      
+      const mostImpactedState = stateAbbrevs.length > 1 
+        ? stateAbbrevs.slice(0, -1).join(", ") + " & " + stateAbbrevs[stateAbbrevs.length - 1]
+        : stateAbbrevs[0] || ""
+      
+      console.log("✅ Most impacted states:", mostImpactedStates)
+      console.log("✅ Most impacted state display:", mostImpactedState)
 
       const kpiData: KpiData = {
         totalActions: totalActions || 0,
@@ -467,7 +632,7 @@ export function HomePageClient() {
             </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-              Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States. Monitor institutional changes, find affected programs, and track students and faculty impacted by higher education restructuring and budget cuts.
+              Comprehensive database tracking higher education cuts, university program closures, and academic department suspensions across the United States. Monitor institutional changes in higher ed, find affected programs, and track students and faculty impacted by higher education restructuring and budget cuts.
             </p>
           </div>
 
@@ -567,28 +732,28 @@ export function HomePageClient() {
               <EnhancedKpiCard
                 title="Total Actions Taken"
                 value={kpiData?.totalActions || 0}
-                subtitle="program suspensions & closures"
+                subtitle="higher ed actions from 2024 to present"
                 icon={GraduationCap}
                 loading={loading}
               />
               <EnhancedKpiCard
                 title="Institutions Impacted"
                 value={kpiData?.institutionsImpacted || 0}
-                subtitle="colleges & universities"
+                subtitle="higher education institutions from 2024"
                 icon={Building2}
                 loading={loading}
               />
               <EnhancedKpiCard
                 title="States Affected"
                 value={kpiData?.statesAffected || 0}
-                subtitle="geographic spread"
+                subtitle="states with higher ed actions since 2024"
                 icon={Activity}
                 loading={loading}
               />
               <EnhancedKpiCard
                 title="Most Impacted State"
                 value={kpiData?.mostImpactedState || ""}
-                subtitle="by number of actions"
+                subtitle="by higher ed actions since 2024"
                 icon={MapPin}
                 loading={loading}
               />
@@ -601,8 +766,8 @@ export function HomePageClient() {
           <section aria-labelledby="latest-actions-title">
             <div className="text-center sm:text-left">
               <div className="space-y-2">
-                <h2 id="latest-actions-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest University Program Actions & Closures</h2>
-                <p className="text-muted-foreground mb-8">Most recent announcements of academic program suspensions, department closures, and institutional changes</p>
+                <h2 id="latest-actions-title" className="text-2xl sm:text-3xl font-bold tracking-tight">Latest Higher Education Actions & Closures</h2>
+                <p className="text-muted-foreground mb-8">Most recent announcements of higher education program suspensions, department closures, and institutional changes</p>
               </div>
             </div>
 
@@ -638,6 +803,9 @@ export function HomePageClient() {
                               </Link>
                               <Badge className={`${cutTypeColors[cut.cut_type]} border transition-colors text-xs`} variant="secondary">
                                 {cut.cut_type.replace("_", " ")}
+                              </Badge>
+                              <Badge className={`${categoryColors[categorizeCut(cut.notes) as keyof typeof categoryColors]} border transition-colors text-xs`} variant="secondary">
+                                {categorizeCut(cut.notes)}
                               </Badge>
                             </div>
                             <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
@@ -695,7 +863,7 @@ export function HomePageClient() {
             <CardContent className="p-6 sm:p-8 text-center">
               <div className="space-y-4">
                 <p className="text-muted-foreground text-base sm:text-lg">
-                  Have information about program actions or institutional changes?{" "}
+                  Have information about higher education program actions or institutional changes?{" "}
                   <Link href="/submit-tip" className="text-primary hover:text-primary/80 font-medium hover:underline">
                     Let me know if you see anything missing!
                   </Link>
