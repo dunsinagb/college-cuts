@@ -6,6 +6,8 @@ import { Header } from "@/components/Header"
 import { PerformanceOptimizer } from "@/components/PerformanceOptimizer"
 import { OfflineIndicator } from "@/components/OfflineIndicator"
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://collegecuts.com'
+
 export const metadata: Metadata = {
   title: "CollegeCuts Tracker - Monitor University Program Actions & Closures",
   description: "Tracking program actions and closures in higher education",
@@ -53,11 +55,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'CollegeCuts Tracker - Monitor University Program Actions & Closures',
     description: 'Tracking program actions and closures in higher education',
-    url: 'https://collegecuts.com',
+    url: siteUrl,
     siteName: 'CollegeCuts',
     images: [
       {
-        url: 'https://collegecuts.com/og-image.jpg',
+        url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'CollegeCuts Tracker - University Program Actions Database'
@@ -70,7 +72,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CollegeCuts Tracker - Monitor University Program Actions & Closures',
     description: 'Tracking program actions and closures in higher education',
-    images: ['https://collegecuts.com/og-image.jpg'],
+    images: [`${siteUrl}/og-image.jpg`],
   },
   other: {
     'apple-mobile-web-app-capable': 'yes',
@@ -97,7 +99,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   alternates: {
-    canonical: 'https://collegecuts.com'
+    canonical: siteUrl
   },
   category: 'education',
   classification: 'Educational Database',
@@ -150,14 +152,14 @@ export default function RootLayout({
         <meta property="og:title" content="CollegeCuts Tracker - Monitor University Program Cuts & Closures" />
         <meta property="og:description" content="Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States. Find affected programs, students, and faculty by state and institution." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://collegecuts.com" />
+        <meta property="og:url" content={siteUrl} />
         <meta property="og:site_name" content="CollegeCuts Tracker" />
         <meta property="og:locale" content="en_US" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="CollegeCuts Tracker - Monitor University Program Cuts & Closures" />
         <meta name="twitter:description" content="Comprehensive database tracking college cuts, university program closures, and academic department suspensions across the United States." />
         <meta name="twitter:image" content="/og-image.png" />
-        <link rel="canonical" href="https://collegecuts.com" />
+        <link rel="canonical" href={siteUrl} />
         <meta name="category" content="education" />
         <meta name="classification" content="Educational Database" />
         <meta name="referrer" content="origin-when-cross-origin" />
@@ -169,8 +171,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "url": "https://college-cuts.com",
-              "logo": "https://college-cuts.com/icons/icon-192x192.svg"
+              "url": siteUrl,
+              "logo": `${siteUrl}/icons/icon-192x192.svg`
             })
           }}
         />
@@ -192,7 +194,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
+              function gtag(){dataLayer.push(arguments);} 
               gtag('js', new Date());
               gtag('config', 'G-09JJ1DBK6G');
             `,
