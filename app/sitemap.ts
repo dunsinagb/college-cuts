@@ -3,6 +3,15 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.college-cuts.com'
   
+  const states = ['california', 'new-york', 'texas', 'florida', 'illinois']
+  
+  const stateUrls = states.map(state => ({
+    url: `${baseUrl}/state/${state}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+  
   return [
     {
       url: baseUrl,
@@ -26,7 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/submit-tip`,
@@ -34,5 +43,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.6,
     },
+    ...stateUrls,
   ]
 } 

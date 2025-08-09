@@ -15,9 +15,68 @@ import {
 import Link from "next/link"
 import { Metadata } from "next"
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.college-cuts.com'
+
 export const metadata: Metadata = {
-  title: "About - CollegeCuts Tracker",
-  description: "A comprehensive, real-time database monitoring program actions, department closures, and institutional changes across higher education institutions in the United States.",
+  title: "About CollegeCuts - Comprehensive Database of University Program Cuts & Closures 2024-2025",
+  description: "Learn about CollegeCuts Tracker, the most comprehensive database monitoring college program cuts, university closures, faculty layoffs, and institutional changes across US higher education. Real-time data on academic program suspensions and budget cuts.",
+  keywords: [
+    "college cuts database",
+    "university program cuts tracker",
+    "higher education closures",
+    "faculty layoffs database",
+    "academic program suspension",
+    "university budget cuts",
+    "college closures 2024",
+    "university closures 2025",
+    "higher education crisis",
+    "academic program elimination",
+    "department closure tracking",
+    "institutional changes database",
+    "education program cuts",
+    "university restructuring",
+    "college program discontinuation",
+    "higher education tracking tool",
+    "academic department cuts",
+    "university faculty reductions",
+    "college enrollment decline",
+    "education budget reductions",
+    "university program elimination",
+    "academic program consolidation",
+    "higher education downsizing",
+    "college financial crisis",
+    "university academic cuts",
+    "education institutional changes",
+    "college cuts methodology",
+    "university closures data",
+    "academic program database",
+    "higher education transparency"
+  ],
+  openGraph: {
+    title: "About CollegeCuts - Comprehensive Database of University Program Cuts & Closures 2024-2025",
+    description: "Learn about CollegeCuts Tracker, the most comprehensive database monitoring college program cuts, university closures, faculty layoffs, and institutional changes across US higher education.",
+    url: `${siteUrl}/about`,
+    siteName: "CollegeCuts",
+    images: [
+      {
+        url: `${siteUrl}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "About CollegeCuts - Higher Education Program Cuts Database",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About CollegeCuts - Comprehensive Database of University Program Cuts & Closures 2024-2025",
+    description: "Learn about CollegeCuts Tracker, the most comprehensive database monitoring college program cuts, university closures, faculty layoffs, and institutional changes across US higher education.",
+    images: [`${siteUrl}/og-image.jpg`],
+  },
+  alternates: {
+    canonical: `${siteUrl}/about`,
+  },
 }
 
 export default function AboutPage() {
