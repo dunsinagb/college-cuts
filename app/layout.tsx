@@ -172,8 +172,57 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
+              "name": "CollegeCuts Tracker",
               "url": siteUrl,
-              "logo": `${siteUrl}/icons/icon-192x192.svg`
+              "logo": `${siteUrl}/icons/icon-192x192.svg`,
+              "description": "Comprehensive database tracking college program cuts, university closures, department suspensions, and faculty layoffs across the United States.",
+              "foundingDate": "2024",
+              "sameAs": [
+                "https://github.com/dunsinagb/college-cuts",
+                "https://linkedin.com/in/dunsinagb"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "url": `${siteUrl}/submit-tip`
+              }
+            })
+          }}
+        />
+        
+        {/* FAQ Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "What is CollegeCuts Tracker?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "CollegeCuts Tracker is a comprehensive database that monitors and tracks college program cuts, university closures, department suspensions, and faculty layoffs across the United States. It provides real-time data on higher education budget cuts, enrollment declines, and institutional changes affecting students and faculty."
+                  }
+                },
+                {
+                  "@type": "Question", 
+                  "name": "How many universities have had program cuts in 2024-2025?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our database tracks program cuts, closures, and academic actions across hundreds of institutions nationwide. The data is continuously updated as new information becomes available from public sources."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Which states are most affected by college cuts?",
+                  "acceptedAnswer": {
+                    "@type": "Answer", 
+                    "text": "College cuts and closures are affecting institutions across all states, with varying degrees of impact. Our analytics dashboard shows state-by-state breakdowns of program actions, closures, and institutional changes."
+                  }
+                }
+              ]
             })
           }}
         />
