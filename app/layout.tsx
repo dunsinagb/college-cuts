@@ -52,6 +52,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'CollegeCuts Team' }],
   robots: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
   manifest: '/manifest.json',
+  metadataBase: new URL(siteUrl),
   openGraph: {
     title: 'CollegeCuts Tracker - Monitor University Program Actions & Closures',
     description: 'Tracking program actions and closures in higher education',
