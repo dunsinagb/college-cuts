@@ -6,7 +6,7 @@ import { Header } from "@/components/Header"
 import { PerformanceOptimizer } from "@/components/PerformanceOptimizer"
 import { OfflineIndicator } from "@/components/OfflineIndicator"
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://collegecuts.com'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.college-cuts.com'
 
 export const metadata: Metadata = {
   title: "CollegeCuts Tracker - Monitor University Program Actions & Closures",
