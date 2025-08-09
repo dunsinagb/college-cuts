@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { HomePageClient } from "@/components/HomePageClient"
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://collegecuts.com'
+
 // SEO Metadata for the homepage
 export const metadata: Metadata = {
   title: "CollegeCuts - Track Higher Education Program Actions & Closures",
@@ -48,11 +50,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CollegeCuts - Track Higher Education Program Actions & Closures",
     description: "Monitor and analyze program actions, department closures, and institutional changes in higher education across the United States.",
-    url: "https://collegecuts.com",
+    url: siteUrl,
     siteName: "CollegeCuts",
     images: [
       {
-        url: "https://collegecuts.com/og-image.jpg",
+        url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: "CollegeCuts - Higher Education Program Actions Tracker",
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CollegeCuts - Track Higher Education Program Actions & Closures",
     description: "Monitor and analyze program actions, department closures, and institutional changes in higher education across the United States.",
-    images: ["https://collegecuts.com/og-image.jpg"],
+    images: [`${siteUrl}/og-image.jpg`],
   },
   robots: {
     index: true,
@@ -77,9 +79,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    google: "your-google-verification-code",
   },
 }
 
