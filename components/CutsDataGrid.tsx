@@ -22,6 +22,26 @@ const cutTypeColors = {
   staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
 }
 
+// Status colors for consistent styling
+const statusColors = {
+  confirmed: "bg-green-100 text-green-800 border-green-200 hover:bg-green-200",
+  provisional: "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
+  pending: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
+  proposed: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
+  under_review: "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200",
+  cancelled: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
+}
+
+// Status display names
+const statusDisplayNames = {
+  confirmed: "Confirmed",
+  provisional: "Provisional",
+  pending: "Pending",
+  proposed: "Proposed",
+  under_review: "Under Review",
+  cancelled: "Cancelled",
+}
+
 // Category colors for the new categorization system
 const categoryColors = {
   "Budget Deficit": "bg-red-50 text-red-700 border-red-200",
@@ -71,49 +91,58 @@ function categorizeCut(notes: string | null): string {
     return "State Mandates"
   }
   
-  // Enrollment issues
+  // Enrollment decline
   if (notesLower.includes("enrollment decline") || notesLower.includes("declining enrollment") ||
-      notesLower.includes("low enrollment") || notesLower.includes("enrollment woes") ||
-      notesLower.includes("enrollment shortfall") || notesLower.includes("enrollment down")) {
+      notesLower.includes("low enrollment") || notesLower.includes("enrollment drop") ||
+      notesLower.includes("student enrollment") || notesLower.includes("admission decline") ||
+      notesLower.includes("student numbers") || notesLower.includes("enrollment numbers") ||
+      notesLower.includes("student population") || notesLower.includes("enrollment trends")) {
     return "Enrollment Decline"
   }
   
   // Strategic restructuring
-  if (notesLower.includes("strategic") || notesLower.includes("restructuring") ||
-      notesLower.includes("realignment") || notesLower.includes("mission alignment") ||
-      notesLower.includes("broader restructuring") || notesLower.includes("institution-wide") ||
-      notesLower.includes("voluntary buyouts") || notesLower.includes("voluntary retirement") ||
-      notesLower.includes("buyouts") || notesLower.includes("retirement incentives")) {
+  if (notesLower.includes("strategic restructuring") || notesLower.includes("strategic plan") ||
+      notesLower.includes("strategic realignment") || notesLower.includes("strategic initiative") ||
+      notesLower.includes("restructuring") || notesLower.includes("reorganization") ||
+      notesLower.includes("realignment") || notesLower.includes("strategic review") ||
+      notesLower.includes("strategic assessment") || notesLower.includes("strategic changes")) {
     return "Strategic Restructuring"
   }
   
+  // Financial mismanagement
+  if (notesLower.includes("financial mismanagement") || notesLower.includes("mismanagement") ||
+      notesLower.includes("financial irregularities") || notesLower.includes("financial scandal") ||
+      notesLower.includes("financial fraud") || notesLower.includes("financial misconduct") ||
+      notesLower.includes("financial impropriety") || notesLower.includes("financial wrongdoing")) {
+    return "Financial Mismanagement"
+  }
+  
   // Political pressure
-  if (notesLower.includes("political pressure") || notesLower.includes("state lawmakers") ||
-      notesLower.includes("national security") || notesLower.includes("antisemitism") ||
-      notesLower.includes("chinese communist party") || notesLower.includes("house select committee")) {
+  if (notesLower.includes("political pressure") || notesLower.includes("political") ||
+      notesLower.includes("legislative pressure") || notesLower.includes("government pressure") ||
+      notesLower.includes("political influence") || notesLower.includes("political climate") ||
+      notesLower.includes("political environment") || notesLower.includes("political factors")) {
     return "Political Pressure"
   }
   
   // Operational costs
-  if (notesLower.includes("operational costs") || notesLower.includes("rising costs") ||
-      notesLower.includes("cost constraints") || notesLower.includes("cost-saving") ||
-      notesLower.includes("operational challenges") || notesLower.includes("operational cuts")) {
+  if (notesLower.includes("operational costs") || notesLower.includes("operating costs") ||
+      notesLower.includes("operational expenses") || notesLower.includes("operating expenses") ||
+      notesLower.includes("cost structure") || notesLower.includes("cost management") ||
+      notesLower.includes("operational efficiency") || notesLower.includes("cost reduction") ||
+      notesLower.includes("operational savings") || notesLower.includes("cost optimization")) {
     return "Operational Costs"
-  }
-  
-  // Financial mismanagement
-  if (notesLower.includes("mismanagement") || notesLower.includes("fraud") ||
-      notesLower.includes("scandal") || notesLower.includes("financial irregularities") ||
-      notesLower.includes("financial misconduct")) {
-    return "Financial Mismanagement"
   }
   
   // Accreditation issues
   if (notesLower.includes("accreditation") || notesLower.includes("accredited") ||
-      notesLower.includes("certification") || notesLower.includes("accreditation issues")) {
+      notesLower.includes("accreditation issues") || notesLower.includes("accreditation problems") ||
+      notesLower.includes("accreditation status") || notesLower.includes("accreditation review") ||
+      notesLower.includes("accreditation standards") || notesLower.includes("accreditation requirements")) {
     return "Accreditation Issues"
   }
   
+  // Default to Budget Deficit if no specific category matches
   return "Budget Deficit"
 }
 
@@ -158,26 +187,16 @@ function determinePersonnelType(cut: any): string {
     return "Staff"
   }
   
-  if (cutType === "department_closure" || cutType === "program_suspension") {
-    // These typically affect both faculty and staff, but let's check the context
+  // Determine based on keywords
     if (hasFacultyKeywords && !hasStaffKeywords) {
       return "Faculty"
     } else if (hasStaffKeywords && !hasFacultyKeywords) {
       return "Staff"
+  } else if (hasFacultyKeywords && hasStaffKeywords) {
+    return "Faculty & Staff"
     } else {
-      return "Faculty/Staff"
-    }
+    return "Personnel"
   }
-  
-  // If we have specific keywords, use them
-  if (hasFacultyKeywords && !hasStaffKeywords) {
-    return "Faculty"
-  } else if (hasStaffKeywords && !hasFacultyKeywords) {
-    return "Staff"
-  }
-  
-  // Default to Faculty/Staff if we can't determine
-  return "Faculty/Staff"
 }
 
 // Mock data as fallback only
@@ -196,6 +215,7 @@ const mockCuts: Cut[] = [
     notes: "Program suspended due to budget constraints",
     source_url: "https://example.com/news",
     source_publication: "University Times",
+    status: "confirmed",
     created_at: "2024-03-15T10:00:00Z",
     updated_at: "2024-03-15T10:00:00Z",
   },
@@ -213,6 +233,7 @@ const mockCuts: Cut[] = [
     notes: "Department closure effective next semester",
     source_url: "https://example.com/announcement",
     source_publication: "State College News",
+    status: "provisional",
     created_at: "2024-03-10T09:00:00Z",
     updated_at: "2024-03-10T09:00:00Z",
   },
@@ -226,13 +247,20 @@ interface FilterOptions {
   sourcePublications: string[]
   controls: string[]
   categories: string[]
+  statuses: string[]
 }
 
 export function CutsDataGrid() {
   const [cuts, setCuts] = useState<Cut[]>([])
   const [filteredCuts, setFilteredCuts] = useState<Cut[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [stateFilter, setStateFilter] = useState("all")
+  const [cutTypeFilter, setCutTypeFilter] = useState("all")
+  const [institutionFilter, setInstitutionFilter] = useState("all")
+  const [controlFilter, setControlFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [showFilters, setShowFilters] = useState(false)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     states: [],
     institutions: [],
@@ -241,128 +269,91 @@ export function CutsDataGrid() {
     sourcePublications: [],
     controls: [],
     categories: [],
+    statuses: []
   })
 
-  // Filter states - reduced to 8 filters
-  const [searchTerm, setSearchTerm] = useState("")
-  const [stateFilter, setStateFilter] = useState<string>("all")
-  const [cutTypeFilter, setCutTypeFilter] = useState<string>("all")
-  const [institutionFilter, setInstitutionFilter] = useState<string>("all")
-  const [controlFilter, setControlFilter] = useState<string>("all")
-  const [dateRangeFilter, setDateRangeFilter] = useState<string>("all")
-  const [studentsAffectedFilter, setStudentsAffectedFilter] = useState<string>("all")
-  const [facultyAffectedFilter, setFacultyAffectedFilter] = useState<string>("all")
-  const [categoryFilter, setCategoryFilter] = useState<string>("all")
-  const [showOnlyWithNumbers, setShowOnlyWithNumbers] = useState<boolean>(false)
-
-  async function fetchData() {
+  useEffect(() => {
+    async function fetchCuts() {
+      try {
     if (!isSupabaseConfigured) {
-      setError("Supabase not configured")
+          console.warn("Supabase not configured, using mock data")
+          setCuts(mockCuts)
+          setFilteredCuts(mockCuts)
       setLoading(false)
       return
     }
 
-    try {
       const client = supabase()
       if (!client) {
-        setError("Supabase client not available")
-        setLoading(false)
+          console.warn("Supabase client not available")
         return
       }
 
+        console.log("🔍 Fetching cuts data...")
       const { data, error } = await client
         .from("v_latest_cuts")
         .select("*")
         .order("announcement_date", { ascending: false })
 
       if (error) {
-        console.error("Error fetching data:", error)
-        setError(error.message)
-        setLoading(false)
+          console.error("Error fetching cuts:", error)
         return
       }
 
+        console.log(`✅ Fetched ${data?.length || 0} cuts`)
       setCuts(data || [])
-      setLoading(false)
+        setFilteredCuts(data || [])
+        
+        // Generate filter options
+        if (data && data.length > 0) {
+          const states = Array.from(new Set(data.map(cut => cut.state).filter(Boolean))).sort()
+          const institutions = Array.from(new Set(data.map(cut => cut.institution).filter(Boolean))).sort()
+          const programs = Array.from(new Set(data.map(cut => cut.program_name).filter(Boolean))).sort()
+          const effectiveTerms = Array.from(new Set(data.map(cut => cut.effective_term).filter(Boolean))).sort()
+          const sourcePublications = Array.from(new Set(data.map(cut => cut.source_publication).filter(Boolean))).sort()
+          const controls = Array.from(new Set(data.map(cut => cut.control).filter(Boolean))).sort()
+          const categories = Array.from(new Set(data.map(cut => categorizeCut(cut.notes)))).sort()
+          const statuses = Array.from(new Set(data.map(cut => cut.status).filter(Boolean))).sort()
+
+          setFilterOptions({
+            states,
+            institutions,
+            programs,
+            effectiveTerms,
+            sourcePublications,
+            controls,
+            categories,
+            statuses
+          })
+        }
     } catch (err) {
       console.error("Error:", err)
-      setError(err instanceof Error ? err.message : "An error occurred")
+      } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchData()
-    fetchFilterOptions()
-  }, [])
+    fetchCuts()
 
-  useEffect(() => {
-    applyFilters()
-  }, [
-    cuts,
-    searchTerm,
-    stateFilter,
-    cutTypeFilter,
-    institutionFilter,
-    controlFilter,
-    dateRangeFilter,
-    studentsAffectedFilter,
-    facultyAffectedFilter,
-    categoryFilter,
-    showOnlyWithNumbers,
-  ])
-
-  async function fetchFilterOptions() {
+    // Subscribe to realtime updates
     const client = supabase()
-    if (!isSupabaseConfigured || !client) {
-      setFilterOptions({
-        states: ["CA", "TX", "NY", "FL"],
-        institutions: ["Example University", "State College"],
-        programs: ["Liberal Arts", "Philosophy"],
-        effectiveTerms: ["Fall 2024", "Spring 2025"],
-        sourcePublications: ["University Times", "State College News"],
-        controls: ["Public", "Private non-profit", "Private for-profit"],
-        categories: ["Budget Deficit", "Enrollment Decline", "Federal Funding Cuts", "State Mandates", "Financial Mismanagement", "Strategic Restructuring", "Political Pressure", "Operational Costs", "Accreditation Issues"],
+    if (client) {
+      const channel = client
+        .channel("public:v_latest_cuts")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "v_latest_cuts" }, (payload: any) => {
+        // Refetch data when new cuts are added
+        fetchCuts()
       })
-      return
-    }
+      .subscribe()
 
-    try {
-      const [
-        { data: statesData },
-        { data: institutionsData },
-        { data: programsData },
-        { data: effectiveTermsData },
-        { data: sourcePublicationsData },
-        { data: controlsData },
-        { data: categoriesData },
-      ] = await Promise.all([
-        client.from("v_latest_cuts").select("state").order("state"),
-        client.from("v_latest_cuts").select("institution").order("institution"),
-        client.from("v_latest_cuts").select("program_name").order("program_name"),
-        client.from("v_latest_cuts").select("effective_term").order("effective_term"),
-        client.from("v_latest_cuts").select("source_publication").order("source_publication"),
-        client.from("v_latest_cuts").select("control").order("control"),
-        client.from("v_latest_cuts").select("notes").order("notes"), // Fetch notes for categorization
-      ])
-
-      setFilterOptions({
-        states: Array.from(new Set(statesData?.map((item: any) => item.state).filter(Boolean) || [])),
-        institutions: Array.from(new Set(institutionsData?.map((item: any) => item.institution).filter(Boolean) || [])),
-        programs: Array.from(new Set(programsData?.map((item: any) => item.program_name).filter(Boolean) || [])),
-        effectiveTerms: Array.from(
-          new Set(effectiveTermsData?.map((item: any) => item.effective_term).filter(Boolean) || []),
-        ),
-        sourcePublications: Array.from(
-          new Set(sourcePublicationsData?.map((item: any) => item.source_publication).filter(Boolean) || []),
-        ),
-        controls: Array.from(new Set(controlsData?.map((item: any) => item.control).filter(Boolean) || [])),
-        categories: Array.from(new Set(categoriesData?.map((item: any) => categorizeCut(item.notes)).filter(Boolean) || [])),
-      })
-    } catch (error) {
-      console.error("❌ Error fetching filter options:", error)
+      return () => {
+        const currentClient = supabase()
+        if (currentClient) {
+          currentClient.removeChannel(channel)
+        }
+      }
     }
-  }
+  }, [])
 
   function applyFilters() {
     let filtered = cuts
@@ -413,400 +404,177 @@ export function CutsDataGrid() {
       console.log(`🔍 Control filter (${controlFilter}): ${beforeControl} → ${filtered.length}`)
     }
 
-    // Date range filter - THIS IS KEY FOR 2024 DATA
-    if (dateRangeFilter !== "all") {
-      const beforeDate = filtered.length
-      const now = new Date()
-      const cutoffDate = new Date()
-
-      switch (dateRangeFilter) {
-        case "last_7_days":
-          cutoffDate.setDate(now.getDate() - 7)
-          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
-          break
-        case "last_30_days":
-          cutoffDate.setDate(now.getDate() - 30)
-          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
-          break
-        case "last_90_days":
-          cutoffDate.setDate(now.getDate() - 90)
-          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
-          break
-        case "last_6_months":
-          cutoffDate.setMonth(now.getMonth() - 6)
-          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
-          break
-        case "last_year":
-          cutoffDate.setFullYear(now.getFullYear() - 1)
-          filtered = filtered.filter((cut) => new Date(cut.announcement_date) >= cutoffDate)
-          break
-        case "2024":
-          filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2024"))
-          console.log(`🔍 2024 filter applied: ${beforeDate} → ${filtered.length}`)
-          break
-        case "2023":
-          filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2023"))
-          break
-        case "2022":
-          filtered = filtered.filter((cut) => cut.announcement_date.startsWith("2022"))
-          break
-      }
-      console.log(`🔍 Date range filter (${dateRangeFilter}): ${beforeDate} → ${filtered.length}`)
+    // Status filter
+    if (statusFilter !== "all") {
+      const beforeStatus = filtered.length
+      filtered = filtered.filter((cut) => cut.status === statusFilter)
+      console.log(`🔍 Status filter (${statusFilter}): ${beforeStatus} → ${filtered.length}`)
     }
 
-    // Students affected filter
-    if (studentsAffectedFilter !== "all") {
-      const beforeStudents = filtered.length
-      filtered = filtered.filter((cut) => {
-        const students = cut.students_affected || 0
-        switch (studentsAffectedFilter) {
-          case "1_10":
-            return students >= 1 && students <= 10
-          case "11_25":
-            return students >= 11 && students <= 25
-          case "26_50":
-            return students >= 26 && students <= 50
-          case "51_100":
-            return students >= 51 && students <= 100
-          case "101_250":
-            return students >= 101 && students <= 250
-          case "251_500":
-            return students >= 251 && students <= 500
-          case "501_1000":
-            return students >= 501 && students <= 1000
-          case "1000_plus":
-            return students > 1000
-          case "unknown":
-            return cut.students_affected === null
-          default:
-            return true
-        }
-      })
-      console.log(`🔍 Students affected filter: ${beforeStudents} → ${filtered.length}`)
-    }
-
-    // Faculty affected filter
-    if (facultyAffectedFilter !== "all") {
-      const beforeFaculty = filtered.length
-      filtered = filtered.filter((cut) => {
-        const faculty = cut.faculty_affected || 0
-        switch (facultyAffectedFilter) {
-          case "1_10":
-            return faculty >= 1 && faculty <= 10
-          case "11_25":
-            return faculty >= 11 && faculty <= 25
-          case "26_50":
-            return faculty >= 26 && faculty <= 50
-          case "51_100":
-            return faculty >= 51 && faculty <= 100
-          case "101_250":
-            return faculty >= 101 && faculty <= 250
-          case "251_500":
-            return faculty >= 251 && faculty <= 500
-          case "501_1000":
-            return faculty >= 501 && faculty <= 1000
-          case "1000_plus":
-            return faculty > 1000
-          case "unknown":
-            return cut.faculty_affected === null
-          default:
-            return true
-        }
-      })
-      console.log(`🔍 Faculty affected filter: ${beforeFaculty} → ${filtered.length}`)
-    }
-
-    // Category filter
-    if (categoryFilter !== "all") {
-      const beforeCategory = filtered.length
-      filtered = filtered.filter((cut) => categorizeCut(cut.notes) === categoryFilter)
-      console.log(`🔍 Category filter (${categoryFilter}): ${beforeCategory} → ${filtered.length}`)
-    }
-
-    // Show only cuts with numbers filter
-    if (showOnlyWithNumbers) {
-      const beforeNumbers = filtered.length
-      filtered = filtered.filter((cut) => {
-        return (cut.students_affected && cut.students_affected > 0) || 
-               (cut.faculty_affected && cut.faculty_affected > 0)
-      })
-      console.log(`🔍 Show only with numbers filter: ${beforeNumbers} → ${filtered.length}`)
-    }
-
-    // Count 2024 entries after filtering
-    const count2024After = filtered.filter((cut) => cut.announcement_date.startsWith("2024")).length
-    console.log("📊 2024 entries after filtering:", count2024After)
-
-    console.log("✅ Final filtered results:", filtered.length, "cuts")
     setFilteredCuts(filtered)
+    console.log(`✅ Final filtered results: ${filtered.length} cuts`)
   }
 
-  function clearAllFilters() {
-    console.log("🧹 Clearing all filters")
+  useEffect(() => {
+    applyFilters()
+  }, [cuts, searchTerm, stateFilter, cutTypeFilter, institutionFilter, controlFilter, statusFilter])
+
+  function clearFilters() {
     setSearchTerm("")
     setStateFilter("all")
     setCutTypeFilter("all")
     setInstitutionFilter("all")
     setControlFilter("all")
-    setDateRangeFilter("all")
-    setStudentsAffectedFilter("all")
-    setFacultyAffectedFilter("all")
-    setCategoryFilter("all")
-    setShowOnlyWithNumbers(false)
+    setStatusFilter("all")
   }
 
-  function showOnly2024() {
-    console.log("📅 Showing only 2024 data")
-    clearAllFilters()
-    setDateRangeFilter("2024")
-  }
+  function exportToCSV() {
+    if (filteredCuts.length === 0) {
+      alert("No data to export")
+      return
+    }
 
-  async function downloadCSV() {
-    try {
       const headers = [
         "Date",
         "Institution",
-        "Control",
+      "Program",
         "State",
         "Action Type",
+      "Status",
         "Primary Reason",
-        "Students",
-        "Faculty/Staff",
-        "Source"
+      "Students Affected",
+      "Faculty/Staff Affected",
+      "Control",
+      "Effective Term",
+      "Notes",
+      "Source URL",
+      "Source Publication"
       ]
 
       const csvContent = [
         headers.join(","),
-        ...filteredCuts.map((cut) =>
-          [
-            // Date (formatted as in table)
-            `"${new Date(cut.announcement_date).toLocaleDateString().replace(/"/g, '""')}"`,
-            // Institution
-            `"${(cut.institution || '').replace(/"/g, '""')}"`,
-            // Control
-            `"${(cut.control || '').replace(/"/g, '""')}"`,
-            // State
-            `"${(cut.state || '').replace(/"/g, '""')}"`,
-            // Cut Type
-            `"${(cut.cut_type || '').replace(/"/g, '""').replace("_", " ")}"`,
-            // Category
-            `"${categorizeCut(cut.notes).replace(/"/g, '""')}"`,
-            // Students
-            `"${cut.students_affected ? cut.students_affected.toLocaleString() : ''}"`,
-            // Faculty/Staff
-            `"${cut.faculty_affected ? `${cut.faculty_affected.toLocaleString()} (${determinePersonnelType(cut)})` : ''}"`,
-            // Source (URL)
-            `"${(cut.source_url || '').replace(/"/g, '""')}"`
-          ].join(","),
-        ),
+      ...filteredCuts.map(cut => [
+        new Date(cut.announcement_date).toLocaleDateString(),
+        `"${cut.institution}"`,
+        `"${cut.program_name || ""}"`,
+        cut.state,
+        cut.cut_type.replace("_", " "),
+        cut.status || "Unknown",
+        `"${categorizeCut(cut.notes)}"`,
+        cut.students_affected || "",
+        cut.faculty_affected || "",
+        `"${cut.control || ""}"`,
+        `"${cut.effective_term || ""}"`,
+        `"${(cut.notes || "").replace(/"/g, '""')}"`,
+        `"${cut.source_url || ""}"`,
+        `"${cut.source_publication || ""}"`
+      ].join(","))
       ].join("\n")
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `college-cuts-filtered-${new Date().toISOString().split("T")[0]}.csv`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      console.error("Error downloading CSV:", error)
-      alert("Failed to download CSV. Please try again.")
-    }
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `college-cuts-${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
-
-  const activeFiltersCount = [
-    searchTerm,
-    stateFilter !== "all" ? stateFilter : null,
-    cutTypeFilter !== "all" ? cutTypeFilter : null,
-    institutionFilter !== "all" ? institutionFilter : null,
-    controlFilter !== "all" ? controlFilter : null,
-    dateRangeFilter !== "all" ? dateRangeFilter : null,
-    studentsAffectedFilter !== "all" ? studentsAffectedFilter : null,
-    facultyAffectedFilter !== "all" ? facultyAffectedFilter : null,
-    categoryFilter !== "all" ? categoryFilter : null,
-    showOnlyWithNumbers ? "with-numbers" : null,
-  ].filter(Boolean).length
-
-  // Calculate year breakdown for display
-  const yearBreakdown = cuts.reduce<Record<string, number>>((acc, cut) => {
-    const year = cut.announcement_date.substring(0, 4)
-    acc[year] = (acc[year] || 0) + 1
-    return acc
-  }, {})
 
   if (loading) {
     return (
-      <div className="space-y-6" aria-label="Loading program actions data">
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-48" aria-label="Loading filter panel" />
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="h-10" aria-label={`Loading filter ${i + 1}`} />
-              ))}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-[300px]" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-[100px]" />
+            <Skeleton className="h-10 w-[100px]" />
             </div>
-          </CardContent>
-        </Card>
+        </div>
         <div className="space-y-2">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 w-full" aria-label={`Loading data row ${i + 1}`} />
+          {[...Array(10)].map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full" />
           ))}
         </div>
       </div>
     )
   }
 
+  if (!isSupabaseConfigured) {
   return (
-    <div className="space-y-6">
-      {error && (
-        <Alert className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800" role="alert">
-          <AlertCircle className="h-4 w-4" aria-hidden="true" />
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Data connection issue: {error}.
-            <Button variant="link" className="p-0 h-auto ml-2" onClick={() => {
-              setError(null)
-              setLoading(true)
-              fetchData()
-            }}>
-              Retry
-            </Button>
+          Database not configured. Showing sample data only.
           </AlertDescription>
         </Alert>
-      )}
+    )
+  }
 
-      {/* Professional Filter Panel with Titles and Selected Filters */}
-      <Card className="shadow-lg border-gray-200">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Filter className="h-4 w-4" />
-              Advanced Filters
-            </CardTitle>
-              {activeFiltersCount > 0 && (
+  return (
+    <div className="space-y-6">
+      {/* Header with Search and Actions */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search institutions, programs, or notes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-[300px]"
+            />
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={clearAllFilters}
-                className="h-7 text-xs bg-white hover:bg-gray-50 border-gray-300"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2"
                 >
-                <X className="h-3 w-3 mr-1" />
-                  Clear All
+            <Filter className="w-4 h-4" />
+            Filters
                 </Button>
-              )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportToCSV}
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </Button>
           </div>
-        </CardHeader>
-        <CardContent className="pt-3 space-y-4">
-          {/* Selected Filters Display */}
-          {activeFiltersCount > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                <span className="text-xs font-medium text-blue-900">Active Filters</span>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {searchTerm && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Search: "{searchTerm}"
-                  </Badge>
-                )}
-                {stateFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    State: {stateFilter}
-                  </Badge>
-                )}
-                {cutTypeFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Action Type: {cutTypeFilter.replace("_", " ")}
-                  </Badge>
-                )}
-                {institutionFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Institution:{" "}
-                    {institutionFilter.length > 20 ? `${institutionFilter.substring(0, 20)}...` : institutionFilter}
-                  </Badge>
-                )}
-                {controlFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Control: {controlFilter}
-                  </Badge>
-                )}
-                {dateRangeFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Date: {dateRangeFilter.replace("_", " ")}
-                  </Badge>
-                )}
-                {studentsAffectedFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Students: {studentsAffectedFilter.replace("_", "-")}
-                  </Badge>
-                )}
-                {facultyAffectedFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Faculty/Staff: {facultyAffectedFilter.replace("_", "-")}
-                  </Badge>
-                )}
-                {categoryFilter !== "all" && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    Primary Reason: {categoryFilter}
-                  </Badge>
-                )}
-                {showOnlyWithNumbers && (
-                  <Badge variant="secondary" className="bg-white border-blue-200 text-blue-800 text-xs px-2 py-1">
-                    With Numbers Only
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Filter Grid with Titles */}
-          <div className="space-y-4">
-            {/* All Dropdown Filters in One Row */}
-            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-9 gap-2">
-          {/* Search Filter */}
-          <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Search</h3>
-                <div className="flex items-center gap-1">
-                  <Search className="h-3 w-3 text-gray-400" />
-              <Input
-                    placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-6 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-              {/* Date Range Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Date</h3>
-                <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="last_7_days">Last 7 Days</SelectItem>
-                    <SelectItem value="last_30_days">Last 30 Days</SelectItem>
-                    <SelectItem value="last_90_days">Last 90 Days</SelectItem>
-                    <SelectItem value="last_6_months">Last 6 Months</SelectItem>
-                    <SelectItem value="last_year">Last Year</SelectItem>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                    <SelectItem value="2022">2022</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
-              {/* State Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">State</h3>
+      {/* Filters */}
+      {showFilters && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Filter className="w-5 h-5" />
+                Filters
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="flex items-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                Clear All
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">State</label>
                 <Select value={stateFilter} onValueChange={setStateFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
+                  <SelectTrigger>
                     <SelectValue placeholder="All States" />
                   </SelectTrigger>
                   <SelectContent>
@@ -820,33 +588,67 @@ export function CutsDataGrid() {
                 </Select>
               </div>
 
-              {/* Institution Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Institution</h3>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Action Type</label>
+                <Select value={cutTypeFilter} onValueChange={setCutTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="program_suspension">Program Suspension</SelectItem>
+                    <SelectItem value="teach_out">Teach Out</SelectItem>
+                    <SelectItem value="department_closure">Department Closure</SelectItem>
+                    <SelectItem value="campus_closure">Campus Closure</SelectItem>
+                    <SelectItem value="institution_closure">Institution Closure</SelectItem>
+                    <SelectItem value="staff_layoff">Staff Layoff</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="provisional">Provisional</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="proposed">Proposed</SelectItem>
+                    <SelectItem value="under_review">Under Review</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+            </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Institution</label>
                 <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
+                  <SelectTrigger>
                     <SelectValue placeholder="All Institutions" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Institutions</SelectItem>
-                    {filterOptions.institutions.slice(0, 50).map((institution) => (
+                    {filterOptions.institutions.map((institution) => (
                       <SelectItem key={institution} value={institution}>
-                        {institution.length > 20 ? `${institution.substring(0, 20)}...` : institution}
+                        {institution}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Control Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Control</h3>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Control</label>
                 <Select value={controlFilter} onValueChange={setControlFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Types" />
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Controls" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="all">All Controls</SelectItem>
                     {filterOptions.controls.map((control) => (
                       <SelectItem key={control} value={control}>
                         {control}
@@ -855,158 +657,23 @@ export function CutsDataGrid() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Cut Type Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Action</h3>
-                <Select value={cutTypeFilter} onValueChange={setCutTypeFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="program_suspension">
-                      <Badge className={cutTypeColors["program_suspension"]}>Program Suspension</Badge>
-                    </SelectItem>
-                    <SelectItem value="teach_out">
-                      <Badge className={cutTypeColors["teach_out"]}>Teach Out</Badge>
-                    </SelectItem>
-                    <SelectItem value="department_closure">
-                      <Badge className={cutTypeColors["department_closure"]}>Department Closure</Badge>
-                    </SelectItem>
-                    <SelectItem value="campus_closure">
-                      <Badge className={cutTypeColors["campus_closure"]}>Campus Closure</Badge>
-                    </SelectItem>
-                    <SelectItem value="institution_closure">
-                      <Badge className={cutTypeColors["institution_closure"]}>Institution Closure</Badge>
-                    </SelectItem>
-                    <SelectItem value="staff_layoff">
-                      <Badge className={cutTypeColors["staff_layoff"]}>Staff Layoff</Badge>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-            </div>
-
-              {/* Category Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Reason</h3>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {filterOptions.categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        <Badge className={categoryColors[category as keyof typeof categoryColors]}>{category}</Badge>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
+          </CardContent>
+        </Card>
+      )}
 
-              {/* Students Affected Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Students</h3>
-                <Select value={studentsAffectedFilter} onValueChange={setStudentsAffectedFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Ranges" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Ranges</SelectItem>
-                    <SelectItem value="1_10">1-10 Students</SelectItem>
-                    <SelectItem value="11_25">11-25 Students</SelectItem>
-                    <SelectItem value="26_50">26-50 Students</SelectItem>
-                    <SelectItem value="51_100">51-100 Students</SelectItem>
-                    <SelectItem value="101_250">101-250 Students</SelectItem>
-                    <SelectItem value="251_500">251-500 Students</SelectItem>
-                    <SelectItem value="501_1000">501-1,000 Students</SelectItem>
-                    <SelectItem value="1000_plus">1,000+ Students</SelectItem>
-                    <SelectItem value="unknown">Unknown</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Faculty Affected Filter */}
-              <div className="text-center">
-                <h3 className="text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Faculty/Staff</h3>
-                <Select value={facultyAffectedFilter} onValueChange={setFacultyAffectedFilter}>
-                  <SelectTrigger className="h-6 text-xs border-gray-300 focus:border-blue-500">
-                    <SelectValue placeholder="All Ranges" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Ranges</SelectItem>
-                    <SelectItem value="1_10">1-10 Faculty/Staff</SelectItem>
-                    <SelectItem value="11_25">11-25 Faculty/Staff</SelectItem>
-                    <SelectItem value="26_50">26-50 Faculty/Staff</SelectItem>
-                    <SelectItem value="51_100">51-100 Faculty/Staff</SelectItem>
-                    <SelectItem value="101_250">101-250 Faculty/Staff</SelectItem>
-                    <SelectItem value="251_500">251-500 Faculty/Staff</SelectItem>
-                    <SelectItem value="501_1000">501-1,000 Faculty/Staff</SelectItem>
-                    <SelectItem value="1000_plus">1,000+ Faculty/Staff</SelectItem>
-                    <SelectItem value="unknown">Unknown</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Special Filters Row */}
-            <div className="flex items-center justify-between gap-4 mt-2">
-              {/* Show Only With Numbers Toggle */}
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="showOnlyWithNumbers"
-                  checked={showOnlyWithNumbers}
-                  onChange={(e) => setShowOnlyWithNumbers(e.target.checked)}
-                  className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="showOnlyWithNumbers" className="text-xs font-medium text-gray-700">
-                  Show only actions with numerical impact data
-                </label>
-          </div>
-
-              {/* Quick Actions */}
+      {/* Results Summary */}
+      <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Button
-                  onClick={showOnly2024}
-                  variant="outline"
-                  size="sm"
-                  className="h-6 text-xs bg-white hover:bg-gray-50 border-gray-300"
-                >
-                  Show 2024 Only
-                </Button>
-                <Button
-                  onClick={clearAllFilters}
-                  variant="outline"
-                  size="sm"
-                  className="h-6 text-xs bg-white hover:bg-gray-50 border-gray-300"
-                >
-                  Clear All
-                </Button>
+          <Database className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">
+            Showing {filteredCuts.length} of {cuts.length} total actions
+          </span>
               </div>
+        <div className="text-sm text-muted-foreground">
+          {cuts.filter((cut) => cut.announcement_date.startsWith("2024")).length} from 2024
             </div>
           </div>
-
-          {/* Results Summary and Export Button */}
-          <div className="flex items-center justify-between text-sm text-gray-600 pt-3 border-t border-gray-200">
-            <div className="bg-gray-50 px-4 py-2 rounded-full border">
-              Showing <span className="font-semibold text-gray-900">{filteredCuts.length}</span> of{" "}
-              <span className="font-semibold text-gray-900">{cuts.length}</span> total cuts
-            </div>
-            <Button
-              onClick={downloadCSV}
-              variant="outline"
-              size="sm"
-              className="h-8 text-xs bg-white hover:bg-gray-50 border-gray-300 ml-4"
-              aria-label={`Export ${filteredCuts.length} cuts to CSV`}
-            >
-              <Download className="h-3 w-3 mr-1" aria-hidden="true" />
-              Export ({filteredCuts.length})
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Data Table */}
       <Card>
@@ -1020,6 +687,7 @@ export function CutsDataGrid() {
                   <th className="h-12 px-4 text-center align-middle font-medium">Control</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">State</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Action Type</th>
+                  <th className="h-12 px-4 text-center align-middle font-medium">Status</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Primary Reason</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Students</th>
                   <th className="h-12 px-4 text-center align-middle font-medium">Faculty/Staff</th>
@@ -1048,6 +716,15 @@ export function CutsDataGrid() {
                       <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
                     </td>
                     <td className="p-4 text-center align-middle">
+                      {cut.status ? (
+                        <Badge className={statusColors[cut.status as keyof typeof statusColors]}>
+                          {statusDisplayNames[cut.status as keyof typeof statusDisplayNames]}
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-gray-100 text-gray-800 border-gray-200">Unknown</Badge>
+                      )}
+                    </td>
+                    <td className="p-4 text-center align-middle">
                       <Badge className={categoryColors[categorizeCut(cut.notes) as keyof typeof categoryColors]}>
                         {categorizeCut(cut.notes)}
                       </Badge>
@@ -1057,22 +734,30 @@ export function CutsDataGrid() {
                     </td>
                     <td className="p-4 text-center align-middle">
                       {cut.faculty_affected ? (
-                        <div className="flex flex-col items-center">
-                          <span className="font-medium">{cut.faculty_affected.toLocaleString()}</span>
-                          <span className="text-xs text-muted-foreground">{determinePersonnelType(cut)}</span>
-                        </div>
-                      ) : "—"}
+                        <span>
+                          {cut.faculty_affected.toLocaleString()}
+                          <br />
+                          <span className="text-xs text-muted-foreground">
+                            {determinePersonnelType(cut)}
+                          </span>
+                        </span>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="p-4 text-center align-middle">
-                      {cut.source_url && (
+                      {cut.source_url ? (
                         <a
                           href={cut.source_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
                         >
-                          <ExternalLink className="h-4 w-4" />
+                          <ExternalLink className="w-3 h-3" />
+                          {cut.source_publication || "Source"}
                         </a>
+                      ) : (
+                        cut.source_publication || "—"
                       )}
                     </td>
                   </tr>
@@ -1083,19 +768,17 @@ export function CutsDataGrid() {
         </CardContent>
       </Card>
 
-      {filteredCuts.length === 0 && !loading && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Filter className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-semibold mb-2">No cuts found</h3>
-            <p className="text-muted-foreground mb-4">Try adjusting your filters to see more results.</p>
-            {activeFiltersCount > 0 && (
-              <Button variant="outline" onClick={clearAllFilters}>
+      {filteredCuts.length === 0 && (
+        <div className="text-center py-12">
+          <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">No cuts found</h3>
+          <p className="text-muted-foreground mb-4">
+            Try adjusting your search terms or filters to find what you're looking for.
+          </p>
+          <Button variant="outline" onClick={clearFilters}>
                 Clear All Filters
               </Button>
-            )}
-          </CardContent>
-        </Card>
+        </div>
       )}
     </div>
   )

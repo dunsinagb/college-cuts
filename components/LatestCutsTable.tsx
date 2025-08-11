@@ -19,29 +19,40 @@ const cutTypeColors = {
   staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
 }
 
-const categoryColors = {
-  "Budget Deficit": "bg-red-50 text-red-700 border-red-200",
-  "Enrollment Decline": "bg-blue-50 text-blue-700 border-blue-200",
-  "Federal Funding Cuts": "bg-purple-50 text-purple-700 border-purple-200",
-  "State Mandates": "bg-orange-50 text-orange-700 border-orange-200",
-  "Strategic Restructuring": "bg-gray-50 text-gray-700 border-gray-200",
-  "Accreditation Issues": "bg-yellow-50 text-yellow-700 border-yellow-200",
-  "Financial Mismanagement": "bg-pink-50 text-pink-700 border-pink-200",
-  "Program Performance": "bg-indigo-50 text-indigo-700 border-indigo-200",
-  "Administrative Changes": "bg-teal-50 text-teal-700 border-teal-200",
-  "Market Demand": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Regulatory Compliance": "bg-amber-50 text-amber-700 border-amber-200",
-  "Technology Integration": "bg-cyan-50 text-cyan-700 border-cyan-200",
-  "Faculty Shortage": "bg-lime-50 text-lime-700 border-lime-200",
-  "Facility Issues": "bg-slate-50 text-slate-700 border-slate-200",
-  "Partnership Changes": "bg-violet-50 text-violet-700 border-violet-200",
-  "Research Funding": "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200",
-  "Student Demand": "bg-sky-50 text-sky-700 border-sky-200",
-  "Operational Efficiency": "bg-stone-50 text-stone-700 border-stone-200",
-  "Quality Standards": "bg-zinc-50 text-zinc-700 border-zinc-200",
-  "External Pressures": "bg-neutral-50 text-neutral-700 border-neutral-200"
+// Status colors for consistent styling
+const statusColors = {
+  confirmed: "bg-green-100 text-green-800 border-green-200 hover:bg-green-200",
+  provisional: "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
+  pending: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
+  proposed: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
+  under_review: "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200",
+  cancelled: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
 }
 
+// Status display names
+const statusDisplayNames = {
+  confirmed: "Confirmed",
+  provisional: "Provisional",
+  pending: "Pending",
+  proposed: "Proposed",
+  under_review: "Under Review",
+  cancelled: "Cancelled",
+}
+
+// Category colors for the categorization system
+const categoryColors = {
+  "Budget Deficit": "bg-red-50 text-red-700 border-red-200",
+  "Enrollment Decline": "bg-blue-50 text-blue-700 border-blue-200", 
+  "Federal Funding Cuts": "bg-purple-50 text-purple-700 border-purple-200",
+  "State Mandates": "bg-green-50 text-green-700 border-green-200",
+  "Financial Mismanagement": "bg-orange-50 text-orange-700 border-orange-200",
+  "Strategic Restructuring": "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "Political Pressure": "bg-pink-50 text-pink-700 border-pink-200",
+  "Operational Costs": "bg-yellow-50 text-yellow-700 border-yellow-200",
+  "Accreditation Issues": "bg-gray-50 text-gray-700 border-gray-200"
+}
+
+// Function to categorize cuts based on notes content
 function categorizeCut(notes: string | null): string {
   if (!notes) return "Budget Deficit"
   
@@ -79,33 +90,6 @@ function categorizeCut(notes: string | null): string {
   }
   if (lowerNotes.includes("regulatory") || lowerNotes.includes("compliance") || lowerNotes.includes("regulation")) {
     return "Regulatory Compliance"
-  }
-  if (lowerNotes.includes("technology") || lowerNotes.includes("digital") || lowerNotes.includes("online")) {
-    return "Technology Integration"
-  }
-  if (lowerNotes.includes("faculty") || lowerNotes.includes("professor") || lowerNotes.includes("staffing")) {
-    return "Faculty Shortage"
-  }
-  if (lowerNotes.includes("facility") || lowerNotes.includes("building") || lowerNotes.includes("infrastructure")) {
-    return "Facility Issues"
-  }
-  if (lowerNotes.includes("partnership") || lowerNotes.includes("collaboration") || lowerNotes.includes("alliance")) {
-    return "Partnership Changes"
-  }
-  if (lowerNotes.includes("research") || lowerNotes.includes("funding") || lowerNotes.includes("grant")) {
-    return "Research Funding"
-  }
-  if (lowerNotes.includes("student demand") || lowerNotes.includes("popularity")) {
-    return "Student Demand"
-  }
-  if (lowerNotes.includes("operational") || lowerNotes.includes("efficiency") || lowerNotes.includes("optimization")) {
-    return "Operational Efficiency"
-  }
-  if (lowerNotes.includes("quality") || lowerNotes.includes("standards") || lowerNotes.includes("excellence")) {
-    return "Quality Standards"
-  }
-  if (lowerNotes.includes("external") || lowerNotes.includes("pressure") || lowerNotes.includes("influence")) {
-    return "External Pressures"
   }
   
   return "Budget Deficit"
@@ -178,11 +162,11 @@ export function LatestCutsTable() {
     return (
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
-          <Search className="h-4 w-4" />
-          <Skeleton className="h-10 flex-1" />
+          <Skeleton className="h-10 w-[250px]" />
+          <Skeleton className="h-10 w-[100px]" />
         </div>
         <div className="space-y-2">
-          {Array.from({ length: 10 }).map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-16 w-full" />
           ))}
         </div>
@@ -192,88 +176,110 @@ export function LatestCutsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <Search className="h-4 w-4" />
-        <Input
-          placeholder="Search institutions and programs..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1"
-        />
-      </div>
-
-      <div className="rounded-md border">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Institution</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Program</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">State</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Action Type</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Primary Reason</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Control</th>
-                <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCuts.map((cut, index) => (
-                <tr
-                  key={cut.id}
-                  className={`border-b transition-colors hover:bg-muted/50 ${index % 2 === 0 ? "bg-background" : "bg-muted/25"}`}
-                >
-                  <td className="p-4 align-middle">
-                    <Link href={`/cut/${cut.id}`} className="hover:underline">
-                      {new Date(cut.announcement_date).toLocaleDateString()}
-                    </Link>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <Link href={`/cut/${cut.id}`} className="hover:underline font-medium">
-                      {cut.institution}
-                    </Link>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <Link href={`/cut/${cut.id}`} className="hover:underline">
-                      {cut.program_name || "N/A"}
-                    </Link>
-                  </td>
-                  <td className="p-4 align-middle">{cut.state}</td>
-                  <td className="p-4 align-middle">
-                    <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <Badge className={categoryColors[categorizeCut(cut.notes) as keyof typeof categoryColors]}>
-                      {categorizeCut(cut.notes)}
-                    </Badge>
-                  </td>
-                  <td className="p-4 align-middle">
-                    {cut.control || "—"}
-                  </td>
-                  <td className="p-4 align-middle">
-                    {cut.source_url && (
-                      <a
-                        href={cut.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Search and View All */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search institutions or programs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-[300px]"
+            />
+          </div>
         </div>
+        <Link href="/cuts">
+          <Button variant="outline" size="sm">
+            View All Actions →
+          </Button>
+        </Link>
       </div>
 
-      <div className="flex justify-center">
-        <Button asChild>
-          <Link href="/cuts">View All Actions</Link>
-        </Button>
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Institution</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Program</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">State</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Action Type</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Primary Reason</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Control</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredCuts.map((cut, index) => (
+              <tr
+                key={cut.id}
+                className={`border-b transition-colors hover:bg-muted/50 ${index % 2 === 0 ? "bg-background" : "bg-muted/25"}`}
+              >
+                <td className="p-4 align-middle">
+                  <Link href={`/cut/${cut.id}`} className="hover:underline">
+                    {new Date(cut.announcement_date).toLocaleDateString()}
+                  </Link>
+                </td>
+                <td className="p-4 align-middle">
+                  <Link href={`/cut/${cut.id}`} className="hover:underline font-medium">
+                    {cut.institution}
+                  </Link>
+                </td>
+                <td className="p-4 align-middle">
+                  <Link href={`/cut/${cut.id}`} className="hover:underline">
+                    {cut.program_name || "N/A"}
+                  </Link>
+                </td>
+                <td className="p-4 align-middle">{cut.state}</td>
+                <td className="p-4 align-middle">
+                  <Badge className={cutTypeColors[cut.cut_type]}>{cut.cut_type.replace("_", " ")}</Badge>
+                </td>
+                <td className="p-4 align-middle">
+                  {cut.status ? (
+                    <Badge className={statusColors[cut.status as keyof typeof statusColors]}>
+                      {statusDisplayNames[cut.status as keyof typeof statusDisplayNames]}
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-gray-100 text-gray-800 border-gray-200">Unknown</Badge>
+                  )}
+                </td>
+                <td className="p-4 align-middle">
+                  <Badge className={categoryColors[categorizeCut(cut.notes) as keyof typeof categoryColors]}>
+                    {categorizeCut(cut.notes)}
+                  </Badge>
+                </td>
+                <td className="p-4 align-middle">
+                  {cut.control || "—"}
+                </td>
+                <td className="p-4 align-middle">
+                  {cut.source_url ? (
+                    <a
+                      href={cut.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      {cut.source_publication || "Source"}
+                    </a>
+                  ) : (
+                    cut.source_publication || "—"
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      {filteredCuts.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          No cuts found matching your search criteria.
+        </div>
+      )}
     </div>
   )
 }
