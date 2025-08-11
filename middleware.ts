@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/', '/subscribe-gate', '/api/subscribe', '/about', '/cuts', '/analytics', '/submit-tip']
+const PUBLIC_ROUTES = ['/', '/subscribe-gate', '/api/subscribe', '/about']
 
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
@@ -40,7 +40,7 @@ export function middleware(req: NextRequest) {
   console.log(`🔍 Cookie check: cc_sub=${ccSubCookie?.value}, subscribed=${sub}`)
   
   // Make key content public; allow access if subscribed or on public routes
-  if (sub || PUBLIC_ROUTES.includes(path) || path.startsWith('/cut')) {
+  if (sub || PUBLIC_ROUTES.includes(path)) {
     console.log(`✅ Allowing access to ${path}`)
     return
   }
