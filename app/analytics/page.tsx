@@ -30,8 +30,8 @@ function AnalyticsPageContent() {
         <section className="text-center space-y-4" aria-labelledby="analytics-title">
           <h1 id="analytics-title" className="text-4xl font-bold tracking-tight">Analytics Dashboard</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive insights into institutional actions across higher education institutions. 
-            Explore trends, patterns, and regional impacts with real-time data.
+            Comprehensive insights into confirmed institutional actions across higher education institutions. 
+            Explore trends, patterns, and regional impacts with real-time data from verified cases only.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Button 

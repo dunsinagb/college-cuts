@@ -1,14 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
   GraduationCap, 
   Building2, 
-  Users, 
   MapPin, 
   TrendingUp, 
   Clock, 
@@ -26,6 +25,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabaseClient"
 import { EnhancedKpiCard } from "@/components/EnhancedKpiCard"
 import type { Cut } from "@/types/supabase"
+import { CUT_TYPE_COLORS, CATEGORY_COLORS, STATUS_COLORS } from "@/lib/constants"
+import { formatMonthYear } from "@/lib/utils"
 
 interface KpiData {
   totalActions: number
@@ -33,47 +34,6 @@ interface KpiData {
   statesAffected: number
   mostImpactedState: string
   lastUpdated: string
-}
-
-const cutTypeColors = {
-  program_suspension: "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
-  teach_out: "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200",
-  department_closure: "bg-red-100 text-red-800 border-red-200 hover:bg-red-200",
-  campus_closure: "bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200",
-  institution_closure: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
-  staff_layoff: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
-}
-
-// Status colors for consistent styling
-const statusColors = {
-  confirmed: "bg-green-100 text-green-800 border-green-200 hover:bg-green-200",
-  provisional: "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200",
-  pending: "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200",
-  proposed: "bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200",
-  under_review: "bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200",
-  cancelled: "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200",
-}
-
-// Status display names
-const statusDisplayNames = {
-  confirmed: "Confirmed",
-  provisional: "Provisional",
-  pending: "Pending",
-  proposed: "Proposed",
-  under_review: "Under Review",
-  cancelled: "Cancelled",
-}
-
-const categoryColors = {
-  "Budget Deficit": "bg-red-50 text-red-700 border-red-200",
-  "Enrollment Decline": "bg-blue-50 text-blue-700 border-blue-200", 
-  "Federal Funding Cuts": "bg-purple-50 text-purple-700 border-purple-200",
-  "State Mandates": "bg-green-50 text-green-700 border-green-200",
-  "Financial Mismanagement": "bg-orange-50 text-orange-700 border-orange-200",
-  "Strategic Restructuring": "bg-indigo-50 text-indigo-700 border-indigo-200",
-  "Political Pressure": "bg-pink-50 text-pink-700 border-pink-200",
-  "Operational Costs": "bg-yellow-50 text-yellow-700 border-yellow-200",
-  "Accreditation Issues": "bg-gray-50 text-gray-700 border-gray-200"
 }
 
 // State abbreviation mapping
@@ -130,74 +90,226 @@ const stateAbbreviations: Record<string, string> = {
   "Wyoming": "WY"
 }
 
-// Function to categorize cuts based on notes content
 function categorizeCut(notes: string | null): string {
-  if (!notes) return "Budget Deficit"
+  if (!notes) return "Budget Deficit" // Default for null notes
   
-  const lowerNotes = notes.toLowerCase()
+  const notesLower = notes.toLowerCase()
   
-  if (lowerNotes.includes("budget") || lowerNotes.includes("deficit") || lowerNotes.includes("financial") || lowerNotes.includes("cost")) {
+  // Budget and financial issues (highest priority - most common)
+  if (notesLower.includes("budget deficit") || notesLower.includes("budget gap") || 
+      notesLower.includes("budget shortfall") || notesLower.includes("deficit") ||
+      notesLower.includes("financial deficit") || notesLower.includes("operating deficit") ||
+      notesLower.includes("budget constraints") || notesLower.includes("budget cuts") ||
+      notesLower.includes("revenue gap") || notesLower.includes("financial instability") ||
+      notesLower.includes("financial collapse") || notesLower.includes("financial challenges") ||
+      notesLower.includes("financial fragility") || notesLower.includes("financial irregularities")) {
     return "Budget Deficit"
   }
-  if (lowerNotes.includes("enrollment") || lowerNotes.includes("decline") || lowerNotes.includes("student") || lowerNotes.includes("admission")) {
-    return "Enrollment Decline"
-  }
-  if (lowerNotes.includes("federal") || lowerNotes.includes("funding") || lowerNotes.includes("government") || lowerNotes.includes("grant")) {
+  
+  // Federal funding cuts
+  if (notesLower.includes("federal funding") || notesLower.includes("federal cuts") ||
+      notesLower.includes("federal budget") || notesLower.includes("federal grants") ||
+      notesLower.includes("usaid") || notesLower.includes("federal funding freeze") ||
+      notesLower.includes("federal funding threats") || notesLower.includes("federal budget cuts") ||
+      notesLower.includes("federal funding elimination")) {
     return "Federal Funding Cuts"
   }
-  if (lowerNotes.includes("state") || lowerNotes.includes("mandate") || lowerNotes.includes("legislation") || lowerNotes.includes("law")) {
+  
+  // State mandates and requirements
+  if (notesLower.includes("state mandate") || notesLower.includes("state requirement") ||
+      notesLower.includes("state funding") || notesLower.includes("state-mandated") ||
+      notesLower.includes("graduation thresholds") || notesLower.includes("low-productivity") ||
+      notesLower.includes("state-mandated graduation") || notesLower.includes("degree program thresholds") ||
+      notesLower.includes("indiana state mandate") || notesLower.includes("ohio sb1") ||
+      notesLower.includes("hb 265")) {
     return "State Mandates"
   }
-  if (lowerNotes.includes("strategic") || lowerNotes.includes("restructuring") || lowerNotes.includes("reorganization") || lowerNotes.includes("realignment")) {
+  
+  // Enrollment issues
+  if (notesLower.includes("enrollment decline") || notesLower.includes("declining enrollment") ||
+      notesLower.includes("low enrollment") || notesLower.includes("enrollment woes") ||
+      notesLower.includes("enrollment shortfall") || notesLower.includes("enrollment down")) {
+    return "Enrollment Decline"
+  }
+  
+  // Strategic restructuring
+  if (notesLower.includes("strategic") || notesLower.includes("restructuring") ||
+      notesLower.includes("realignment") || notesLower.includes("mission alignment") ||
+      notesLower.includes("broader restructuring") || notesLower.includes("institution-wide") ||
+      notesLower.includes("voluntary buyouts") || notesLower.includes("voluntary retirement") ||
+      notesLower.includes("buyouts") || notesLower.includes("retirement incentives")) {
     return "Strategic Restructuring"
   }
-  if (lowerNotes.includes("accreditation") || lowerNotes.includes("accredited") || lowerNotes.includes("certification")) {
-    return "Accreditation Issues"
+  
+  // Political pressure
+  if (notesLower.includes("political pressure") || notesLower.includes("state lawmakers") ||
+      notesLower.includes("national security") || notesLower.includes("antisemitism") ||
+      notesLower.includes("chinese communist party") || notesLower.includes("house select committee")) {
+    return "Political Pressure"
   }
-  if (lowerNotes.includes("mismanagement") || lowerNotes.includes("fraud") || lowerNotes.includes("scandal")) {
+  
+  // Operational costs
+  if (notesLower.includes("operational costs") || notesLower.includes("rising costs") ||
+      notesLower.includes("cost constraints") || notesLower.includes("cost-saving") ||
+      notesLower.includes("operational challenges") || notesLower.includes("operational cuts")) {
+    return "Operational Costs"
+  }
+  
+  // Financial mismanagement
+  if (notesLower.includes("mismanagement") || notesLower.includes("fraud") ||
+      notesLower.includes("scandal") || notesLower.includes("financial irregularities") ||
+      notesLower.includes("financial misconduct")) {
     return "Financial Mismanagement"
   }
-  if (lowerNotes.includes("performance") || lowerNotes.includes("quality") || lowerNotes.includes("metrics")) {
-    return "Program Performance"
-  }
-  if (lowerNotes.includes("administrative") || lowerNotes.includes("leadership") || lowerNotes.includes("management")) {
-    return "Administrative Changes"
-  }
-  if (lowerNotes.includes("market") || lowerNotes.includes("demand") || lowerNotes.includes("industry")) {
-    return "Market Demand"
-  }
-  if (lowerNotes.includes("regulatory") || lowerNotes.includes("compliance") || lowerNotes.includes("regulation")) {
-    return "Regulatory Compliance"
+  
+  // Accreditation issues
+  if (notesLower.includes("accreditation") || notesLower.includes("accredited") ||
+      notesLower.includes("certification") || notesLower.includes("accreditation issues")) {
+    return "Accreditation Issues"
   }
   
   return "Budget Deficit"
 }
 
+// Mock data as fallback only
+const mockKpiData: KpiData = {
+  totalActions: 96,
+  institutionsImpacted: 90,
+  statesAffected: 25,
+  mostImpactedState: "CA",
+  lastUpdated: new Date().toISOString(),
+}
+
+const mockLatestCuts: Cut[] = [
+  {
+    id: "1",
+    institution: "Example University",
+    program_name: "Liberal Arts Program",
+    state: "CA",
+    cut_type: "program_suspension",
+    announcement_date: "2024-03-15",
+    effective_term: "Fall 2024",
+    students_affected: 150,
+    faculty_affected: 8,
+    notes: "Program suspended due to budget constraints",
+    source_url: "https://example.com/news",
+    source_publication: "University Times",
+    control: "Public",
+    status: "Active",
+    created_at: "2024-03-15T10:00:00Z",
+    updated_at: "2024-03-15T10:00:00Z",
+  },
+  {
+    id: "2",
+    institution: "State College",
+    program_name: "Philosophy Department",
+    state: "TX",
+    cut_type: "department_closure",
+    announcement_date: "2024-03-10",
+    effective_term: "Spring 2025",
+    students_affected: 75,
+    faculty_affected: 12,
+    notes: "Department closure effective next semester",
+    source_url: "https://example.com/announcement",
+    source_publication: "State College News",
+    control: "Public",
+    status: "Active",
+    created_at: "2024-03-10T09:00:00Z",
+    updated_at: "2024-03-10T09:00:00Z",
+  },
+  {
+    id: "3",
+    institution: "Community College",
+    program_name: null,
+    state: "NY",
+    cut_type: "campus_closure",
+    announcement_date: "2024-03-05",
+    effective_term: "Summer 2024",
+    students_affected: null,
+    faculty_affected: 25,
+    notes: "Campus closure due to declining enrollment",
+    source_url: null,
+    source_publication: null,
+    control: "Public",
+    status: "Active",
+    created_at: "2024-03-05T08:00:00Z",
+    updated_at: "2024-03-05T08:00:00Z",
+  },
+  {
+    id: "4",
+    institution: "Technical Institute",
+    program_name: "Engineering Technology",
+    state: "FL",
+    cut_type: "teach_out",
+    announcement_date: "2024-02-28",
+    effective_term: "Fall 2024",
+    students_affected: 200,
+    faculty_affected: 15,
+    notes: "Teach-out plan in place for current students",
+    source_url: "https://example.com/tech-news",
+    source_publication: "Tech Education Today",
+    control: "Private",
+    status: "Active",
+    created_at: "2024-02-28T11:00:00Z",
+    updated_at: "2024-02-28T11:00:00Z",
+  },
+  {
+    id: "5",
+    institution: "Regional University",
+    program_name: "Art History Program",
+    state: "IL",
+    cut_type: "program_suspension",
+    announcement_date: "2024-02-20",
+    effective_term: "Summer 2024",
+    students_affected: 45,
+    faculty_affected: 3,
+    notes: "Program suspended pending review",
+    source_url: "https://example.com/university-update",
+    source_publication: "Regional News",
+    control: "Public",
+    status: "Active",
+    created_at: "2024-02-20T14:00:00Z",
+    updated_at: "2024-02-20T14:00:00Z",
+  },
+]
+
 export function HomePageClient() {
-  const [mounted, setMounted] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [kpiData, setKpiData] = useState<KpiData | null>(null)
   const [latestCuts, setLatestCuts] = useState<Cut[]>([])
+  const [loading, setLoading] = useState(true)
   const [cutsLoading, setCutsLoading] = useState(true)
-  const [isSubscribed, setIsSubscribed] = useState(false)
-  const [email, setEmail] = useState("")
+  const [refreshing, setRefreshing] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  
+  // Subscription state
+  const [email, setEmail] = useState('')
   const [subscribing, setSubscribing] = useState(false)
-  const [subscriptionMessage, setSubscriptionMessage] = useState("")
-  const [statusSummary, setStatusSummary] = useState<Record<string, number>>({})
+  const [subscriptionMessage, setSubscriptionMessage] = useState('')
+  const [isSubscribed, setIsSubscribed] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    console.log("🔍 HomePage mounted, checking Supabase configuration...")
+    console.log("🔍 isSupabaseConfigured:", isSupabaseConfigured)
+    console.log("🔍 supabase client:", !!getSupabaseClient())
+    
+    // Check subscription status
+    const checkSubscription = () => {
+      const cookies = document.cookie.split(';')
+      const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+      const isSubscribed = ccSubCookie?.includes('1') || false
+      
+      console.log('🔍 Client-side subscription check:', {
+        cookies: document.cookie,
+        ccSubCookie: ccSubCookie,
+        isSubscribed: isSubscribed
+      })
+      
+      setIsSubscribed(isSubscribed)
+    }
     checkSubscription()
   }, [])
-
-  const checkSubscription = () => {
-    if (typeof window !== "undefined") {
-      const hasSubscription = document.cookie.includes("subscription=active")
-      setIsSubscribed(hasSubscription)
-    }
-  }
 
   useEffect(() => {
     if (mounted) {
@@ -271,119 +383,138 @@ export function HomePageClient() {
     }
   }
 
+  /** Refresh all data */
   async function refreshData() {
+    if (refreshing) return
+
     setRefreshing(true)
     try {
       await Promise.all([fetchKpiData(), fetchLatestCuts()])
       setLastRefresh(new Date())
     } catch (err) {
       console.error("Error refreshing data:", err)
+      // setError(err instanceof Error ? err.message : "Failed to refresh data") // Removed unused variable
     } finally {
       setRefreshing(false)
     }
   }
 
+  /** Fetch KPI data from Supabase */
   async function fetchKpiData() {
+    console.log("🔍 fetchKpiData called")
+    console.log("🔍 isSupabaseConfigured:", isSupabaseConfigured)
+    
+    const client = getSupabaseClient()
+    console.log("🔍 supabase client:", !!client)
+    
+    if (!isSupabaseConfigured || !client) {
+      console.log("⚠️ Supabase not configured, using mock data")
+      setKpiData(mockKpiData)
+      setLoading(false)
+      return
+    }
+
     try {
-      const client = getSupabaseClient()
-      if (!isSupabaseConfigured || !client) {
-        console.warn("Supabase not configured, using mock KPI data")
-        setKpiData({
-          totalActions: 150,
-          institutionsImpacted: 45,
-          statesAffected: 28,
-          mostImpactedState: "California",
-          lastUpdated: new Date().toISOString()
-        })
-        return
-      }
+      console.log("📊 Fetching KPI data from Supabase...")
 
       // Fetch total actions count
-      const { count: totalActions, error: totalError } = await client
+      const { count: totalActions, error: actionsError } = await client
         .from("v_latest_cuts")
         .select("*", { count: "exact", head: true })
 
-      if (totalError) {
-        console.error("Error fetching total actions:", totalError)
-        return
+      if (actionsError) {
+        console.error("Error fetching total actions:", actionsError)
+        throw actionsError
       }
+
+      console.log("✅ Total actions fetched:", totalActions)
 
       // Fetch unique institutions count
       const { data: institutions, error: institutionsError } = await client
         .from("v_latest_cuts")
         .select("institution")
+        .not("institution", "is", null)
 
       if (institutionsError) {
         console.error("Error fetching institutions:", institutionsError)
-        return
+        throw institutionsError
       }
 
-      const uniqueInstitutions = new Set(institutions?.map(cut => cut.institution) || [])
-      const institutionsImpacted = uniqueInstitutions.size
+      const uniqueInstitutions = new Set(institutions.map((i) => i.institution)).size
+      console.log("✅ Unique institutions:", uniqueInstitutions)
 
       // Fetch unique states count
-      const { data: states, error: statesError } = await client
+      const { data: stateData, error: stateError } = await client
         .from("v_latest_cuts")
         .select("state")
+        .not("state", "is", null)
 
-      if (statesError) {
-        console.error("Error fetching states:", statesError)
-        return
+      if (stateError) {
+        console.error("Error fetching state data:", stateError)
+        throw stateError
       }
 
-      const uniqueStates = new Set(states?.map(cut => cut.state) || [])
-      const statesAffected = uniqueStates.size
+      const uniqueStates = new Set(stateData.map((s) => s.state)).size
+      console.log("✅ Unique states:", uniqueStates)
 
-      // Find most impacted state
-      const stateCounts: Record<string, number> = {}
-      states?.forEach(cut => {
-        stateCounts[cut.state] = (stateCounts[cut.state] || 0) + 1
-      })
+      // Count occurrences of each state to find most impacted
+      const stateCounts = stateData.reduce((acc: Record<string, number>, item: { state: string }) => {
+        acc[item.state] = (acc[item.state] || 0) + 1
+        return acc
+      }, {} as Record<string, number>)
 
-      const mostImpactedState = Object.entries(stateCounts)
-        .sort(([, a], [, b]) => b - a)[0]?.[0] || "N/A"
+      // Find the maximum count
+      const maxCount = Math.max(...Object.values(stateCounts))
+      
+      // Find all states with the maximum count
+      const mostImpactedStates = Object.entries(stateCounts)
+        .filter(([state, count]) => count === maxCount)
+        .map(([state]) => state)
+        .sort() // Sort alphabetically for consistent display
+      
+      // Convert to abbreviations and format
+      const stateAbbrevs = mostImpactedStates
+        .map(state => stateAbbreviations[state] || state)
+        .sort()
+      
+      const mostImpactedState = stateAbbrevs.length > 1 
+        ? stateAbbrevs.slice(0, -1).join(", ") + " & " + stateAbbrevs[stateAbbrevs.length - 1]
+        : stateAbbrevs[0] || ""
+      
+      console.log("✅ Most impacted states:", mostImpactedStates)
+      console.log("✅ Most impacted state display:", mostImpactedState)
 
-      setKpiData({
+      const kpiData: KpiData = {
         totalActions: totalActions || 0,
-        institutionsImpacted,
-        statesAffected,
+        institutionsImpacted: uniqueInstitutions,
+        statesAffected: uniqueStates,
         mostImpactedState,
-        lastUpdated: new Date().toISOString()
-      })
+        lastUpdated: new Date().toISOString(),
+      }
+
+      console.log("✅ KPI data fetched successfully:", kpiData)
+      setKpiData(kpiData)
     } catch (err) {
-      console.error("Error fetching KPI data:", err)
+      console.error("❌ Error fetching KPI data:", err)
+      // Fallback to mock data
+      setKpiData(mockKpiData)
     } finally {
       setLoading(false)
     }
   }
 
+  /** Fetch latest cuts from Supabase */
   async function fetchLatestCuts() {
+    const client = getSupabaseClient()
+    if (!isSupabaseConfigured || !client) {
+      console.log("⚠️ Supabase not configured, using mock data")
+      setLatestCuts(mockLatestCuts)
+      setCutsLoading(false)
+      return
+    }
+
     try {
-      const client = getSupabaseClient()
-      if (!isSupabaseConfigured || !client) {
-        console.warn("Supabase not configured, using mock cuts data")
-        setLatestCuts([
-          {
-            id: "1",
-            institution: "Example University",
-            program_name: "Liberal Arts Program",
-            state: "CA",
-            cut_type: "program_suspension",
-            announcement_date: "2024-03-15",
-            effective_term: "Fall 2024",
-            students_affected: 150,
-            faculty_affected: 8,
-            control: "Public",
-            notes: "Program suspended due to budget constraints",
-            source_url: "https://example.com/news",
-            source_publication: "University Times",
-            status: "confirmed",
-            created_at: "2024-03-15T10:00:00Z",
-            updated_at: "2024-03-15T10:00:00Z",
-          }
-        ])
-        return
-      }
+      console.log("Fetching latest cuts from Supabase...")
 
       const { data, error } = await client
         .from("v_latest_cuts")
@@ -393,21 +524,27 @@ export function HomePageClient() {
 
       if (error) {
         console.error("Error fetching latest cuts:", error)
-        return
+        throw error
       }
 
+      console.log("✅ Latest cuts fetched successfully:", data?.length || 0, "cuts")
+      
+      // Debug: Log status distribution in latest cuts
+      if (data && data.length > 0) {
+        const statusCounts = data.reduce((acc: Record<string, number>, cut: any) => {
+          const status = cut.status || 'NULL'
+          acc[status] = (acc[status] || 0) + 1
+          return acc
+        }, {})
+        console.log("📊 Status distribution in latest cuts:", statusCounts)
+      }
+      
       setLatestCuts(data || [])
-
-      // Calculate status summary
-      const statusCounts: Record<string, number> = {}
-      data?.forEach(cut => {
-        const status = cut.status || 'unknown'
-        statusCounts[status] = (statusCounts[status] || 0) + 1
-      })
-      setStatusSummary(statusCounts)
-
     } catch (err) {
       console.error("Error fetching latest cuts:", err)
+      // setError(err instanceof Error ? err.message : "Failed to fetch latest cuts") // Removed unused variable
+      // Fallback to mock data
+      setLatestCuts(mockLatestCuts)
     } finally {
       setCutsLoading(false)
     }
@@ -416,26 +553,46 @@ export function HomePageClient() {
   async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault()
     setSubscribing(true)
-    setSubscriptionMessage("")
+    setSubscriptionMessage('')
 
     try {
-      const response = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        setSubscriptionMessage("Success! Check your email to confirm your subscription.")
-        setEmail("")
+        setSubscriptionMessage('Success! You now have full access.')
         setIsSubscribed(true)
+        setEmail('')
+        
+        // Manual fallback: Set cookie on client side as well
+        document.cookie = 'cc_sub=1; path=/; max-age=31536000; samesite=lax'
+        
+        // Debug: Check if cookie was set
+        setTimeout(() => {
+          const cookies = document.cookie.split(';')
+          const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+          console.log('🍪 After subscription success:', {
+            cookies: document.cookie,
+            ccSubCookie: ccSubCookie,
+            isSubscribed: ccSubCookie?.includes('1') || false
+          })
+        }, 100)
+        
+        // Smooth transition: show success message briefly, then fade out subscription gate
+        setTimeout(() => {
+          setSubscriptionMessage('')
+          // Trigger a custom event to notify other components of subscription change
+          window.dispatchEvent(new CustomEvent('subscriptionChanged', { detail: { subscribed: true } }))
+        }, 2000)
       } else {
-        setSubscriptionMessage(result.error || "Failed to subscribe. Please try again.")
+        const data = await response.json()
+        setSubscriptionMessage(data.error || 'Please enter a valid email')
       }
     } catch (error) {
-      setSubscriptionMessage("Network error. Please try again.")
+      setSubscriptionMessage('Something went wrong. Please try again.')
     } finally {
       setSubscribing(false)
     }
@@ -600,25 +757,6 @@ export function HomePageClient() {
           </section>
         </div>
 
-        {/* Status Summary Section */}
-        {Object.keys(statusSummary).length > 0 && (
-          <div className="container mx-auto px-4 py-4">
-            <section aria-labelledby="status-summary-title">
-              <h2 id="status-summary-title" className="text-xl font-semibold mb-4 text-center">Action Status Overview</h2>
-              <div className="flex items-center justify-center gap-3 flex-wrap">
-                {Object.entries(statusSummary).map(([status, count]) => (
-                  <div key={status} className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full border">
-                    <Badge className={statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800 border-gray-200"}>
-                      {statusDisplayNames[status as keyof typeof statusDisplayNames] || status}
-                    </Badge>
-                    <span className="text-sm font-medium text-muted-foreground">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-        )}
-
         {/* Latest 5 Actions */}
         <div className="container mx-auto px-4 py-8">
           <section aria-labelledby="latest-actions-title">
@@ -639,7 +777,6 @@ export function HomePageClient() {
                             <div className="flex items-center gap-3 flex-wrap">
                               <Skeleton className="h-6 w-32 sm:w-48" />
                               <Skeleton className="h-6 w-16 sm:w-24" />
-                              <Skeleton className="h-6 w-20 sm:w-28" />
                             </div>
                             <Skeleton className="h-4 w-48 sm:w-64" />
                           </div>
@@ -660,17 +797,17 @@ export function HomePageClient() {
                               >
                                 {cut.institution}
                               </Link>
-                              <Badge className={`${cutTypeColors[cut.cut_type]} border transition-colors text-xs`} variant="secondary">
+                              <Badge className={`${CUT_TYPE_COLORS[cut.cut_type]} border transition-colors text-xs`} variant="secondary">
                                 {cut.cut_type.replace("_", " ")}
                               </Badge>
-                              {cut.status && (
-                                <Badge className={`${statusColors[cut.status as keyof typeof statusColors] || "bg-gray-100 text-gray-800 border-gray-200"} border transition-colors text-xs`} variant="secondary">
-                                  {statusDisplayNames[cut.status as keyof typeof statusDisplayNames] || cut.status}
-                                </Badge>
-                              )}
-                              <Badge className={`${categoryColors[categorizeCut(cut.notes) as keyof typeof categoryColors]} border transition-colors text-xs`} variant="secondary">
+                              <Badge className={`${CATEGORY_COLORS[categorizeCut(cut.notes) as keyof typeof CATEGORY_COLORS]} border transition-colors text-xs`} variant="secondary">
                                 {categorizeCut(cut.notes)}
                               </Badge>
+                              {cut.status && (
+                                <Badge className={`${STATUS_COLORS[cut.status as keyof typeof STATUS_COLORS] || "bg-gray-50 text-gray-700 border-gray-200"} border transition-colors text-xs`} variant="secondary">
+                                  {cut.status}
+                                </Badge>
+                              )}
                             </div>
                             <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
                               {cut.program_name && (
@@ -681,7 +818,7 @@ export function HomePageClient() {
                               )}
                               <span>{cut.state}</span>
                               <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>
-                              <span>{new Date(cut.announcement_date).toLocaleDateString()}</span>
+                              <span>{formatMonthYear(cut.announcement_date)}</span>
                               {cut.students_affected && (
                                 <>
                                   <div className="h-1 w-1 bg-muted-foreground rounded-full" aria-hidden="true"></div>

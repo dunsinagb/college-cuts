@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { Metadata } from "next"
+import { formatFullMonthYear } from "@/lib/utils"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.college-cuts.com'
 
@@ -319,7 +320,7 @@ export default function AboutPage() {
         {/* Footer */}
         <div className="text-center mt-12 pt-8 border-t">
           <p className="text-sm text-muted-foreground">
-            Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Data coverage: Started from 2024
+            Last updated: {formatFullMonthYear(new Date())} • Data coverage: Started from 2024
         </p>
         </div>
       </div>

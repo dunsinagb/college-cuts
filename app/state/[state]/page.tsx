@@ -2,8 +2,11 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Users, Building2, TrendingDown } from "lucide-react"
+import { ExternalLink, MapPin, Users, GraduationCap, TrendingUp, AlertTriangle } from "lucide-react"
 import Link from "next/link"
+import { createClient } from "@supabase/supabase-js"
+import type { Database } from "@/types/supabase"
+import { formatFullMonthYear } from "@/lib/utils"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.college-cuts.com'
 
@@ -119,11 +122,11 @@ export default function StatePage({ params }: { params: { state: string } }) {
           </p>
           <div className="flex justify-center gap-2">
             <Badge variant="secondary" className="text-sm">
-              <TrendingDown className="w-3 h-3 mr-1" />
+              <TrendingUp className="w-3 h-3 mr-1" />
               2024-2025 Data
             </Badge>
             <Badge variant="secondary" className="text-sm">
-              <Building2 className="w-3 h-3 mr-1" />
+              <AlertTriangle className="w-3 h-3 mr-1" />
               Real-time Updates
             </Badge>
           </div>
@@ -189,7 +192,7 @@ export default function StatePage({ params }: { params: { state: string } }) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-green-600" />
+                <GraduationCap className="w-5 h-5 text-green-600" />
                 Data Sources
               </CardTitle>
             </CardHeader>
@@ -253,7 +256,7 @@ export default function StatePage({ params }: { params: { state: string } }) {
         {/* Footer */}
         <div className="text-center mt-12 pt-8 border-t">
           <p className="text-sm text-muted-foreground">
-            Data coverage: Started from 2024 • Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            Data coverage: Started from 2024 • Last updated: {formatFullMonthYear(new Date())}
           </p>
           <div className="mt-4">
             <Link href="/about" className="text-sm text-blue-600 hover:text-blue-700">

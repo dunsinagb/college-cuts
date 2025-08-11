@@ -49,6 +49,7 @@ export function StateActionsChart() {
           .from("v_latest_cuts")
           .select("state, announcement_date")
           .not("state", "is", null)
+          .eq("status", "confirmed") // Only confirmed cases
 
         if (error) {
           console.error("Error fetching state data:", error)

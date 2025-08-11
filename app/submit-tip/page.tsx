@@ -13,6 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient"
 import type { Cut } from "@/types/supabase"
+import { Badge } from "@/components/ui/badge"
+import { ExternalLink } from "lucide-react"
+import { formatMonthYear } from "@/lib/utils"
 
 // Mock data for fallback
 const mockLatestCuts: Cut[] = [
@@ -30,6 +33,7 @@ const mockLatestCuts: Cut[] = [
     notes: "Program suspended due to budget constraints",
     source_url: "https://example.com/news",
     source_publication: "University Times",
+    status: "confirmed",
     created_at: "2024-03-15T10:00:00Z",
     updated_at: "2024-03-15T10:00:00Z",
   },
@@ -47,6 +51,7 @@ const mockLatestCuts: Cut[] = [
     notes: "Department closure effective next semester",
     source_url: "https://example.com/announcement",
     source_publication: "State College News",
+    status: "confirmed",
     created_at: "2024-03-10T09:00:00Z",
     updated_at: "2024-03-10T09:00:00Z",
   },
@@ -64,6 +69,7 @@ const mockLatestCuts: Cut[] = [
     notes: "Program suspended pending review",
     source_url: "https://example.com/university-update",
     source_publication: "Regional News",
+    status: "confirmed",
     created_at: "2024-02-20T14:00:00Z",
     updated_at: "2024-02-20T14:00:00Z",
   },
@@ -347,7 +353,7 @@ export default function SubmitTipPage() {
                       <div className="text-right">
                         <div className="text-sm font-medium">Date</div>
                         <div className="text-sm text-muted-foreground">
-                          {new Date(cut.announcement_date).toLocaleDateString()}
+                          {formatMonthYear(cut.announcement_date)}
                         </div>
                       </div>
                     </div>

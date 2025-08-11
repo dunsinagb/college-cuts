@@ -40,11 +40,13 @@ const fetcher = async (): Promise<CutsAnalytics & { cutsByMonthYear: { month: st
 
     // Since we don't have the exact table structure with institutions join,
     // we'll use the v_latest_cuts view and adapt the queries
+    // FILTER: Only show confirmed cases in analytics
     
     // a) cutsByMonthYear: [{ month: 'Jan', year: 2024, cuts: 2 }, ...]
     const { data: monthData, error: monthError } = await client
       .from("v_latest_cuts")
       .select("announcement_date")
+      .eq("status", "confirmed") // Only confirmed cases
     
     if (monthError) throw monthError
 
@@ -90,6 +92,7 @@ const fetcher = async (): Promise<CutsAnalytics & { cutsByMonthYear: { month: st
     const { data: controlData, error: controlError } = await client
       .from("v_latest_cuts")
       .select("control, institution")
+      .eq("status", "confirmed") // Only confirmed cases
     
     if (controlError) throw controlError
 
@@ -116,6 +119,7 @@ const fetcher = async (): Promise<CutsAnalytics & { cutsByMonthYear: { month: st
     const { data: stateData, error: stateError } = await client
       .from("v_latest_cuts")
       .select("state")
+      .eq("status", "confirmed") // Only confirmed cases
     
     if (stateError) throw stateError
 
@@ -134,6 +138,7 @@ const fetcher = async (): Promise<CutsAnalytics & { cutsByMonthYear: { month: st
     const { data: typeData, error: typeError } = await client
       .from("v_latest_cuts")
       .select("cut_type")
+      .eq("status", "confirmed") // Only confirmed cases
     
     if (typeError) throw typeError
 

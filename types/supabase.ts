@@ -16,7 +16,7 @@ export interface Database {
           notes: string | null
           source_url: string | null
           source_publication: string | null
-          status: "confirmed" | "provisional" | "pending" | "proposed" | "under_review" | "cancelled" | null
+          status: string | null
           created_at: string
           updated_at: string
         }
