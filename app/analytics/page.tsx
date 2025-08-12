@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
@@ -16,7 +16,13 @@ const StateActionsChart = dynamic(() => import("@/components/analytics/StateActi
 
 function AnalyticsPageContent() {
   const { manualRefresh, isLoading } = useCutsAnalytics()
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setLastRefresh(new Date())
+  }, [])
 
   const handleRefresh = async () => {
     manualRefresh()
@@ -44,9 +50,11 @@ function AnalyticsPageContent() {
               <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh Data
             </Button>
-            <span className="text-sm text-muted-foreground">
-              Last updated: {lastRefresh.toLocaleTimeString()}
-            </span>
+            {mounted && lastRefresh && (
+              <span className="text-sm text-muted-foreground">
+                Last updated: {lastRefresh.toLocaleTimeString()}
+              </span>
+            )}
           </div>
         </section>
 

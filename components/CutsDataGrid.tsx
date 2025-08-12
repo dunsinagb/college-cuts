@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, Filter, X, RefreshCw, Search, ExternalLink, AlertCircle } from "lucide-react"
+import { Download, Filter, X, Search, ExternalLink, AlertCircle, Bookmark } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
@@ -240,6 +240,7 @@ export function CutsDataGrid() {
   const [filteredCuts, setFilteredCuts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isSubscribed, setIsSubscribed] = useState(false)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     states: [],
     institutions: [],
@@ -263,6 +264,11 @@ export function CutsDataGrid() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [showOnlyWithNumbers, setShowOnlyWithNumbers] = useState<boolean>(false)
+  
+  // Saved searches state
+  const [savedSearches, setSavedSearches] = useState<Array<{id: string, name: string, filters: any}>>([])
+  const [showSaveSearch, setShowSaveSearch] = useState(false)
+  const [searchName, setSearchName] = useState("")
 
   async function fetchData() {
     if (!isSupabaseConfigured) {
@@ -279,10 +285,22 @@ export function CutsDataGrid() {
         return
       }
 
-      const { data, error } = await client
+      // Check subscription status before fetching
+      const cookies = document.cookie.split(';')
+      const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+      const isCurrentlySubscribed = ccSubCookie?.includes('1') || false
+      
+      // Limit results for non-subscribers
+      const queryBuilder = client
         .from("v_latest_cuts")
         .select("*")
         .order("announcement_date", { ascending: false })
+      
+      if (!isCurrentlySubscribed) {
+        queryBuilder.limit(20) // Limit to 20 results for non-subscribers
+      }
+
+      const { data, error } = await queryBuilder
 
       if (error) {
         console.error("Error fetching data:", error)
@@ -312,8 +330,30 @@ export function CutsDataGrid() {
   }
 
   useEffect(() => {
+    // Check subscription status
+    const checkSubscription = () => {
+      const cookies = document.cookie.split(';')
+      const ccSubCookie = cookies.find(cookie => cookie.trim().startsWith('cc_sub='))
+      setIsSubscribed(ccSubCookie?.includes('1') || false)
+    }
+    
+    checkSubscription()
     fetchData()
     fetchFilterOptions()
+    
+    // Listen for subscription changes
+    const handleSubscriptionChange = (event: CustomEvent) => {
+      if (event.detail?.subscribed) {
+        setIsSubscribed(true)
+        fetchData() // Refresh data when user subscribes
+      }
+    }
+    
+    window.addEventListener('subscriptionChanged', handleSubscriptionChange as EventListener)
+    
+    return () => {
+      window.removeEventListener('subscriptionChanged', handleSubscriptionChange as EventListener)
+    }
   }, [])
 
   useEffect(() => {
@@ -387,6 +427,89 @@ export function CutsDataGrid() {
     } catch (error) {
       console.error("❌ Error fetching filter options:", error)
     }
+  }
+
+  // Load saved searches from localStorage on component mount
+  useEffect(() => {
+    const saved = localStorage.getItem('collegeCuts_savedSearches')
+    if (saved) {
+      setSavedSearches(JSON.parse(saved))
+    }
+  }, [])
+
+  // Save current filters as a saved search
+  const saveCurrentSearch = () => {
+    if (!searchName.trim()) return
+    
+    const currentFilters = {
+      searchTerm,
+      stateFilter,
+      cutTypeFilter,
+      institutionFilter,
+      controlFilter,
+      dateRangeFilter,
+      studentsAffectedFilter,
+      facultyAffectedFilter,
+      categoryFilter,
+      statusFilter,
+      showOnlyWithNumbers
+    }
+    
+    const newSearch = {
+      id: Date.now().toString(),
+      name: searchName.trim(),
+      filters: currentFilters
+    }
+    
+    const updated = [...savedSearches, newSearch]
+    setSavedSearches(updated)
+    localStorage.setItem('collegeCuts_savedSearches', JSON.stringify(updated))
+    setSearchName("")
+    setShowSaveSearch(false)
+  }
+
+  // Load a saved search
+  const loadSavedSearch = (search: {id: string, name: string, filters: any}) => {
+    const filters = search.filters
+    setSearchTerm(filters.searchTerm || "")
+    setStateFilter(filters.stateFilter || "all")
+    setCutTypeFilter(filters.cutTypeFilter || "all")
+    setInstitutionFilter(filters.institutionFilter || "all")
+    setControlFilter(filters.controlFilter || "all")
+    setDateRangeFilter(filters.dateRangeFilter || "all")
+    setStudentsAffectedFilter(filters.studentsAffectedFilter || "all")
+    setFacultyAffectedFilter(filters.facultyAffectedFilter || "all")
+    setCategoryFilter(filters.categoryFilter || "all")
+    setStatusFilter(filters.statusFilter || "all")
+    setShowOnlyWithNumbers(filters.showOnlyWithNumbers || false)
+  }
+
+  // Delete a saved search
+  const deleteSavedSearch = (id: string) => {
+    const updated = savedSearches.filter(search => search.id !== id)
+    setSavedSearches(updated)
+    localStorage.setItem('collegeCuts_savedSearches', JSON.stringify(updated))
+  }
+
+  // Check if current filters match any saved search
+  const getCurrentSearchMatch = () => {
+    const currentFilters = {
+      searchTerm,
+      stateFilter,
+      cutTypeFilter,
+      institutionFilter,
+      controlFilter,
+      dateRangeFilter,
+      studentsAffectedFilter,
+      facultyAffectedFilter,
+      categoryFilter,
+      statusFilter,
+      showOnlyWithNumbers
+    }
+    
+    return savedSearches.find(search => 
+      JSON.stringify(search.filters) === JSON.stringify(currentFilters)
+    )
   }
 
   function applyFilters() {
@@ -716,6 +839,33 @@ export function CutsDataGrid() {
         </Alert>
       )}
 
+      {/* Freemium Limitation Banner */}
+      {!isSubscribed && cuts.length >= 20 && (
+        <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800">
+          <AlertCircle className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800 dark:text-blue-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <strong>Limited Preview:</strong> Showing 20 most recent actions. 
+                <span className="block text-sm mt-1">Subscribe for unlimited access to all data, advanced analytics, and data exports.</span>
+              </div>
+              <Button 
+                size="sm" 
+                className="ml-4 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => {
+                  const upgradeSection = document.getElementById('upgrade-title');
+                  if (upgradeSection) {
+                    upgradeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
+              >
+                Upgrade Now
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Professional Filter Panel with Titles and Selected Filters */}
       <Card className="shadow-lg border-gray-200">
         <CardHeader className="pb-3">
@@ -724,17 +874,68 @@ export function CutsDataGrid() {
               <Filter className="h-4 w-4" />
               Advanced Filters
             </CardTitle>
+            <div className="flex items-center gap-2">
+              {/* Saved Searches */}
+              {savedSearches.length > 0 && (
+                <Select onValueChange={(value) => {
+                  const search = savedSearches.find(s => s.id === value)
+                  if (search) loadSavedSearch(search)
+                }}>
+                  <SelectTrigger className="w-48 h-7 text-xs">
+                    <SelectValue placeholder="Load saved search..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {savedSearches.map((search) => (
+                      <SelectItem key={search.id} value={search.id}>
+                        <div className="flex items-center justify-between w-full">
+                          <span className="flex-1">{search.name}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 ml-2 hover:bg-red-100"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              deleteSavedSearch(search.id)
+                            }}
+                            title="Delete saved search"
+                          >
+                            <X className="h-3 w-3 text-red-600" />
+                          </Button>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              
+              {/* Save Current Search */}
+              {!showSaveSearch && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSaveSearch(true)}
+                  className="h-7 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                  disabled={activeFiltersCount === 0}
+                >
+                  <Bookmark className="h-3 w-3 mr-1" />
+                  Save Search
+                </Button>
+              )}
+              
+              {/* Clear All Filters */}
               {activeFiltersCount > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={clearAllFilters}
-                className="h-7 text-xs bg-white hover:bg-gray-50 border-gray-300"
+                  className="h-7 text-xs bg-white hover:bg-gray-50 border-gray-300"
                 >
-                <X className="h-3 w-3 mr-1" />
+                  <X className="h-3 w-3 mr-1" />
                   Clear All
                 </Button>
               )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-3 space-y-4">
@@ -802,6 +1003,44 @@ export function CutsDataGrid() {
                     With Numbers Only
                   </Badge>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Save Search Form */}
+          {showSaveSearch && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Bookmark className="h-4 w-4 text-green-600" />
+                <span className="text-xs font-medium text-green-900">Save Current Search</span>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter search name..."
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  className="flex-1 h-7 text-xs"
+                  onKeyPress={(e) => e.key === 'Enter' && saveCurrentSearch()}
+                />
+                <Button
+                  size="sm"
+                  onClick={saveCurrentSearch}
+                  disabled={!searchName.trim()}
+                  className="h-7 text-xs"
+                >
+                  Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setShowSaveSearch(false)
+                    setSearchName("")
+                  }}
+                  className="h-7 text-xs"
+                >
+                  Cancel
+                </Button>
               </div>
             </div>
           )}

@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { 
   GraduationCap, 
   Building2, 
@@ -16,7 +17,8 @@ import {
   Mail,
   CheckCircle,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  HelpCircle
 } from 'lucide-react'
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
@@ -665,21 +667,24 @@ export function HomePageClient() {
           </div>
         </section>
 
-        {/* Subscription Gate with smooth transition */}
+        {/* Premium Upgrade Call-to-Action (shown for all users) */}
         {!isSubscribed && (
           <section 
-            aria-labelledby="subscription-title"
-            className={`transition-all duration-1000 ease-in-out ${
-              subscriptionMessage.includes('Success') ? 'opacity-0 transform scale-95' : 'opacity-100 transform scale-100'
-            }`}
+            aria-labelledby="upgrade-title"
+            className="transition-all duration-500 ease-in-out"
           >
             <Card className="gradient-border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
               <CardContent className="p-6 sm:p-8 flex flex-col items-center justify-center gap-4">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 mb-2">
                   <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h2 id="subscription-title" className="text-2xl sm:text-3xl font-bold text-center">Unlock Full Access</h2>
-                <p className="text-muted-foreground text-base text-center mb-2">Subscribe to access the full database and analytics.</p>
+                <h2 id="upgrade-title" className="text-2xl sm:text-3xl font-bold text-center">Get Premium Access</h2>
+                <p className="text-muted-foreground text-base text-center mb-2">Subscribe for unlimited access to analytics, advanced filters, and data exports.</p>
+                <div className="text-sm text-muted-foreground text-center mb-4">
+                  <span className="font-medium text-green-600">✓ Full database access</span> • 
+                  <span className="font-medium text-green-600"> ✓ Advanced analytics</span> • 
+                  <span className="font-medium text-green-600"> ✓ Data exports</span>
+                </div>
                 <form onSubmit={handleSubscribe} className="w-full max-w-md flex gap-2">
                   <Input
                     type="email"
@@ -696,7 +701,7 @@ export function HomePageClient() {
                     disabled={subscribing}
                     className="px-6 text-base font-semibold"
                   >
-                    {subscribing ? '...' : 'Subscribe'}
+                    {subscribing ? '...' : 'Upgrade'}
                   </Button>
                 </form>
                 {subscriptionMessage && (
@@ -857,6 +862,97 @@ export function HomePageClient() {
             </div>
           </section>
         </div>
+
+        {/* FAQ Section */}
+        <section aria-labelledby="faq-title">
+          <Card className="glass">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold">
+                <HelpCircle className="h-6 w-6 text-primary" />
+                Frequently Asked Questions
+              </CardTitle>
+              <p className="text-muted-foreground">Everything you need to know about CollegeCuts Tracker</p>
+            </CardHeader>
+            <CardContent className="px-6 pb-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="what-is-tracker">
+                  <AccordionTrigger className="text-left">What is CollegeCuts Tracker?</AccordionTrigger>
+                  <AccordionContent>
+                    CollegeCuts Tracker is a comprehensive database that monitors and documents program cuts, university closures, department suspensions, and faculty layoffs across higher education institutions in the United States. We track real-time changes to help students, faculty, and stakeholders stay informed about institutional actions affecting higher education.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="data-accuracy">
+                  <AccordionTrigger className="text-left">How accurate and reliable is your data?</AccordionTrigger>
+                  <AccordionContent>
+                    We maintain high data quality through multiple verification sources including official university announcements, local news reports, state education board communications, and community submissions. Each entry includes source links when available, and we mark the status of each action (confirmed, ongoing, reversed, or rumor) to ensure transparency.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="coverage-period">
+                  <AccordionTrigger className="text-left">What time period does your database cover?</AccordionTrigger>
+                  <AccordionContent>
+                    We began systematic data collection in 2024 and continue to track ongoing actions in real-time. While our comprehensive coverage starts from 2024, we may include significant historical closures that have ongoing impact on students and communities.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="free-vs-premium">
+                  <AccordionTrigger className="text-left">What's included in the free vs. premium access?</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-3">
+                      <div>
+                        <strong className="text-green-600">Free Access:</strong>
+                        <ul className="list-disc list-inside mt-1 text-sm text-muted-foreground">
+                          <li>20 most recent program actions</li>
+                          <li>Basic search and filtering</li>
+                          <li>Institution and program information</li>
+                          <li>Source links and status updates</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <strong className="text-blue-600">Premium Access:</strong>
+                        <ul className="list-disc list-inside mt-1 text-sm text-muted-foreground">
+                          <li>Unlimited access to full database</li>
+                          <li>Advanced analytics and trend analysis</li>
+                          <li>Export data in multiple formats</li>
+                          <li>Job market impact analysis</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="submit-information">
+                  <AccordionTrigger className="text-left">How can I contribute information or report missing data?</AccordionTrigger>
+                  <AccordionContent>
+                    We welcome community contributions! You can submit tips about program cuts, closures, or other institutional changes through our <Link href="/submit-tip" className="text-primary hover:underline">Submit Tip page</Link>. Please include as much detail as possible, including dates, sources, and links to official announcements.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="student-support">
+                  <AccordionTrigger className="text-left">Do you provide resources for affected students and faculty?</AccordionTrigger>
+                  <AccordionContent>
+                    Yes! For recent program actions (July 2025 and later), we provide contextual resources including transfer assistance, career counseling, legal aid, mental health support, financial aid information, and academic support resources tailored to each specific situation.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="data-usage">
+                  <AccordionTrigger className="text-left">Can I use this data for research or journalism?</AccordionTrigger>
+                  <AccordionContent>
+                    Absolutely! Our data is publicly accessible and we encourage its use for research, journalism, and policy analysis. We ask that you cite CollegeCuts Tracker as your source and verify current information with institutions when making critical decisions. For large-scale data requests, please contact us through the Submit Tip form.
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="updates-frequency">
+                  <AccordionTrigger className="text-left">How often is the data updated?</AccordionTrigger>
+                  <AccordionContent>
+                    Our database is updated continuously as new information becomes available. The homepage displays real-time statistics, and we refresh the data automatically every 30 seconds when you're viewing the site. Premium subscribers receive email alerts about significant new additions.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+        </section>
 
         {/* Call to Action */}
         <section aria-labelledby="cta-title">

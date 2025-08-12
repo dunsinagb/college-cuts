@@ -41,11 +41,11 @@ export function Header() {
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: TrendingUp, public: true },
-    { href: "/cuts", label: "All Actions", icon: AlertTriangle, public: false },
-    { href: "/analytics", label: "Analytics", icon: BarChart3, public: false },
-    { href: "/job-outlook", label: "Job Outlook", icon: Briefcase, public: false },
+    { href: "/cuts", label: "All Actions", icon: AlertTriangle, public: true },
+    { href: "/analytics", label: "Analytics", icon: BarChart3, public: false, premium: true },
+    { href: "/job-outlook", label: "Job Outlook", icon: Briefcase, public: false, premium: true },
     { href: "/about", label: "About", icon: Info, public: true },
-    { href: "/submit-tip", label: "Submit Tip", icon: Send, public: false },
+    { href: "/submit-tip", label: "Submit Tip", icon: Send, public: true },
   ]
 
   const isActive = (href: string) => {
@@ -79,24 +79,29 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1 ml-auto" role="navigation" aria-label="Main navigation">
           {navItems.map((item) => {
-            // Only show item if it's public or user is subscribed
-            if (!item.public && !isSubscribed) return null
-            
+            // Show all public items, premium items need subscription for full access
             const Icon = item.icon
             const active = isActive(item.href)
+            const isPremiumLocked = item.premium && !isSubscribed
+            
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 group
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 group relative
                   ${active
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "hover:bg-accent hover:text-primary"
-                  }`}
+                  }
+                  ${isPremiumLocked ? "opacity-75" : ""}
+                `}
                 aria-current={active ? "page" : undefined}
               >
                 <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
                 <span>{item.label}</span>
+                {isPremiumLocked && (
+                  <span className="text-xs bg-yellow-500 text-yellow-950 px-1 py-0.5 rounded font-medium">PRO</span>
+                )}
               </Link>
             )
           })}
@@ -126,11 +131,11 @@ export function Header() {
         >
           <nav className="py-4 space-y-2 max-w-4xl mx-auto">
             {navItems.map((item) => {
-              // Only show item if it's public or user is subscribed
-              if (!item.public && !isSubscribed) return null
-              
+              // Show all public items, premium items need subscription for full access
               const Icon = item.icon
               const active = isActive(item.href)
+              const isPremiumLocked = item.premium && !isSubscribed
+              
               return (
                 <Link
                   key={item.href}
@@ -139,12 +144,17 @@ export function Header() {
                     ${active
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "hover:bg-accent hover:text-primary"
-                    }`}
+                    }
+                    ${isPremiumLocked ? "opacity-75" : ""}
+                  `}
                   onClick={() => setIsMenuOpen(false)}
                   aria-current={active ? "page" : undefined}
                 >
                   <Icon className={`h-4 w-4 transition-transform ${active ? "scale-110" : "group-hover:scale-110"}`} aria-hidden="true" />
                   <span>{item.label}</span>
+                  {isPremiumLocked && (
+                    <span className="text-xs bg-yellow-500 text-yellow-950 px-1 py-0.5 rounded font-medium">PRO</span>
+                  )}
                 </Link>
               )
             })}

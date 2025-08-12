@@ -13,7 +13,9 @@ import {
   BookOpen,
   ExternalLink,
   MapPin,
-  Building
+  Building,
+  AlertTriangle,
+  Home
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -43,7 +45,9 @@ const categoryIcons = {
   legalAid: Scale,
   mentalHealth: Heart,
   financialAid: DollarSign,
-  academicSupport: BookOpen
+  academicSupport: BookOpen,
+  emergencyAssistance: AlertTriangle,
+  housingAssistance: Home
 }
 
 const categoryColors = {
@@ -52,7 +56,9 @@ const categoryColors = {
   legalAid: "bg-orange-100 text-orange-800 border-orange-200",
   mentalHealth: "bg-purple-100 text-purple-800 border-purple-200",
   financialAid: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  academicSupport: "bg-indigo-100 text-indigo-800 border-indigo-200"
+  academicSupport: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  emergencyAssistance: "bg-red-100 text-red-800 border-red-200",
+  housingAssistance: "bg-teal-100 text-teal-800 border-teal-200"
 }
 
 const categoryLabels = {
@@ -61,7 +67,9 @@ const categoryLabels = {
   legalAid: "Legal Aid",
   mentalHealth: "Mental Health",
   financialAid: "Financial Aid",
-  academicSupport: "Academic Support"
+  academicSupport: "Academic Support",
+  emergencyAssistance: "Emergency Assistance",
+  housingAssistance: "Housing Assistance"
 }
 
 export function ResourceSection({ institution, state, actionType, actionId, notes, announcementDate }: ResourceSectionProps) {
@@ -206,11 +214,39 @@ export function ResourceSection({ institution, state, actionType, actionId, note
         source: 'Institution'
       },
       {
-        title: 'National Academic Support Association',
-        url: 'https://www.naspa.org',
-        description: 'Academic support resources and best practices',
+        title: 'Khan Academy',
+        url: 'https://www.khanacademy.org',
+        description: 'Free online courses and academic support across all subjects',
+        source: 'Educational Platform'
+      }
+    ],
+    emergencyAssistance: [
+      {
+        title: 'College Crisis Fund',
+        url: 'https://www.collegecrisis.org',
+        description: 'Emergency financial assistance for college students in crisis',
+        source: 'Non-profit Organization'
+      },
+      {
+        title: '211 Helpline',
+        url: 'https://www.211.org',
+        description: 'Comprehensive directory of local emergency and social services',
+        source: 'Information Service'
+      }
+    ],
+    housingAssistance: [
+      {
+        title: `${state} Housing Authority`,
+        url: `https://${state.toLowerCase()}.gov/housing`,
+        description: 'State housing assistance programs and rental support',
         state,
-        source: 'Professional Organization'
+        source: 'State Government'
+      },
+      {
+        title: 'National Alliance to End Homelessness',
+        url: 'https://endhomelessness.org',
+        description: 'Resources for students experiencing housing insecurity',
+        source: 'Non-profit Organization'
       }
     ]
   })

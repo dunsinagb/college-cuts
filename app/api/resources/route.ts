@@ -217,11 +217,25 @@ function getFallbackResources(): Record<string, Resource[]> {
         relevanceScore: 5
       },
       {
-        title: 'College Transfer Guide',
-        url: 'https://www.collegetransfer.net',
-        description: 'Step-by-step guidance for transferring credits and programs',
-        source: 'Educational Resource',
+        title: 'Transferology',
+        url: 'https://www.transferology.com',
+        description: 'Course equivalency and transfer pathway planning platform',
+        source: 'Educational Technology',
         relevanceScore: 5
+      },
+      {
+        title: 'College Navigator',
+        url: 'https://nces.ed.gov/collegenavigator',
+        description: 'Federal tool for finding and comparing colleges',
+        source: 'Department of Education',
+        relevanceScore: 4
+      },
+      {
+        title: 'Transfer Credit Evaluation Services',
+        url: 'https://www.naces.org',
+        description: 'Professional credential evaluation for transfer students',
+        source: 'Professional Association',
+        relevanceScore: 4
       }
     ],
     careerCounseling: [
@@ -236,72 +250,223 @@ function getFallbackResources(): Record<string, Resource[]> {
         title: 'CareerOneStop',
         url: 'https://www.careeronestop.org',
         description: 'Federal career resources and job search assistance',
-        source: 'Federal Government',
+        source: 'Department of Labor',
         relevanceScore: 5
+      },
+      {
+        title: 'O*NET Interest Profiler',
+        url: 'https://www.mynextmove.org/explore/ip',
+        description: 'Career exploration and skills assessment tool',
+        source: 'Department of Labor',
+        relevanceScore: 4
+      },
+      {
+        title: 'Career Transitions for Faculty',
+        url: 'https://versatilephd.com',
+        description: 'Career transition resources specifically for academic professionals',
+        source: 'Career Services',
+        relevanceScore: 4
       }
     ],
     legalAid: [
       {
         title: 'Student Borrower Protection Center',
         url: 'https://protectborrowers.org',
-        description: 'Legal resources for student loan and education rights',
-        source: 'National Organization',
+        description: 'Legal advocacy and resources for student loan borrowers',
+        source: 'Non-profit Organization',
         relevanceScore: 5
       },
       {
-        title: 'Legal Services Corporation',
-        url: 'https://www.lsc.gov',
-        description: 'Free legal aid resources for students and families',
-        source: 'Federal Government',
+        title: 'Legal Aid Society',
+        url: 'https://www.lsc.gov/find-legal-aid',
+        description: 'Find free legal aid in your area for education-related issues',
+        source: 'Legal Services Corporation',
         relevanceScore: 5
+      },
+      {
+        title: 'National Association of Consumer Advocates',
+        url: 'https://www.naca.net',
+        description: 'Consumer protection lawyers for education fraud cases',
+        source: 'Professional Association',
+        relevanceScore: 4
+      },
+      {
+        title: 'Student Defense',
+        url: 'https://www.studentdefense.org',
+        description: 'Legal assistance for students defrauded by their schools',
+        source: 'Non-profit Organization',
+        relevanceScore: 4
       }
     ],
     mentalHealth: [
       {
         title: 'National Alliance on Mental Illness',
         url: 'https://www.nami.org',
-        description: 'Mental health support and resources for students and families',
-        source: 'National Organization',
+        description: 'Mental health support, education, and advocacy resources',
+        source: 'Non-profit Organization',
         relevanceScore: 5
       },
       {
         title: 'Crisis Text Line',
         url: 'https://www.crisistextline.org',
-        description: '24/7 crisis support via text message',
+        description: '24/7 crisis support via text message (Text HOME to 741741)',
         source: 'Crisis Support',
         relevanceScore: 5
+      },
+      {
+        title: 'National Suicide Prevention Lifeline',
+        url: 'https://988lifeline.org',
+        description: '24/7 suicide prevention and crisis intervention (Call 988)',
+        source: 'Federal Government',
+        relevanceScore: 5
+      },
+      {
+        title: 'Mental Health America',
+        url: 'https://www.mhanational.org',
+        description: 'Mental health screening tools and local resources',
+        source: 'Non-profit Organization',
+        relevanceScore: 4
+      },
+      {
+        title: 'BetterHelp',
+        url: 'https://www.betterhelp.com',
+        description: 'Online professional counseling and therapy services',
+        source: 'Private Platform',
+        relevanceScore: 3
       }
     ],
     financialAid: [
       {
         title: 'Federal Student Aid',
         url: 'https://studentaid.gov',
-        description: 'Federal financial aid resources and guidance for students',
-        source: 'Federal Government',
+        description: 'Official federal financial aid information and FAFSA applications',
+        source: 'Department of Education',
         relevanceScore: 5
       },
       {
         title: 'Scholarship America',
         url: 'https://scholarshipamerica.org',
-        description: 'Scholarship resources and financial aid guidance',
+        description: 'Scholarship search and financial aid guidance',
         source: 'Non-profit Organization',
         relevanceScore: 5
+      },
+      {
+        title: 'Fastweb',
+        url: 'https://www.fastweb.com',
+        description: 'Comprehensive scholarship search and financial aid resources',
+        source: 'Educational Platform',
+        relevanceScore: 4
+      },
+      {
+        title: 'College Board Scholarship Search',
+        url: 'https://bigfuture.collegeboard.org/scholarships',
+        description: 'Scholarship database and financial planning tools',
+        source: 'Educational Organization',
+        relevanceScore: 4
+      },
+      {
+        title: 'Emergency Financial Aid',
+        url: 'https://www.collegefinancialaidadvice.com/emergency-aid',
+        description: 'Resources for emergency financial assistance for students',
+        source: 'Financial Aid Resource',
+        relevanceScore: 4
       }
     ],
     academicSupport: [
       {
-        title: 'National Academic Support Association',
-        url: 'https://www.naspa.org',
-        description: 'Academic support resources and best practices for students',
-        source: 'Professional Organization',
+        title: 'Khan Academy',
+        url: 'https://www.khanacademy.org',
+        description: 'Free online courses and academic support across all subjects',
+        source: 'Educational Platform',
         relevanceScore: 5
       },
       {
-        title: 'Khan Academy',
-        url: 'https://www.khanacademy.org',
-        description: 'Free online academic resources and tutoring',
+        title: 'Coursera Financial Aid',
+        url: 'https://www.coursera.org/financial-aid',
+        description: 'Free access to online courses for students in need',
         source: 'Educational Platform',
+        relevanceScore: 4
+      },
+      {
+        title: 'edX',
+        url: 'https://www.edx.org',
+        description: 'Free online courses from top universities worldwide',
+        source: 'Educational Platform',
+        relevanceScore: 4
+      },
+      {
+        title: 'Academic Writing Support',
+        url: 'https://owl.purdue.edu',
+        description: 'Purdue Online Writing Lab - comprehensive writing resources',
+        source: 'Purdue University',
+        relevanceScore: 4
+      },
+      {
+        title: 'Study Groups International',
+        url: 'https://www.studygroup.com',
+        description: 'Academic pathway programs and university preparation',
+        source: 'Educational Services',
+        relevanceScore: 3
+      }
+    ],
+    emergencyAssistance: [
+      {
+        title: 'College Crisis Fund',
+        url: 'https://www.collegecrisis.org',
+        description: 'Emergency financial assistance for college students in crisis',
+        source: 'Non-profit Organization',
         relevanceScore: 5
+      },
+      {
+        title: 'United Way',
+        url: 'https://www.unitedway.org',
+        description: 'Local emergency assistance programs including housing and food',
+        source: 'Non-profit Network',
+        relevanceScore: 4
+      },
+      {
+        title: 'Salvation Army',
+        url: 'https://www.salvationarmyusa.org',
+        description: 'Emergency assistance with rent, utilities, and basic needs',
+        source: 'Non-profit Organization',
+        relevanceScore: 4
+      },
+      {
+        title: '211 Helpline',
+        url: 'https://www.211.org',
+        description: 'Comprehensive directory of local emergency and social services',
+        source: 'Information Service',
+        relevanceScore: 5
+      }
+    ],
+    housingAssistance: [
+      {
+        title: 'National Alliance to End Homelessness',
+        url: 'https://endhomelessness.org',
+        description: 'Resources for students experiencing housing insecurity',
+        source: 'Non-profit Organization',
+        relevanceScore: 5
+      },
+      {
+        title: 'HUD Housing Resources',
+        url: 'https://www.hud.gov/topics/rental_assistance',
+        description: 'Federal housing assistance programs and rental support',
+        source: 'Department of Housing',
+        relevanceScore: 4
+      },
+      {
+        title: 'Campus Housing Support',
+        url: 'https://www.basicneeds.ucla.edu/housing',
+        description: 'Resources for students experiencing housing instability',
+        source: 'UCLA Basic Needs',
+        relevanceScore: 4
+      },
+      {
+        title: 'CoStar Student Housing',
+        url: 'https://www.apartments.com/student-housing',
+        description: 'Student-specific housing search and rental assistance',
+        source: 'Housing Platform',
+        relevanceScore: 3
       }
     ]
   }
