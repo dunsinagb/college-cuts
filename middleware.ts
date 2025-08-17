@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/', '/subscribe-gate', '/api/subscribe', '/about']
+const PUBLIC_ROUTES = ['/', '/subscribe-gate', '/api/subscribe', '/about', '/og-image.svg']
 
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
@@ -46,7 +46,10 @@ export function middleware(req: NextRequest) {
   }
 
   // Allow static assets and API routes
-  if (path.startsWith('/_next') || path.startsWith('/static') || path.startsWith('/api/')) {
+  if (path.startsWith('/_next') || path.startsWith('/static') || path.startsWith('/api/') || 
+      path.startsWith('/icons/') || path.startsWith('/og-image') || path.endsWith('.svg') || 
+      path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || 
+      path.endsWith('.gif') || path.endsWith('.webp')) {
     console.log(`✅ Allowing static/API access to ${path}`)
     return
   }
