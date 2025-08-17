@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     siteName: "CollegeCuts",
     images: [
       {
-        url: `${siteUrl}/og-image.svg`,
+        url: `${siteUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: "CollegeCuts - Higher Education Program Cuts and University Closures Tracker",
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CollegeCuts - Track University Program Cuts, Closures & Academic Actions 2024-2025",
     description: "Comprehensive database tracking college program cuts, university closures, department suspensions, and faculty layoffs across the United States.",
-    images: [`${siteUrl}/og-image.svg`],
+    images: [`${siteUrl}/og-image.jpg`],
   },
   robots: {
     index: true,
