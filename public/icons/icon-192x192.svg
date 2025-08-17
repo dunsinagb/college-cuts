@@ -1,5 +1,53 @@
 <svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
   <rect width="192" height="192" fill="#0f172a"/>
-  <rect x="19.200000000000003" y="19.200000000000003" width="153.6" height="153.6" fill="#3b82f6" rx="8"/>
-  <text x="96" y="100" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="57.599999999999994" font-weight="bold">CC</text>
+  
+  <!-- Glowing background effect -->
+  <defs>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#3b82f6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    
+    <linearGradient id="capGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    
+    <filter id="glowFilter">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Glow effect -->
+  <circle cx="96" cy="96" r="80" fill="url(#glow)" opacity="0.6"/>
+  
+  <!-- Main container with rounded corners -->
+  <rect x="24" y="24" width="144" height="144" fill="url(#capGradient)" rx="12" filter="url(#glowFilter)"/>
+  
+  <!-- Graduation Cap -->
+  <g transform="translate(96, 96)">
+    <!-- Cap base -->
+    <path d="M-32 -20 L32 -20 L24 -8 L-24 -8 Z" fill="#ffffff" opacity="0.9"/>
+    
+    <!-- Cap top -->
+    <path d="M-24 -8 L24 -8 L16 4 L-16 4 Z" fill="#ffffff" opacity="0.95"/>
+    
+    <!-- Tassel -->
+    <circle cx="0" cy="4" r="2" fill="#fbbf24"/>
+    <path d="M0 6 L0 16 M-2 8 L2 8 M-1 10 L1 10 M-1 12 L1 12 M-1 14 L1 14" 
+          stroke="#fbbf24" stroke-width="1" fill="none"/>
+    
+    <!-- Cap details -->
+    <rect x="-20" y="-6" width="40" height="2" fill="#3b82f6" opacity="0.8"/>
+    <rect x="-16" y="-2" width="32" height="1" fill="#3b82f6" opacity="0.6"/>
+  </g>
+  
+  <!-- Subtle inner glow -->
+  <circle cx="96" cy="96" r="60" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2"/>
 </svg>
