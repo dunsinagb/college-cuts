@@ -75,14 +75,14 @@ export async function generateMetadata({ params }: { params: { state: string } }
       description: stateInfo.description,
       url: `${siteUrl}/state/${state}`,
       siteName: "CollegeCuts",
-      images: [
-        {
-          url: `${siteUrl}/og-image.jpg`,
-          width: 1200,
-          height: 630,
-          alt: `${stateInfo.fullName} College Cuts and University Closures`,
-        },
-      ],
+          images: [
+      {
+        url: `${siteUrl}/og-image.svg`,
+        width: 1200,
+        height: 630,
+        alt: `${stateInfo.fullName} College Cuts and University Closures`,
+      },
+    ],
       locale: "en_US",
       type: "website",
     },
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: { params: { state: string } }
       card: "summary_large_image",
       title: `${stateInfo.fullName} College Cuts & University Closures 2024-2025 - CollegeCuts Tracker`,
       description: stateInfo.description,
-      images: [`${siteUrl}/og-image.jpg`],
+      images: [`${siteUrl}/og-image.svg`],
     },
     alternates: {
       canonical: `${siteUrl}/state/${state}`,

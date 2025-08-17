@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     siteName: 'CollegeCuts',
     images: [
       {
-        url: `${siteUrl}/og-image.jpg`,
+        url: `${siteUrl}/og-image.svg`,
         width: 1200,
         height: 630,
         alt: 'CollegeCuts Tracker - University Program Actions Database'
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CollegeCuts Tracker - Monitor University Program Actions & Closures',
     description: 'Tracking program actions and closures in higher education',
-    images: [`${siteUrl}/og-image.jpg`],
+    images: [`${siteUrl}/og-image.svg`],
   },
   other: {
     'apple-mobile-web-app-capable': 'yes',
