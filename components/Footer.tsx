@@ -1,6 +1,27 @@
 import Link from "next/link"
 import { GraduationCap, TrendingUp, AlertTriangle, Info, Send, ExternalLink, Linkedin } from "lucide-react"
 
+// Coffee cup icon component
+const CoffeeIcon = () => (
+  <svg 
+    width="16" 
+    height="16" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className="h-4 w-4"
+  >
+    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+    <line x1="6" y1="1" x2="6" y2="4" />
+    <line x1="10" y1="1" x2="10" y2="4" />
+    <line x1="14" y1="1" x2="14" y2="4" />
+  </svg>
+)
+
 export function Footer() {
   const quickLinks = [
     { href: "/", label: "Dashboard", icon: TrendingUp },
@@ -96,6 +117,15 @@ export function Footer() {
                 <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
                 <span>Public sources verified</span>
               </div>
+              <a
+                href="https://buymeacoffee.com/dunsinagb"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+              >
+                <CoffeeIcon />
+                <span>Buy me a coffee</span>
+              </a>
             </div>
           </div>
         </div>
