@@ -176,10 +176,11 @@ export default function Dashboard() {
                           dataKey="month"
                           tickFormatter={(val) => format(parseISO(val + "-01"), "MMM yyyy")}
                           stroke="hsl(var(--muted-foreground))"
-                          fontSize={12}
+                          fontSize={11}
                           tickLine={false}
                           axisLine={false}
                           dy={10}
+                          minTickGap={55}
                         />
                         <YAxis
                           stroke="hsl(var(--muted-foreground))"
@@ -259,13 +260,13 @@ export default function Dashboard() {
                     <Link href="/subscribe">Unlock Free Access</Link>
                   </Button>
                 </div>
-                <div className="p-6 space-y-4 opacity-30 pointer-events-none select-none">
-                  <h2 className="text-2xl font-bold">Year-over-Year Comparison</h2>
-                  <div className="h-[220px] bg-muted/40 rounded-lg flex items-end justify-around px-8 pb-4 gap-2">
+                <div className="p-4 sm:p-6 space-y-4 opacity-30 pointer-events-none select-none overflow-hidden">
+                  <h2 className="text-xl sm:text-2xl font-bold">Year-over-Year Comparison</h2>
+                  <div className="h-[180px] sm:h-[220px] bg-muted/40 rounded-lg flex items-end justify-around px-2 sm:px-8 pb-4 gap-1 overflow-hidden">
                     {[3, 6, 4, 8, 5, 11, 9, 12, 7, 10, 8, 6].map((h, i) => (
-                      <div key={i} className="flex gap-0.5 items-end">
-                        <div className="w-4 bg-blue-400 rounded-t" style={{ height: `${h * 8}px` }} />
-                        <div className="w-4 bg-amber-400 rounded-t" style={{ height: `${(h + 2) * 8}px` }} />
+                      <div key={i} className="flex gap-px items-end">
+                        <div className="w-2 sm:w-4 bg-blue-400 rounded-t" style={{ height: `${h * 8}px` }} />
+                        <div className="w-2 sm:w-4 bg-amber-400 rounded-t" style={{ height: `${(h + 2) * 8}px` }} />
                       </div>
                     ))}
                   </div>
