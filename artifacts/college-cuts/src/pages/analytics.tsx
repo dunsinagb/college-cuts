@@ -267,37 +267,62 @@ export default function Analytics() {
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            {loadMonthly ? <ChartSkeleton height={340} /> : monthly && monthly.data.length > 0 ? (
-              <ResponsiveContainer width="100%" height={340}>
-                <AreaChart data={monthly.data} margin={{ top: 10, right: 24, left: -8, bottom: 0 }}>
-                  <defs>
-                    {years.map((yr) => (
-                      <linearGradient key={yr} id={`grad-${yr}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor={YEAR_COLORS[yr] ?? SLATE} stopOpacity={0.18} />
-                        <stop offset="95%" stopColor={YEAR_COLORS[yr] ?? SLATE} stopOpacity={0.01} />
-                      </linearGradient>
-                    ))}
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
-                  <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
-                  <RechartsTooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
-                  {years.map((yr) => (
-                    <Area
-                      key={yr}
-                      type="monotone"
-                      dataKey={yr}
-                      name={yr}
-                      stroke={YEAR_COLORS[yr] ?? SLATE}
-                      strokeWidth={2.5}
-                      fill={`url(#grad-${yr})`}
-                      dot={{ r: 3, fill: YEAR_COLORS[yr] ?? SLATE, strokeWidth: 0 }}
-                      activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff" }}
-                    />
-                  ))}
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
+            {loadMonthly ? <ChartSkeleton height={340} /> : monthly && monthly.data.length > 0 ? (() => {
+              const currentYr = years[years.length - 1];
+              // Replace 0 / missing with null so lines break on months with no data
+              const cleanData = monthly.data.map((row) => {
+                const out: Record<string, string | number | null> = { month: row.month };
+                for (const yr of years) {
+                  const v = row[yr];
+                  out[yr] = (v == null || v === 0) ? null : v;
+                }
+                return out;
+              });
+              return (
+                <ResponsiveContainer width="100%" height={340}>
+                  <AreaChart data={cleanData} margin={{ top: 10, right: 24, left: -8, bottom: 0 }}>
+                    <defs>
+                      {years.map((yr) => {
+                        const isCurrent = yr === currentYr;
+                        return (
+                          <linearGradient key={yr} id={`grad-${yr}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%"  stopColor={YEAR_COLORS[yr] ?? SLATE} stopOpacity={isCurrent ? 0.22 : 0.06} />
+                            <stop offset="95%" stopColor={YEAR_COLORS[yr] ?? SLATE} stopOpacity={0} />
+                          </linearGradient>
+                        );
+                      })}
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
+                    <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} />
+                    <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
+                    <RechartsTooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
+                    {/* Render past years first (behind) then current on top */}
+                    {[...years].sort((a, b) => (a === currentYr ? 1 : b === currentYr ? -1 : 0)).map((yr) => {
+                      const isCurrent = yr === currentYr;
+                      return (
+                        <Area
+                          key={yr}
+                          type="monotone"
+                          dataKey={yr}
+                          name={yr}
+                          connectNulls={false}
+                          stroke={YEAR_COLORS[yr] ?? SLATE}
+                          strokeWidth={isCurrent ? 2.5 : 1.5}
+                          strokeOpacity={isCurrent ? 1 : 0.4}
+                          strokeDasharray={isCurrent ? undefined : "5 3"}
+                          fill={`url(#grad-${yr})`}
+                          fillOpacity={1}
+                          dot={isCurrent
+                            ? { r: 3.5, fill: YEAR_COLORS[yr] ?? SLATE, strokeWidth: 0 }
+                            : false}
+                          activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff" }}
+                        />
+                      );
+                    })}
+                  </AreaChart>
+                </ResponsiveContainer>
+              );
+            })() : (
               <div className="h-[340px] flex items-center justify-center text-muted-foreground">No data</div>
             )}
           </CardContent>
