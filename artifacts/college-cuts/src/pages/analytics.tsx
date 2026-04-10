@@ -155,8 +155,8 @@ export default function Analytics() {
   const { data: byControl,   isLoading: loadControl  } = useAPI<ByControlRow[]>("stats/by-control",      refreshKey);
   const { data: byReason,    isLoading: loadReason   } = useAPI<ByReasonRow[]> ("stats/by-reason",       refreshKey);
 
-  const years      = monthly?.years ?? [];
-  const stateYears = byState?.years ?? [];
+  const years      = (monthly?.years ?? []).filter(y => parseInt(y) >= 2024);
+  const stateYears = (byState?.years ?? []).filter(y => parseInt(y) >= 2024);
 
   /* ── KPI cards ── */
   const kpis = [
