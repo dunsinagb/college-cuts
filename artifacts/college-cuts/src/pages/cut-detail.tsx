@@ -10,7 +10,7 @@ import { ArrowLeft, ExternalLink, Calendar, Users, GraduationCap, Building2, Map
 
 export default function CutDetail() {
   const params = useParams();
-  const id = params.id ? parseInt(params.id, 10) : 0;
+  const id = params.id ?? "";
 
   const { data: cut, isLoading, error } = useGetCut(id, {
     query: {

@@ -65,11 +65,11 @@ export const ListCutsResponse = zod.object({
  * @summary Get a single cut by ID
  */
 export const GetCutParams = zod.object({
-  id: zod.coerce.number(),
+  id: zod.string(),
 });
 
 export const GetCutResponse = zod.object({
-  id: zod.number(),
+  id: zod.string(),
   institution: zod.string(),
   programName: zod.string().nullish(),
   state: zod.string(),

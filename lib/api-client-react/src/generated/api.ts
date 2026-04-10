@@ -210,12 +210,12 @@ export function useListCuts<
 /**
  * @summary Get a single cut by ID
  */
-export const getGetCutUrl = (id: number) => {
+export const getGetCutUrl = (id: string) => {
   return `/api/cuts/${id}`;
 };
 
 export const getCut = async (
-  id: number,
+  id: string,
   options?: RequestInit,
 ): Promise<Cut> => {
   return customFetch<Cut>(getGetCutUrl(id), {
@@ -224,7 +224,7 @@ export const getCut = async (
   });
 };
 
-export const getGetCutQueryKey = (id: number) => {
+export const getGetCutQueryKey = (id: string) => {
   return [`/api/cuts/${id}`] as const;
 };
 
@@ -232,7 +232,7 @@ export const getGetCutQueryOptions = <
   TData = Awaited<ReturnType<typeof getCut>>,
   TError = ErrorType<void>,
 >(
-  id: number,
+  id: string,
   options?: {
     query?: UseQueryOptions<Awaited<ReturnType<typeof getCut>>, TError, TData>;
     request?: SecondParameter<typeof customFetch>;
@@ -267,7 +267,7 @@ export function useGetCut<
   TData = Awaited<ReturnType<typeof getCut>>,
   TError = ErrorType<void>,
 >(
-  id: number,
+  id: string,
   options?: {
     query?: UseQueryOptions<Awaited<ReturnType<typeof getCut>>, TError, TData>;
     request?: SecondParameter<typeof customFetch>;
