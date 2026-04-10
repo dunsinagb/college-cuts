@@ -22,16 +22,21 @@ export function Footer() {
               <li><Link href="/analytics" className="text-muted-foreground hover:text-primary transition-colors">Analytics</Link></li>
               <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">About</Link></li>
               <li>
-                <a
-                  href={`${BASE_URL}/api/rss`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
-                  title="Open RSS feed in new tab — paste the URL into your feed reader"
+                <span
+                  className="inline-flex items-center gap-1.5 text-muted-foreground cursor-pointer hover:text-primary transition-colors"
+                  title="Copy RSS feed URL to paste into your feed reader"
+                  onClick={() => {
+                    const url = `${window.location.origin}${BASE_URL}/api/rss`;
+                    navigator.clipboard.writeText(url).then(() => {
+                      alert(`RSS feed URL copied!\n\n${url}\n\nPaste this URL into your RSS reader app (e.g. Feedly, NetNewsWire, Reeder).`);
+                    }).catch(() => {
+                      alert(`RSS feed URL:\n\n${url}\n\nPaste this URL into your RSS reader app (e.g. Feedly, NetNewsWire, Reeder).`);
+                    });
+                  }}
                 >
                   <Rss className="h-3.5 w-3.5 text-orange-500" />
                   RSS Feed
-                </a>
+                </span>
               </li>
             </ul>
           </div>
