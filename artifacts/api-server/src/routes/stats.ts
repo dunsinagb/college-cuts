@@ -104,6 +104,77 @@ router.get("/stats/monthly-trend", async (_req, res): Promise<void> => {
   );
 });
 
+router.get("/stats/yearly-by-month", async (_req, res): Promise<void> => {
+  const rows = await db
+    .select({
+      year: sql<string>`extract(year from ${cutsTable.announcementDate}::date)::text`,
+      month: sql<string>`to_char(${cutsTable.announcementDate}::date, 'MM')`,
+      count: count(),
+    })
+    .from(cutsTable)
+    .groupBy(
+      sql`extract(year from ${cutsTable.announcementDate}::date)`,
+      sql`to_char(${cutsTable.announcementDate}::date, 'MM')`
+    )
+    .orderBy(
+      sql`extract(year from ${cutsTable.announcementDate}::date)`,
+      sql`to_char(${cutsTable.announcementDate}::date, 'MM')`
+    );
+
+  const MONTH_LABELS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const years = [...new Set(rows.map(r => r.year))].sort();
+  const byMonth: Record<string, Record<string, number>> = {};
+
+  for (const r of rows) {
+    const label = MONTH_LABELS[parseInt(r.month, 10) - 1];
+    if (!byMonth[label]) byMonth[label] = {};
+    byMonth[label][r.year] = Number(r.count);
+  }
+
+  const result = MONTH_LABELS.map((label) => {
+    const entry: Record<string, string | number> = { month: label };
+    for (const yr of years) entry[yr] = byMonth[label]?.[yr] ?? 0;
+    return entry;
+  });
+
+  res.json({ years, data: result });
+});
+
+router.get("/stats/yearly-by-state", async (_req, res): Promise<void> => {
+  const rows = await db
+    .select({
+      state: cutsTable.state,
+      year: sql<string>`extract(year from ${cutsTable.announcementDate}::date)::text`,
+      count: count(),
+    })
+    .from(cutsTable)
+    .groupBy(
+      cutsTable.state,
+      sql`extract(year from ${cutsTable.announcementDate}::date)`
+    );
+
+  const years = [...new Set(rows.map(r => r.year))].sort();
+
+  const totals: Record<string, number> = {};
+  const byState: Record<string, Record<string, number>> = {};
+  for (const r of rows) {
+    totals[r.state] = (totals[r.state] ?? 0) + Number(r.count);
+    if (!byState[r.state]) byState[r.state] = {};
+    byState[r.state][r.year] = Number(r.count);
+  }
+
+  const top10 = Object.entries(totals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([state]) => {
+      const entry: Record<string, string | number> = { state };
+      for (const yr of years) entry[yr] = byState[state]?.[yr] ?? 0;
+      return entry;
+    });
+
+  res.json({ years, data: top10 });
+});
+
 router.get("/stats/recent", async (_req, res): Promise<void> => {
   const rows = await db
     .select()

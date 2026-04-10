@@ -1,187 +1,299 @@
-import { 
-  useGetStatsByState,
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
   useGetStatsByType,
-  useGetMonthlyTrend
 } from "@workspace/api-client-react";
-import { format, parseISO } from "date-fns";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
+import { Button } from "@/components/ui/button";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  Cell
+  Legend,
+  Cell,
 } from "recharts";
+import { RefreshCw } from "lucide-react";
+import { format } from "date-fns";
+
+const YEAR_COLORS: Record<string, string> = {
+  "2024": "#60a5fa",
+  "2025": "#f97316",
+  "2026": "#a855f7",
+};
+
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+
+type YearlyMonthResponse = { years: string[]; data: Record<string, string | number>[] };
+type YearlyStateResponse = { years: string[]; data: Record<string, string | number>[] };
+
+function useYearlyByMonth(refreshKey: number) {
+  return useQuery<YearlyMonthResponse>({
+    queryKey: ["stats/yearly-by-month", refreshKey],
+    queryFn: async () => {
+      const res = await fetch(`${BASE_URL}/api/stats/yearly-by-month`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
+}
+
+function useYearlyByState(refreshKey: number) {
+  return useQuery<YearlyStateResponse>({
+    queryKey: ["stats/yearly-by-state", refreshKey],
+    queryFn: async () => {
+      const res = await fetch(`${BASE_URL}/api/stats/yearly-by-state`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+  });
+}
 
 export default function Analytics() {
-  const { data: monthlyTrend, isLoading: isLoadingTrend } = useGetMonthlyTrend();
-  const { data: statsByState, isLoading: isLoadingState } = useGetStatsByState();
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const { data: monthlyData, isLoading: isLoadingMonthly } = useYearlyByMonth(refreshKey);
+  const { data: stateData, isLoading: isLoadingState } = useYearlyByState(refreshKey);
   const { data: statsByType, isLoading: isLoadingType } = useGetStatsByType();
 
-  const sortedStates = statsByState ? [...statsByState].sort((a, b) => b.count - a.count).slice(0, 15) : [];
+  function handleRefresh() {
+    setRefreshKey((k) => k + 1);
+    setLastUpdated(new Date());
+  }
+
+  const years = monthlyData?.years ?? [];
+  const stateYears = stateData?.years ?? [];
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-12">
-      <div className="space-y-4 max-w-3xl">
-        <h1 className="text-4xl font-extrabold tracking-tight text-primary">Data & Analytics</h1>
-        <p className="text-xl text-muted-foreground leading-relaxed">
-          Macro trends in higher education retrenchment. The data reveals accelerating closures and structural shifts across the sector.
+    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-10">
+      <div className="text-center space-y-3 max-w-2xl mx-auto">
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">Analytics Dashboard</h1>
+        <p className="text-base text-muted-foreground leading-relaxed">
+          Comprehensive insights into confirmed institutional actions across higher education
+          institutions. Explore trends, patterns, and regional impacts with real-time data from
+          verified cases only.
         </p>
+        <div className="flex items-center justify-center gap-4 pt-2">
+          <Button variant="outline" onClick={handleRefresh} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Refresh Data
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Last updated: {format(lastUpdated, "h:mm:ss aa")}
+          </span>
+        </div>
       </div>
 
-      <div className="grid gap-8">
-        {/* Timeline */}
+      <div className="grid gap-10">
+        {/* Actions Over Time — Year Comparison */}
         <Card className="shadow-md">
-          <CardHeader className="bg-muted/20 border-b pb-6">
-            <CardTitle className="text-2xl">Volume of Actions Over Time</CardTitle>
-            <CardDescription className="text-base">
-              Monthly count of announcements related to closures, teach-outs, and program suspensions.
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold">
+              Actions Over Time ({years.join(" vs ")})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="h-[380px] pb-6">
+            {isLoadingMonthly ? (
+              <Skeleton className="h-full w-full" />
+            ) : monthlyData && monthlyData.data.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={monthlyData.data}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
+                  barCategoryGap="25%"
+                  barGap={2}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="month"
+                    stroke="#9ca3af"
+                    fontSize={13}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
+                  <YAxis
+                    stroke="#9ca3af"
+                    fontSize={13}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      borderColor: "#e5e7eb",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    }}
+                  />
+                  <Legend verticalAlign="top" height={36} />
+                  {years.map((yr) => (
+                    <Bar
+                      key={yr}
+                      dataKey={yr}
+                      name={yr}
+                      fill={YEAR_COLORS[yr] ?? "#94a3b8"}
+                      radius={[2, 2, 0, 0]}
+                      maxBarSize={28}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
+          </CardContent>
+          <div className="px-6 pb-5 text-sm text-muted-foreground">
+            Monthly trend of institutional actions across all institutions, grouped by year
+          </div>
+        </Card>
+
+        {/* Top 10 States — Year Comparison */}
+        <Card className="shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold">
+              Top 10 States by Program Actions ({stateYears.join("-")})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="h-[420px] pb-6">
+            {isLoadingState ? (
+              <Skeleton className="h-full w-full" />
+            ) : stateData && stateData.data.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={stateData.data}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
+                  barCategoryGap="25%"
+                  barGap={2}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="state"
+                    stroke="#9ca3af"
+                    fontSize={13}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    label={{ value: "State", position: "insideBottom", offset: -12, fontSize: 13, fill: "#6b7280" }}
+                  />
+                  <YAxis
+                    stroke="#9ca3af"
+                    fontSize={13}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    label={{ value: "Number of Actions", angle: -90, position: "insideLeft", offset: 10, fontSize: 13, fill: "#6b7280" }}
+                  />
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      borderColor: "#e5e7eb",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="top"
+                    height={36}
+                    formatter={(value) => `${value} Actions`}
+                  />
+                  {stateYears.map((yr) => (
+                    <Bar
+                      key={yr}
+                      dataKey={yr}
+                      name={yr}
+                      fill={YEAR_COLORS[yr] ?? "#94a3b8"}
+                      radius={[2, 2, 0, 0]}
+                      maxBarSize={28}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
+          </CardContent>
+          <div className="px-6 pb-5 text-sm text-muted-foreground">
+            Showing top 10 states by total program actions from {stateYears.join("-")}. {stateYears.map((yr, i) => (
+              <span key={yr}>{i > 0 ? ", " : ""}<span style={{ color: YEAR_COLORS[yr] ?? "#94a3b8" }}>■</span> {yr} actions</span>
+            ))}.
+          </div>
+        </Card>
+
+        {/* Distribution by Action Type */}
+        <Card className="shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold">Distribution by Action Type</CardTitle>
+            <CardDescription>
+              Relative frequency of different retrenchment strategies across all years.
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6 h-[450px] pt-8">
-            {isLoadingTrend ? (
+          <CardContent className="h-[360px] pb-6">
+            {isLoadingType ? (
               <Skeleton className="h-full w-full" />
-            ) : monthlyTrend && monthlyTrend.length > 0 ? (
+            ) : statsByType && statsByType.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyTrend} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="month" 
-                    tickFormatter={(val) => format(parseISO(val + "-01"), "MMM yyyy")}
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={13}
-                    tickMargin={12}
+                <BarChart data={statsByType} margin={{ top: 10, right: 20, left: 0, bottom: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="cutType"
+                    tickFormatter={(val) =>
+                      val.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
+                    }
+                    stroke="#9ca3af"
+                    fontSize={12}
                     tickLine={false}
                     axisLine={false}
+                    angle={-40}
+                    textAnchor="end"
+                    dy={15}
                   />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))"
+                  <YAxis
+                    stroke="#9ca3af"
                     fontSize={13}
                     tickLine={false}
                     axisLine={false}
-                    tickMargin={12}
+                    tickMargin={8}
                   />
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--popover))', borderColor: 'hsl(var(--border))', borderRadius: '8px', boxShadow: 'var(--shadow-md)' }}
-                    labelFormatter={(val) => format(parseISO(val + "-01"), "MMMM yyyy")}
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      borderColor: "#e5e7eb",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    }}
+                    labelFormatter={(val) =>
+                      String(val)
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                    }
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="count" 
-                    name="Actions Logged"
-                    stroke="hsl(var(--destructive))" 
-                    strokeWidth={4}
-                    dot={{ fill: 'hsl(var(--background))', stroke: 'hsl(var(--destructive))', strokeWidth: 2, r: 5 }}
-                    activeDot={{ r: 8, strokeWidth: 0, fill: 'hsl(var(--destructive))' }}
-                  />
-                </LineChart>
+                  <Bar dataKey="count" name="Count" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                    {statsByType.map((entry, index) => {
+                      const isSevere =
+                        entry.cutType === "institution_closure" ||
+                        entry.cutType === "campus_closure";
+                      return (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={isSevere ? "#ef4444" : "#1e3a5f"}
+                        />
+                      );
+                    })}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex items-center justify-center text-muted-foreground">No data available</div>
             )}
           </CardContent>
         </Card>
-
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Top States */}
-          <Card className="shadow-md">
-            <CardHeader className="bg-muted/20 border-b pb-6">
-              <CardTitle className="text-xl">Most Affected States</CardTitle>
-              <CardDescription>
-                Top 15 states by volume of institutional actions.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6 h-[500px] pt-8">
-              {isLoadingState ? (
-                <Skeleton className="h-full w-full" />
-              ) : sortedStates && sortedStates.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={sortedStates} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
-                    <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis 
-                      type="category" 
-                      dataKey="state" 
-                      stroke="hsl(var(--foreground))" 
-                      fontWeight={600}
-                      fontSize={13} 
-                      tickLine={false} 
-                      axisLine={false}
-                    />
-                    <RechartsTooltip 
-                      cursor={{fill: 'hsl(var(--muted)/0.5)'}}
-                      contentStyle={{ backgroundColor: 'hsl(var(--popover))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                    />
-                    <Bar dataKey="count" name="Actions" radius={[0, 4, 4, 0]} barSize={20}>
-                      {sortedStates.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index < 3 ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground">No data available</div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Breakdown by Type */}
-          <Card className="shadow-md">
-            <CardHeader className="bg-muted/20 border-b pb-6">
-              <CardTitle className="text-xl">Distribution by Action Type</CardTitle>
-              <CardDescription>
-                Relative frequency of different retrenchment strategies.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6 h-[500px] pt-8">
-              {isLoadingType ? (
-                <Skeleton className="h-full w-full" />
-              ) : statsByType && statsByType.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={statsByType} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                    <XAxis 
-                      dataKey="cutType" 
-                      tickFormatter={(val) => val.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      angle={-45}
-                      textAnchor="end"
-                      dy={15}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <RechartsTooltip 
-                      cursor={{fill: 'hsl(var(--muted)/0.5)'}}
-                      contentStyle={{ backgroundColor: 'hsl(var(--popover))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                      labelFormatter={(val) => String(val).replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
-                    />
-                    <Bar dataKey="count" name="Count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                       {statsByType.map((entry, index) => {
-                         const isSevere = entry.cutType === 'institution_closure' || entry.cutType === 'campus_closure';
-                         return <Cell key={`cell-${index}`} fill={isSevere ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'} />;
-                       })}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground">No data available</div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
