@@ -259,7 +259,7 @@ export default function JobOutlookPage() {
                     </TableHead>
                     <TableHead>Education</TableHead>
                     <TableHead>Growth</TableHead>
-                    <TableHead className="pr-6">SOC</TableHead>
+                    <TableHead className="pr-6">Career Profile</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -299,14 +299,18 @@ export default function JobOutlookPage() {
                         ) : "N/A"}
                       </TableCell>
                       <TableCell className="pr-6">
-                        <a
-                          href={`https://www.bls.gov/oes/current/oes${job.soc.replace("-", "")}.htm`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
-                        >
-                          {job.soc} <ExternalLink className="h-3 w-3" />
-                        </a>
+                        {job.soc && job.soc !== "99-9999" ? (
+                          <a
+                            href={`https://www.onetonline.org/link/summary/${job.soc}.00`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline whitespace-nowrap"
+                          >
+                            O*NET <ExternalLink className="h-3 w-3" />
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
