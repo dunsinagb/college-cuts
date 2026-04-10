@@ -97,10 +97,6 @@ export default function Dashboard() {
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               <span className="inline-flex items-center gap-1.5 text-xs text-blue-200 bg-white/10 border border-white/15 rounded-full px-3 py-1.5">
-                <Calendar className="h-3.5 w-3.5 text-amber-400" />
-                Tracking actions since <strong className="text-white">2024</strong>
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-blue-200 bg-white/10 border border-white/15 rounded-full px-3 py-1.5">
                 <RefreshCw className="h-3.5 w-3.5 text-amber-400" />
                 Refreshed monthly · prior month's data published each cycle
               </span>
