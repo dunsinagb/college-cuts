@@ -390,24 +390,24 @@ export default function Analytics() {
                     ))}
                   </div>
                   {/* Column headers */}
-                  <div className="flex items-center gap-3 mb-2 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5" />
-                    <span className="w-36">State</span>
-                    <span className="flex-1">Year breakdown</span>
-                    <span className="w-14 text-right">Total</span>
+                  <div className="flex items-center gap-2 mb-2 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <span className="w-4" />
+                    <span className="w-14 sm:w-36">State</span>
+                    <span className="flex-1 hidden sm:block">Year breakdown</span>
+                    <span className="w-10 sm:w-14 text-right">Total</span>
                   </div>
                   <div className="space-y-2.5">
                     {rows.map((row, i) => (
-                      <div key={row.state} className="flex items-center gap-3 px-1 py-1.5 rounded-lg hover:bg-muted/40 transition-colors">
+                      <div key={row.state} className="flex items-center gap-2 px-1 py-1.5 rounded-lg hover:bg-muted/40 transition-colors">
                         {/* Rank */}
-                        <span className="w-5 text-right text-xs text-muted-foreground font-mono">{i + 1}</span>
+                        <span className="w-4 text-right text-xs text-muted-foreground font-mono">{i + 1}</span>
                         {/* State */}
-                        <div className="w-36 flex items-center gap-1.5 min-w-0">
+                        <div className="w-14 sm:w-36 flex items-center gap-1.5 min-w-0 shrink-0">
                           <span className="text-xs font-bold text-[#1e3a5f] bg-[#1e3a5f]/10 rounded px-1.5 py-0.5 shrink-0">{row.state}</span>
-                          <span className="text-xs text-muted-foreground truncate">{STATE_NAMES[String(row.state)] ?? ""}</span>
+                          <span className="text-xs text-muted-foreground truncate hidden sm:block">{STATE_NAMES[String(row.state)] ?? ""}</span>
                         </div>
                         {/* Stacked segment bar */}
-                        <div className="flex-1 flex flex-col gap-1">
+                        <div className="flex-1 flex flex-col gap-1 min-w-0">
                           <div className="h-5 bg-gray-100 rounded-full overflow-hidden flex">
                             {stateYears.map(yr => {
                               const count = Number(row[yr]) || 0;
@@ -441,7 +441,7 @@ export default function Analytics() {
                           </div>
                         </div>
                         {/* Total */}
-                        <span className="w-14 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.total}</span>
+                        <span className="w-10 sm:w-14 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.total}</span>
                       </div>
                     ))}
                   </div>
@@ -627,12 +627,12 @@ export default function Analytics() {
               return (
                 <div>
                   {/* Column headers */}
-                  <div className="flex items-center gap-3 mb-3 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    <span className="w-5" />
-                    <span className="w-36">State</span>
-                    <span className="flex-1">Share of actions</span>
-                    <span className="w-16 text-right">Actions</span>
-                    <span className="w-28 text-right">Est. Students</span>
+                  <div className="flex items-center gap-2 mb-3 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <span className="w-4" />
+                    <span className="w-14 sm:w-36">State</span>
+                    <span className="flex-1">Share</span>
+                    <span className="w-10 sm:w-16 text-right">Actions</span>
+                    <span className="hidden sm:block w-28 text-right">Est. Students</span>
                   </div>
                   <div className="space-y-1.5">
                     {sorted.map((row, i) => {
@@ -640,16 +640,16 @@ export default function Analytics() {
                       const sharePct = ((row.count / total) * 100).toFixed(1);
                       const intensity = Math.max(0.35, 1 - i * 0.018);
                       return (
-                        <div key={row.state} className="flex items-center gap-3 px-1 py-1 rounded-lg hover:bg-muted/40 transition-colors">
+                        <div key={row.state} className="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-muted/40 transition-colors">
                           {/* Rank */}
-                          <span className="w-5 text-right text-xs text-muted-foreground font-mono tabular-nums">{i + 1}</span>
+                          <span className="w-4 text-right text-xs text-muted-foreground font-mono tabular-nums">{i + 1}</span>
                           {/* State */}
-                          <div className="w-36 flex items-center gap-1.5 min-w-0">
+                          <div className="w-14 sm:w-36 flex items-center gap-1.5 min-w-0 shrink-0">
                             <span className="text-xs font-bold text-[#1e3a5f] bg-[#1e3a5f]/10 rounded px-1.5 py-0.5 shrink-0">{row.state}</span>
-                            <span className="text-xs text-muted-foreground truncate">{STATE_NAMES[row.state] ?? ""}</span>
+                            <span className="text-xs text-muted-foreground truncate hidden sm:block">{STATE_NAMES[row.state] ?? ""}</span>
                           </div>
                           {/* Bar + share */}
-                          <div className="flex-1 flex items-center gap-2">
+                          <div className="flex-1 flex items-center gap-2 min-w-0">
                             <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
                               <div
                                 className="h-full rounded-full transition-all"
@@ -659,9 +659,9 @@ export default function Analytics() {
                             <span className="text-xs text-muted-foreground w-9 text-right tabular-nums">{sharePct}%</span>
                           </div>
                           {/* Count */}
-                          <span className="w-16 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.count}</span>
-                          {/* Students */}
-                          <span className="w-28 text-right text-xs text-muted-foreground tabular-nums">
+                          <span className="w-10 sm:w-16 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.count}</span>
+                          {/* Students — desktop only */}
+                          <span className="hidden sm:block w-28 text-right text-xs text-muted-foreground tabular-nums">
                             {row.studentsAffected > 0 ? row.studentsAffected.toLocaleString() : "—"}
                           </span>
                         </div>
