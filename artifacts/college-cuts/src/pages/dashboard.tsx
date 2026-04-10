@@ -310,7 +310,7 @@ export default function Dashboard() {
                 <div className="space-y-2.5 text-sm text-blue-100">
                   {[
                     { icon: <BarChart3 className="h-4 w-4 text-amber-400" />, label: "Full analytics dashboard" },
-                    { icon: <GraduationCap className="h-4 w-4 text-amber-400" />, label: "Complete 40+ entry database" },
+                    { icon: <GraduationCap className="h-4 w-4 text-amber-400" />, label: "Complete 210+ entry database" },
                     { icon: <Briefcase className="h-4 w-4 text-amber-400" />, label: "Job outlook by major" },
                     { icon: <MapPin className="h-4 w-4 text-amber-400" />, label: "State-level breakdowns" },
                   ].map(({ icon, label }) => (
