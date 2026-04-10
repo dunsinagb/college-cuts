@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,11 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Search, TrendingUp, DollarSign, Briefcase, Users, GraduationCap,
   Loader2, AlertCircle, ExternalLink, ChevronUp, ChevronDown, ChevronsUpDown
 } from "lucide-react";
+
+/* ─── native select helper ────────────────────────────────────────── */
+function NativeSelect({ value, onChange, className = "", children }: {
+  value: string; onChange: (v: string) => void; className?: string; children: React.ReactNode;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={`h-9 rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-sm
+        focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 cursor-pointer appearance-none pr-8 ${className}`}
+      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center" }}
+    >
+      {children}
+    </select>
+  );
+}
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -206,28 +222,18 @@ export default function JobOutlookPage() {
                 <CardDescription>BLS occupational data for related careers</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Select value={educationFilter} onValueChange={setEducationFilter}>
-                  <SelectTrigger className="w-44 h-9">
-                    <SelectValue placeholder="Education level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Education</SelectItem>
-                    {educationLevels.map((e) => (
-                      <SelectItem key={e} value={e}>{e}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={salaryFilter} onValueChange={setSalaryFilter}>
-                  <SelectTrigger className="w-36 h-9">
-                    <SelectValue placeholder="Salary" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Salaries</SelectItem>
-                    <SelectItem value="low">Under $60k</SelectItem>
-                    <SelectItem value="medium">$60k–$100k</SelectItem>
-                    <SelectItem value="high">$100k+</SelectItem>
-                  </SelectContent>
-                </Select>
+                <NativeSelect value={educationFilter} onChange={setEducationFilter} className="w-44">
+                  <option value="all">All Education</option>
+                  {educationLevels.map((e) => (
+                    <option key={e} value={e}>{e}</option>
+                  ))}
+                </NativeSelect>
+                <NativeSelect value={salaryFilter} onChange={setSalaryFilter} className="w-36">
+                  <option value="all">All Salaries</option>
+                  <option value="low">Under $60k</option>
+                  <option value="medium">$60k–$100k</option>
+                  <option value="high">$100k+</option>
+                </NativeSelect>
               </div>
             </CardHeader>
             <CardContent className="p-0">
