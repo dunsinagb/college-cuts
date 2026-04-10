@@ -38,6 +38,21 @@ const YEAR_COLORS: Record<string, string> = {
   "2023": "#94a3b8",
   "2024": "#60a5fa",
   "2025": "#f97316",
+  "2026": "#a855f7",
+};
+
+const STATE_NAMES: Record<string, string> = {
+  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",
+  CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",
+  HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",
+  KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",
+  MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",
+  MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",
+  NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",
+  OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",
+  SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",
+  VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",
+  DC:"Washington D.C.",
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -472,41 +487,60 @@ export default function Analytics() {
           <CardHeader className="pb-2">
             <SectionBadge label="All States" />
             <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">Actions by State</CardTitle>
-            <CardDescription>Full state-level breakdown — all recorded institutional actions and estimated students affected</CardDescription>
+            <CardDescription>Full state-level ranking — total recorded institutional actions per state</CardDescription>
           </CardHeader>
-          <CardContent className="pt-4">
-            {loadAllState ? <ChartSkeleton height={420} /> : allStates && allStates.length > 0 ? (
-              <ResponsiveContainer width="100%" height={Math.max(320, allStates.length * 32)}>
-                <BarChart
-                  data={[...allStates].sort((a, b) => b.count - a.count)}
-                  layout="vertical"
-                  margin={{ top: 4, right: 80, left: 32, bottom: 4 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e9ecef" />
-                  <XAxis type="number" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                  <YAxis type="category" dataKey="state" stroke="#9ca3af" fontSize={13} tickLine={false} axisLine={false} width={32} />
-                  <RechartsTooltip
-                    contentStyle={tooltipStyle}
-                    formatter={(val, name) => {
-                      if (name === "count") return [`${val} actions`, "Actions"];
-                      if (name === "studentsAffected") return [`${Number(val).toLocaleString()} students`, "Est. Students Affected"];
-                      return [val, name];
-                    }}
-                  />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 13, paddingTop: 12 }}
-                    formatter={(v) => v === "count" ? "Actions" : "Est. Students Affected"}
-                  />
-                  <Bar dataKey="count" name="count" fill={NAVY} radius={[0, 4, 4, 0]} maxBarSize={14}>
-                    {allStates.map((_, i) => (
-                      <Cell key={i} fill={NAVY} fillOpacity={1 - i * 0.025} />
-                    ))}
-                  </Bar>
-                  <Bar dataKey="studentsAffected" name="studentsAffected" fill={AMBER} radius={[0, 4, 4, 0]} maxBarSize={14}>
-                    <RechartsTooltip />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
+          <CardContent className="pt-2">
+            {loadAllState ? <ChartSkeleton height={420} /> : allStates && allStates.length > 0 ? (() => {
+              const sorted = [...allStates].sort((a, b) => b.count - a.count);
+              const max = sorted[0]?.count ?? 1;
+              const total = sorted.reduce((s, r) => s + r.count, 0);
+              return (
+                <div>
+                  {/* Column headers */}
+                  <div className="flex items-center gap-3 mb-3 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <span className="w-5" />
+                    <span className="w-36">State</span>
+                    <span className="flex-1">Share of actions</span>
+                    <span className="w-16 text-right">Actions</span>
+                    <span className="w-28 text-right">Est. Students</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {sorted.map((row, i) => {
+                      const barPct = (row.count / max) * 100;
+                      const sharePct = ((row.count / total) * 100).toFixed(1);
+                      const intensity = Math.max(0.35, 1 - i * 0.018);
+                      return (
+                        <div key={row.state} className="flex items-center gap-3 px-1 py-1 rounded-lg hover:bg-muted/40 transition-colors">
+                          {/* Rank */}
+                          <span className="w-5 text-right text-xs text-muted-foreground font-mono tabular-nums">{i + 1}</span>
+                          {/* State */}
+                          <div className="w-36 flex items-center gap-1.5 min-w-0">
+                            <span className="text-xs font-bold text-[#1e3a5f] bg-[#1e3a5f]/10 rounded px-1.5 py-0.5 shrink-0">{row.state}</span>
+                            <span className="text-xs text-muted-foreground truncate">{STATE_NAMES[row.state] ?? ""}</span>
+                          </div>
+                          {/* Bar + share */}
+                          <div className="flex-1 flex items-center gap-2">
+                            <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{ width: `${barPct}%`, background: `rgba(30,58,95,${intensity})` }}
+                              />
+                            </div>
+                            <span className="text-xs text-muted-foreground w-9 text-right tabular-nums">{sharePct}%</span>
+                          </div>
+                          {/* Count */}
+                          <span className="w-16 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.count}</span>
+                          {/* Students */}
+                          <span className="w-28 text-right text-xs text-muted-foreground tabular-nums">
+                            {row.studentsAffected > 0 ? row.studentsAffected.toLocaleString() : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })() : (
               <div className="h-[420px] flex items-center justify-center text-muted-foreground">No data</div>
             )}
           </CardContent>
