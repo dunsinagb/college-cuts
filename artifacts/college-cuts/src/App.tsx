@@ -13,6 +13,7 @@ import SubmitTip from "@/pages/submit-tip";
 import About from "@/pages/about";
 import Subscribe from "@/pages/subscribe";
 import JobOutlook from "@/pages/job-outlook";
+import News from "@/pages/news";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,7 @@ function Router() {
         <Route path="/cuts/:id">{(params) => <GatedPage path={`/cuts/${params.id}`} component={CutDetail} />}</Route>
         <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
         <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
+        <Route path="/news">{() => <News />}</Route>
         <Route path="/subscribe">{() => <Subscribe />}</Route>
         <Route path="/submit-tip">{() => <SubmitTip />}</Route>
         <Route path="/about">{() => <About />}</Route>

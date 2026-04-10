@@ -9,6 +9,7 @@ export function Navbar() {
     { href: "/", label: "Dashboard" },
     { href: "/cuts", label: "All Actions" },
     { href: "/analytics", label: "Analytics" },
+    { href: "/news", label: "News" },
     { href: "/job-outlook", label: "Job Outlook" },
     { href: "/about", label: "About" },
   ];
