@@ -86,7 +86,7 @@ export default function Dashboard() {
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
               <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-amber-300 text-xs font-semibold tracking-wide uppercase">Live Database</span>
+              <span className="text-amber-300 text-xs font-semibold tracking-wide">Tracking actions since 2024</span>
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white leading-tight">
               Tracking the human cost of<br />
