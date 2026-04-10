@@ -77,6 +77,7 @@ router.get("/cuts", async (req, res): Promise<void> => {
     .order("announcement_date", { ascending: false })
     .range(offset, offset + limit - 1);
 
+  query = query.gte("announcement_date", "2024-01-01");
   if (state)   query = query.eq("state", state);
   if (cutType) query = query.eq("cut_type", cutType);
   if (status)  query = query.eq("status", status);

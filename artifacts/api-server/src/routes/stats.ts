@@ -110,6 +110,7 @@ router.get("/stats/monthly-trend", async (_req, res): Promise<void> => {
       if (month) map[month] = (map[month] ?? 0) + 1;
     }
     const result = Object.entries(map)
+      .filter(([month]) => month >= "2024-01")
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, count]) => ({ month, count }));
     res.json(result);
