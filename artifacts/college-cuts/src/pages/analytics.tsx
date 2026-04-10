@@ -325,46 +325,34 @@ export default function Analytics() {
                 );
               }
 
-              // Line / area view
+              // Line view — uses LineChart so null gaps render cleanly
               return (
                 <ResponsiveContainer width="100%" height={340}>
-                  <AreaChart data={cleanData} margin={{ top: 10, right: 24, left: -8, bottom: 0 }}>
-                    <defs>
-                      {years.map((yr) => {
-                        const isCurrent = yr === currentYr;
-                        return (
-                          <linearGradient key={yr} id={`grad-${yr}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%"  stopColor={YEAR_COLORS[yr] ?? SLATE} stopOpacity={isCurrent ? 0.22 : 0.06} />
-                            <stop offset="95%" stopColor={YEAR_COLORS[yr] ?? SLATE} stopOpacity={0} />
-                          </linearGradient>
-                        );
-                      })}
-                    </defs>
+                  <LineChart data={cleanData} margin={{ top: 10, right: 24, left: -8, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
                     <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} />
                     <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
                     <RechartsTooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
                     {[...years].sort((a, b) => (a === currentYr ? 1 : b === currentYr ? -1 : 0)).map((yr) => {
                       const isCurrent = yr === currentYr;
+                      const color = YEAR_COLORS[yr] ?? SLATE;
                       return (
-                        <Area
+                        <Line
                           key={yr}
                           type="monotone"
                           dataKey={yr}
                           name={yr}
                           connectNulls={false}
-                          stroke={YEAR_COLORS[yr] ?? SLATE}
+                          stroke={color}
                           strokeWidth={isCurrent ? 2.5 : 1.5}
                           strokeOpacity={isCurrent ? 1 : 0.4}
                           strokeDasharray={isCurrent ? undefined : "5 3"}
-                          fill={`url(#grad-${yr})`}
-                          fillOpacity={1}
-                          dot={isCurrent ? { r: 3.5, fill: YEAR_COLORS[yr] ?? SLATE, strokeWidth: 0 } : false}
-                          activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff" }}
+                          dot={isCurrent ? { r: 3.5, fill: color, stroke: color, strokeWidth: 0 } : false}
+                          activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff", fill: color }}
                         />
                       );
                     })}
-                  </AreaChart>
+                  </LineChart>
                 </ResponsiveContainer>
               );
             })() : (
