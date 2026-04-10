@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { Rss } from "lucide-react";
 
 export function Footer() {
   return (
@@ -18,6 +19,12 @@ export function Footer() {
               <li><Link href="/cuts" className="text-muted-foreground hover:text-primary transition-colors">All Actions</Link></li>
               <li><Link href="/analytics" className="text-muted-foreground hover:text-primary transition-colors">Analytics</Link></li>
               <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">About</Link></li>
+              <li>
+                <a href="/api/rss" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
+                  <Rss className="h-3.5 w-3.5 text-orange-500" />
+                  RSS Feed
+                </a>
+              </li>
             </ul>
           </div>
           <div>

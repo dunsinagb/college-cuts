@@ -6,6 +6,7 @@ import tipsRouter from "./tips";
 import subscribeRouter from "./subscribe";
 import jobOutlookRouter from "./job-outlook";
 import newsRouter from "./news";
+import rssRouter from "./rss";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(tipsRouter);
 router.use(subscribeRouter);
 router.use(jobOutlookRouter);
 router.use(newsRouter);
+router.use(rssRouter);
 
 export default router;
