@@ -523,7 +523,7 @@ export default function Analytics() {
                   <BarChart
                     data={[...byType].sort((a, b) => b.count - a.count)}
                     layout="vertical"
-                    margin={{ top: 4, right: 40, left: 8, bottom: 4 }}
+                    margin={{ top: 4, right: 40, left: 0, bottom: 4 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e9ecef" />
                     <XAxis type="number" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
@@ -534,7 +534,7 @@ export default function Analytics() {
                       fontSize={12}
                       tickLine={false}
                       axisLine={false}
-                      width={148}
+                      width={112}
                       tickFormatter={fmt}
                     />
                     <RechartsTooltip
