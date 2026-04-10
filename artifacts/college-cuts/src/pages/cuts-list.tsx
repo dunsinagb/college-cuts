@@ -288,7 +288,7 @@ export default function CutsList() {
                       className="hover:bg-[#f8f9fc] transition-colors group"
                     >
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground text-xs">
-                        {format(parseISO(cut.announcementDate), "MMM yyyy")}
+                        {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : "—"}
                       </td>
                       <td className="px-4 py-3 font-medium max-w-[220px]">
                         <Link

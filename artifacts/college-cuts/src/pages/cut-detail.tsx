@@ -84,7 +84,7 @@ export default function CutDetail() {
                     <Calendar className="h-4 w-4" /> Announcement Date
                   </dt>
                   <dd className="text-base font-semibold">
-                    {format(parseISO(cut.announcementDate), "MMMM d, yyyy")}
+                    {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMMM d, yyyy") : "—"}
                   </dd>
                 </div>
                 
