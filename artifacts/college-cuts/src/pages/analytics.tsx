@@ -26,19 +26,26 @@ import { RefreshCw, TrendingUp, GraduationCap, Users, MapPin, AlertTriangle, Boo
 import { format } from "date-fns";
 
 /* ─── colours ─────────────────────────────────────────────────── */
+// Brand primaries
 const NAVY       = "#1e3a5f";
-const AMBER      = "#f59e0b";
-const ROSE       = "#ef4444";
-const TEAL       = "#0d9488";
-const PURPLE     = "#7c3aed";
 const SLATE      = "#64748b";
-const LIME       = "#65a30d";
+
+// Semantic severity scale (institution → staff, darkest → lightest)
+const C_CRIMSON  = "#9b1c2e";   // institution_closure — most severe
+const C_SIENNA   = "#b94a1e";   // campus_closure
+const C_OCHRE    = "#c27c10";   // department_closure
+const C_COBALT   = "#1d4ed8";   // program_suspension
+const C_TEAL     = "#0f766e";   // teach_out
+const C_VIOLET   = "#6d28d9";   // staff_layoff
+
+// Retained for misc use
+const AMBER      = "#d97706";
 
 const YEAR_COLORS: Record<string, string> = {
-  "2023": "#94a3b8",
-  "2024": "#60a5fa",
-  "2025": "#f97316",
-  "2026": "#a855f7",
+  "2023": "#94a3b8",   // muted slate — kept for legacy data
+  "2024": "#2563eb",   // sapphire blue
+  "2025": "#d97706",   // amber (brand accent)
+  "2026": "#7c3aed",   // violet
 };
 
 const STATE_NAMES: Record<string, string> = {
@@ -56,24 +63,25 @@ const STATE_NAMES: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  institution_closure: ROSE,
-  campus_closure:      "#f97316",
-  department_closure:  AMBER,
-  program_suspension:  NAVY,
-  teach_out:           TEAL,
-  staff_layoff:        PURPLE,
+  institution_closure: C_CRIMSON,
+  campus_closure:      C_SIENNA,
+  department_closure:  C_OCHRE,
+  program_suspension:  C_COBALT,
+  teach_out:           C_TEAL,
+  staff_layoff:        C_VIOLET,
 };
 
-const CONTROL_COLORS = [NAVY, TEAL, AMBER, PURPLE, SLATE];
+// Control: navy → crimson → amber → violet → slate
+const CONTROL_COLORS = [NAVY, C_CRIMSON, AMBER, C_VIOLET, SLATE];
 
 const REASON_COLORS: Record<string, string> = {
-  "Budget / Financial Deficit": ROSE,
-  "Enrollment Decline":         AMBER,
-  "State Funding Cuts":         PURPLE,
-  "Strategic Restructuring":    NAVY,
-  "Compliance / Policy":        TEAL,
+  "Budget / Financial Deficit": C_CRIMSON,
+  "Enrollment Decline":         C_SIENNA,
+  "State Funding Cuts":         C_COBALT,
+  "Strategic Restructuring":    C_TEAL,
+  "Compliance / Policy":        C_VIOLET,
   "Merger / Consolidation":     SLATE,
-  "Accreditation Issues":       LIME,
+  "Accreditation Issues":       C_OCHRE,
 };
 
 /* ─── helpers ─────────────────────────────────────────────────── */
@@ -89,11 +97,18 @@ function numFmt(n: number) {
 }
 
 const tooltipStyle = {
-  backgroundColor: "#fff",
-  border: "1px solid #e5e7eb",
-  borderRadius: "10px",
-  boxShadow: "0 4px 24px -4px rgb(0 0 0 / 0.12)",
-  fontSize: 13,
+  backgroundColor: "#ffffff",
+  border: "1px solid #dde3ed",
+  borderRadius: "8px",
+  boxShadow: "0 6px 32px -6px rgba(30,58,95,0.16), 0 2px 8px -2px rgba(0,0,0,0.06)",
+  fontSize: 12,
+  fontFamily: "inherit",
+};
+
+const tooltipLabelStyle = {
+  color: NAVY,
+  fontWeight: 600,
+  marginBottom: 2,
 };
 
 /* ─── hooks ───────────────────────────────────────────────────── */
@@ -175,12 +190,12 @@ export default function Analytics() {
 
   /* ── KPI cards ── */
   const kpis = [
-    { label: "Total Actions",    value: summary?.totalCuts,             icon: <AlertTriangle className="h-5 w-5" />, color: "text-rose-500"   },
-    { label: "Students Affected", value: summary?.totalStudentsAffected, icon: <GraduationCap className="h-5 w-5" />, color: "text-amber-500"  },
-    { label: "Faculty Affected",  value: summary?.totalFacultyAffected,  icon: <Users         className="h-5 w-5" />, color: "text-blue-500"   },
-    { label: "States Affected",   value: summary?.totalStatesAffected,   icon: <MapPin        className="h-5 w-5" />, color: "text-teal-500"   },
-    { label: "Confirmed Cases",   value: summary?.confirmedCuts,         icon: <BookOpen      className="h-5 w-5" />, color: "text-purple-500" },
-    { label: "Ongoing",           value: summary?.ongoingCuts,           icon: <TrendingUp    className="h-5 w-5" />, color: "text-orange-500" },
+    { label: "Total Actions",     value: summary?.totalCuts,             icon: <AlertTriangle className="h-5 w-5" />, color: "text-[#9b1c2e]"  },
+    { label: "Students Affected", value: summary?.totalStudentsAffected, icon: <GraduationCap className="h-5 w-5" />, color: "text-[#d97706]"  },
+    { label: "Faculty Affected",  value: summary?.totalFacultyAffected,  icon: <Users         className="h-5 w-5" />, color: "text-[#1d4ed8]"  },
+    { label: "States Affected",   value: summary?.totalStatesAffected,   icon: <MapPin        className="h-5 w-5" />, color: "text-[#0f766e]"  },
+    { label: "Confirmed Cases",   value: summary?.confirmedCuts,         icon: <BookOpen      className="h-5 w-5" />, color: "text-[#1e3a5f]"  },
+    { label: "Ongoing",           value: summary?.ongoingCuts,           icon: <TrendingUp    className="h-5 w-5" />, color: "text-[#6d28d9]"  },
   ];
 
   return (
@@ -266,7 +281,7 @@ export default function Analytics() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
                   <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} />
                   <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
-                  <RechartsTooltip contentStyle={tooltipStyle} />
+                  <RechartsTooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
                   {years.map((yr) => (
                     <Area
                       key={yr}
@@ -413,7 +428,7 @@ export default function Analytics() {
                         ))}
                       </Pie>
                       <RechartsTooltip
-                        contentStyle={tooltipStyle}
+                        contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle}
                         formatter={(val, _name, props) => [
                           `${val} actions (${((props.payload.count / (summary?.totalCuts || 1)) * 100).toFixed(0)}%)`,
                           fmt(props.payload.control),
@@ -465,7 +480,7 @@ export default function Analytics() {
                       tickFormatter={fmt}
                     />
                     <RechartsTooltip
-                      contentStyle={tooltipStyle}
+                      contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle}
                       labelFormatter={fmt}
                       formatter={(v) => [`${v} actions`, "Count"]}
                     />
@@ -523,7 +538,7 @@ export default function Analytics() {
                     width={186}
                   />
                   <RechartsTooltip
-                    contentStyle={tooltipStyle}
+                    contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle}
                     formatter={(v) => [`${v} cases`, "Occurrences"]}
                   />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={22}>
