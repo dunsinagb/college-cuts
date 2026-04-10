@@ -1,22 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: CollegeCuts Tracker API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: cuts
+    description: College program cuts and closures
+  - name: tips
+    description: User submitted tips
+  - name: stats
+    description: Aggregate statistics
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +28,164 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /cuts:
+    get:
+      operationId: listCuts
+      tags: [cuts]
+      summary: List all program cuts with optional filters
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: cutType
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: control
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated list of cuts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedCuts"
+
+  /cuts/{id}:
+    get:
+      operationId: getCut
+      tags: [cuts]
+      summary: Get a single cut by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cut record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cut"
+        "404":
+          description: Not found
+
+  /stats/summary:
+    get:
+      operationId: getStatsSummary
+      tags: [stats]
+      summary: Get top-level aggregate statistics
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsSummary"
+
+  /stats/by-state:
+    get:
+      operationId: getStatsByState
+      tags: [stats]
+      summary: Get cuts grouped by state
+      responses:
+        "200":
+          description: State breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StateBreakdownItem"
+
+  /stats/by-type:
+    get:
+      operationId: getStatsByType
+      tags: [stats]
+      summary: Get cuts grouped by cut type
+      responses:
+        "200":
+          description: Cut type breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TypeBreakdownItem"
+
+  /stats/monthly-trend:
+    get:
+      operationId: getMonthlyTrend
+      tags: [stats]
+      summary: Get cuts count by month
+      responses:
+        "200":
+          description: Monthly trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyTrendItem"
+
+  /stats/recent:
+    get:
+      operationId: getRecentCuts
+      tags: [stats]
+      summary: Get the 10 most recent cuts
+      responses:
+        "200":
+          description: Recent cuts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cut"
+
+  /tips:
+    post:
+      operationId: submitTip
+      tags: [tips]
+      summary: Submit a tip about a new cut or closure
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTipBody"
+      responses:
+        "201":
+          description: Tip submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tip"
+        "400":
+          description: Validation error
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +196,193 @@ components:
       required:
         - status
 
+    Cut:
+      type: object
+      properties:
+        id:
+          type: integer
+        institution:
+          type: string
+        programName:
+          type: ["string", "null"]
+        state:
+          type: string
+        control:
+          type: ["string", "null"]
+        cutType:
+          type: string
+          enum: [program_suspension, teach_out, department_closure, campus_closure, institution_closure, staff_layoff]
+        announcementDate:
+          type: string
+        effectiveTerm:
+          type: ["string", "null"]
+        studentsAffected:
+          type: ["integer", "null"]
+        facultyAffected:
+          type: ["integer", "null"]
+        notes:
+          type: ["string", "null"]
+        sourceUrl:
+          type: ["string", "null"]
+        sourcePublication:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - institution
+        - state
+        - cutType
+        - announcementDate
+        - createdAt
+        - updatedAt
+
+    PaginatedCuts:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Cut"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - data
+        - total
+        - page
+        - limit
+        - totalPages
+
+    StatsSummary:
+      type: object
+      properties:
+        totalCuts:
+          type: integer
+        totalStudentsAffected:
+          type: integer
+        totalFacultyAffected:
+          type: integer
+        totalInstitutions:
+          type: integer
+        totalStatesAffected:
+          type: integer
+        confirmedCuts:
+          type: integer
+        ongoingCuts:
+          type: integer
+        reversedCuts:
+          type: integer
+      required:
+        - totalCuts
+        - totalStudentsAffected
+        - totalFacultyAffected
+        - totalInstitutions
+        - totalStatesAffected
+        - confirmedCuts
+        - ongoingCuts
+        - reversedCuts
+
+    StateBreakdownItem:
+      type: object
+      properties:
+        state:
+          type: string
+        count:
+          type: integer
+        studentsAffected:
+          type: integer
+      required:
+        - state
+        - count
+        - studentsAffected
+
+    TypeBreakdownItem:
+      type: object
+      properties:
+        cutType:
+          type: string
+        count:
+          type: integer
+      required:
+        - cutType
+        - count
+
+    MonthlyTrendItem:
+      type: object
+      properties:
+        month:
+          type: string
+        count:
+          type: integer
+      required:
+        - month
+        - count
+
+    CreateTipBody:
+      type: object
+      properties:
+        institution:
+          type: string
+        programName:
+          type: ["string", "null"]
+        state:
+          type: string
+        cutType:
+          type: string
+        announcementDate:
+          type: ["string", "null"]
+        sourceUrl:
+          type: ["string", "null"]
+        description:
+          type: string
+        submitterEmail:
+          type: ["string", "null"]
+      required:
+        - institution
+        - state
+        - cutType
+        - description
+
+    Tip:
+      type: object
+      properties:
+        id:
+          type: integer
+        institution:
+          type: string
+        programName:
+          type: ["string", "null"]
+        state:
+          type: string
+        cutType:
+          type: string
+        announcementDate:
+          type: ["string", "null"]
+        sourceUrl:
+          type: ["string", "null"]
+        description:
+          type: string
+        submitterEmail:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - institution
+        - state
+        - cutType
+        - description
+        - status
+        - createdAt
