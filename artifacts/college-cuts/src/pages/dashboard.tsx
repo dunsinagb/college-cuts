@@ -326,7 +326,7 @@ export default function Dashboard() {
                             <div className="flex items-center justify-between mt-2">
                               <CutTypeBadge cutType={cut.cutType} className="text-[10px] px-1.5 py-0 h-5" />
                               <span className="text-xs text-muted-foreground">
-                                {format(parseISO(cut.announcementDate), "MMM d, yyyy")}
+                                {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM d, yyyy") : "—"}
                               </span>
                             </div>
                           </CardContent>
