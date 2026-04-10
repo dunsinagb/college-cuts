@@ -293,31 +293,88 @@ export default function Analytics() {
           <CardHeader className="pb-2">
             <SectionBadge label="Geographic" />
             <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">
-              Top 10 States by Program Actions ({stateYears.join("–")})
+              Top 10 States by Program Actions
             </CardTitle>
-            <CardDescription>States with the highest concentration of higher-ed institutional actions</CardDescription>
+            <CardDescription>Year-over-year breakdown of institutional actions — states ranked by total volume</CardDescription>
           </CardHeader>
-          <CardContent className="pt-4">
-            {loadState ? <ChartSkeleton height={380} /> : byState && byState.data.length > 0 ? (
-              <ResponsiveContainer width="100%" height={380}>
-                <BarChart
-                  data={byState.data}
-                  layout="vertical"
-                  margin={{ top: 4, right: 40, left: 32, bottom: 4 }}
-                  barCategoryGap="28%"
-                  barGap={3}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e9ecef" />
-                  <XAxis type="number" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                  <YAxis type="category" dataKey="state" stroke="#9ca3af" fontSize={13} tickLine={false} axisLine={false} width={32} />
-                  <RechartsTooltip contentStyle={tooltipStyle} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 13, paddingTop: 12 }} />
-                  {stateYears.map((yr) => (
-                    <Bar key={yr} dataKey={yr} name={yr} fill={YEAR_COLORS[yr] ?? SLATE} radius={[0, 4, 4, 0]} maxBarSize={18} />
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
+          <CardContent className="pt-2">
+            {loadState ? <ChartSkeleton height={380} /> : byState && byState.data.length > 0 ? (() => {
+              const rows = [...byState.data].map(row => ({
+                ...row,
+                total: stateYears.reduce((s, yr) => s + (Number(row[yr]) || 0), 0),
+              })).sort((a, b) => b.total - a.total);
+              const maxTotal = rows[0]?.total ?? 1;
+
+              return (
+                <div>
+                  {/* Legend */}
+                  <div className="flex flex-wrap gap-4 mb-4 px-1">
+                    {stateYears.map(yr => (
+                      <div key={yr} className="flex items-center gap-1.5">
+                        <span className="inline-block w-3 h-3 rounded-sm" style={{ background: YEAR_COLORS[yr] ?? SLATE }} />
+                        <span className="text-xs font-medium text-muted-foreground">{yr}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Column headers */}
+                  <div className="flex items-center gap-3 mb-2 px-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <span className="w-5" />
+                    <span className="w-36">State</span>
+                    <span className="flex-1">Year breakdown</span>
+                    <span className="w-14 text-right">Total</span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {rows.map((row, i) => (
+                      <div key={row.state} className="flex items-center gap-3 px-1 py-1.5 rounded-lg hover:bg-muted/40 transition-colors">
+                        {/* Rank */}
+                        <span className="w-5 text-right text-xs text-muted-foreground font-mono">{i + 1}</span>
+                        {/* State */}
+                        <div className="w-36 flex items-center gap-1.5 min-w-0">
+                          <span className="text-xs font-bold text-[#1e3a5f] bg-[#1e3a5f]/10 rounded px-1.5 py-0.5 shrink-0">{row.state}</span>
+                          <span className="text-xs text-muted-foreground truncate">{STATE_NAMES[String(row.state)] ?? ""}</span>
+                        </div>
+                        {/* Stacked segment bar */}
+                        <div className="flex-1 flex flex-col gap-1">
+                          <div className="h-5 bg-gray-100 rounded-full overflow-hidden flex">
+                            {stateYears.map(yr => {
+                              const count = Number(row[yr]) || 0;
+                              const pct = (count / maxTotal) * 100;
+                              if (pct === 0) return null;
+                              return (
+                                <div
+                                  key={yr}
+                                  title={`${yr}: ${count}`}
+                                  className="h-full first:rounded-l-full last:rounded-r-full transition-all"
+                                  style={{ width: `${pct}%`, background: YEAR_COLORS[yr] ?? SLATE, opacity: 0.85 }}
+                                />
+                              );
+                            })}
+                          </div>
+                          {/* Per-year chips */}
+                          <div className="flex gap-1.5 flex-wrap">
+                            {stateYears.map(yr => {
+                              const count = Number(row[yr]) || 0;
+                              if (count === 0) return null;
+                              return (
+                                <span
+                                  key={yr}
+                                  className="text-xs px-1.5 py-0.5 rounded font-medium"
+                                  style={{ background: (YEAR_COLORS[yr] ?? SLATE) + "22", color: YEAR_COLORS[yr] ?? SLATE }}
+                                >
+                                  {yr}: {count}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        {/* Total */}
+                        <span className="w-14 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.total}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })() : (
               <div className="h-[380px] flex items-center justify-center text-muted-foreground">No data</div>
             )}
           </CardContent>
