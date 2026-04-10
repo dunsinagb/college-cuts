@@ -168,9 +168,10 @@ function SectionBadge({ label }: { label: string }) {
 
 /* ═══════════════════════════════════════════════════════════════ */
 export default function Analytics() {
-  const [refreshKey, setRefreshKey]   = useState(0);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [refreshKey, setRefreshKey]     = useState(0);
+  const [lastUpdated, setLastUpdated]   = useState<Date>(new Date());
   const [activePieIdx, setActivePieIdx] = useState(0);
+  const [chartMode, setChartMode]       = useState<"bar" | "line">("bar");
 
   function handleRefresh() {
     setRefreshKey((k) => k + 1);
@@ -248,7 +249,7 @@ export default function Analytics() {
         {/* ══ CHART 1 — Actions Over Time ══ */}
         <Card className="shadow-sm border-border/60">
           <CardHeader className="pb-2">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div>
                 <SectionBadge label="Trend" />
                 <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">
@@ -256,20 +257,38 @@ export default function Analytics() {
                 </CardTitle>
                 <CardDescription>Monthly volume of institutional actions, year-over-year comparison</CardDescription>
               </div>
-              <div className="flex gap-3 shrink-0">
-                {years.map((yr) => (
-                  <span key={yr} className="flex items-center gap-1.5 text-sm font-medium">
-                    <span className="inline-block w-3 h-3 rounded-full" style={{ background: YEAR_COLORS[yr] ?? SLATE }} />
-                    {yr}
-                  </span>
-                ))}
+              <div className="flex items-center gap-4 shrink-0">
+                {/* Year legend */}
+                <div className="flex gap-3">
+                  {years.map((yr) => (
+                    <span key={yr} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                      <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: YEAR_COLORS[yr] ?? SLATE }} />
+                      {yr}
+                    </span>
+                  ))}
+                </div>
+                {/* Bar / Line toggle */}
+                <div className="flex rounded-md border border-border overflow-hidden text-xs font-medium">
+                  <button
+                    onClick={() => setChartMode("bar")}
+                    className={`px-3 py-1.5 transition-colors ${chartMode === "bar" ? "bg-[#1e3a5f] text-white" : "bg-white text-muted-foreground hover:bg-muted/50"}`}
+                  >
+                    Bars
+                  </button>
+                  <button
+                    onClick={() => setChartMode("line")}
+                    className={`px-3 py-1.5 transition-colors border-l border-border ${chartMode === "line" ? "bg-[#1e3a5f] text-white" : "bg-white text-muted-foreground hover:bg-muted/50"}`}
+                  >
+                    Lines
+                  </button>
+                </div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-4">
             {loadMonthly ? <ChartSkeleton height={340} /> : monthly && monthly.data.length > 0 ? (() => {
               const currentYr = years[years.length - 1];
-              // Replace 0 / missing with null so lines break on months with no data
+              // Null-out months with no data so gaps are honest
               const cleanData = monthly.data.map((row) => {
                 const out: Record<string, string | number | null> = { month: row.month };
                 for (const yr of years) {
@@ -278,6 +297,35 @@ export default function Analytics() {
                 }
                 return out;
               });
+
+              if (chartMode === "bar") {
+                return (
+                  <ResponsiveContainer width="100%" height={340}>
+                    <BarChart data={cleanData} margin={{ top: 10, right: 24, left: -8, bottom: 0 }} barCategoryGap="28%" barGap={3}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
+                      <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} />
+                      <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
+                      <RechartsTooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} cursor={{ fill: "rgba(30,58,95,0.04)" }} />
+                      {years.map((yr) => {
+                        const isCurrent = yr === currentYr;
+                        return (
+                          <Bar
+                            key={yr}
+                            dataKey={yr}
+                            name={yr}
+                            fill={YEAR_COLORS[yr] ?? SLATE}
+                            fillOpacity={isCurrent ? 1 : 0.45}
+                            radius={[3, 3, 0, 0]}
+                            maxBarSize={28}
+                          />
+                        );
+                      })}
+                    </BarChart>
+                  </ResponsiveContainer>
+                );
+              }
+
+              // Line / area view
               return (
                 <ResponsiveContainer width="100%" height={340}>
                   <AreaChart data={cleanData} margin={{ top: 10, right: 24, left: -8, bottom: 0 }}>
@@ -296,7 +344,6 @@ export default function Analytics() {
                     <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} />
                     <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
                     <RechartsTooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} />
-                    {/* Render past years first (behind) then current on top */}
                     {[...years].sort((a, b) => (a === currentYr ? 1 : b === currentYr ? -1 : 0)).map((yr) => {
                       const isCurrent = yr === currentYr;
                       return (
@@ -312,9 +359,7 @@ export default function Analytics() {
                           strokeDasharray={isCurrent ? undefined : "5 3"}
                           fill={`url(#grad-${yr})`}
                           fillOpacity={1}
-                          dot={isCurrent
-                            ? { r: 3.5, fill: YEAR_COLORS[yr] ?? SLATE, strokeWidth: 0 }
-                            : false}
+                          dot={isCurrent ? { r: 3.5, fill: YEAR_COLORS[yr] ?? SLATE, strokeWidth: 0 } : false}
                           activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff" }}
                         />
                       );
