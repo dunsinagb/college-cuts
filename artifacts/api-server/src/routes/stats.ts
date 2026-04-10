@@ -129,6 +129,7 @@ router.get("/stats/yearly-by-month", async (_req, res): Promise<void> => {
       if (!r.announcement_date) continue;
       const d    = new Date(r.announcement_date);
       const yr   = String(d.getFullYear());
+      if (parseInt(yr) < 2024) continue;
       const lbl  = MONTH_LABELS[d.getMonth()];
       years.add(yr);
       if (!byMonth[lbl]) byMonth[lbl] = {};
@@ -158,6 +159,7 @@ router.get("/stats/yearly-by-state", async (_req, res): Promise<void> => {
     for (const r of rows) {
       if (!r.announcement_date) continue;
       const yr = String(new Date(r.announcement_date).getFullYear());
+      if (parseInt(yr) < 2024) continue;
       years.add(yr);
       totals[r.state] = (totals[r.state] ?? 0) + 1;
       if (!byState[r.state]) byState[r.state] = {};
