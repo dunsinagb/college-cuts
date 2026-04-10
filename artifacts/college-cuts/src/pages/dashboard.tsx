@@ -1,11 +1,13 @@
 import { Link } from "wouter";
 import { format, parseISO } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import {
   useGetStatsSummary,
   useGetMonthlyTrend,
   useGetStatsByType,
   useGetRecentCuts
 } from "@workspace/api-client-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CutTypeBadge } from "@/components/shared/Badges";
@@ -25,6 +27,22 @@ import {
 import { ArrowRight, AlertTriangle, Users, GraduationCap, MapPin, Lock, BarChart3, Briefcase, Calendar, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+
+const STATE_NAMES: Record<string, string> = {
+  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",
+  CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",
+  HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",
+  KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",
+  MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",
+  MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",
+  NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",
+  OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",
+  SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",
+  VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",
+  DC:"Washington D.C.",
+};
+
 function isSubscribed() {
   return localStorage.getItem("cc_subscribed") === "1";
 }
@@ -34,6 +52,17 @@ export default function Dashboard() {
   const { data: monthlyTrend, isLoading: isLoadingTrend } = useGetMonthlyTrend();
   const { data: statsByType, isLoading: isLoadingType } = useGetStatsByType();
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
+  const { data: byState, isLoading: isLoadingState } = useQuery<{ state: string; count: number }[]>({
+    queryKey: ["stats/by-state"],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/stats/by-state`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
+
+  const topState = byState && byState.length > 0 ? byState[0] : null;
+  const topStateName = topState ? (STATE_NAMES[topState.state] ?? topState.state) : undefined;
 
   const subscribed = isSubscribed();
 
@@ -93,32 +122,36 @@ export default function Dashboard() {
       <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title="Total Actions Logged"
+            title="Institutions Impacted"
             value={summary?.totalCuts}
+            subtitle="higher education institutions since 2024"
             icon={<AlertTriangle className="h-5 w-5" />}
-            iconBg="bg-rose-500"
+            iconBg="bg-[#9b1c2e]"
             isLoading={isLoadingSummary}
           />
           <StatCard
-            title="Students Affected (Est.)"
+            title="Students Affected"
             value={summary?.totalStudentsAffected}
+            subtitle="estimated students impacted"
             icon={<GraduationCap className="h-5 w-5" />}
-            iconBg="bg-amber-500"
-            isLoading={isLoadingSummary}
-          />
-          <StatCard
-            title="Faculty Affected (Est.)"
-            value={summary?.totalFacultyAffected}
-            icon={<Users className="h-5 w-5" />}
-            iconBg="bg-blue-500"
+            iconBg="bg-[#d97706]"
             isLoading={isLoadingSummary}
           />
           <StatCard
             title="States Affected"
             value={summary?.totalStatesAffected}
+            subtitle="states with higher ed actions since 2024"
             icon={<MapPin className="h-5 w-5" />}
-            iconBg="bg-teal-500"
+            iconBg="bg-[#0f766e]"
             isLoading={isLoadingSummary}
+          />
+          <StatCard
+            title="Most Impacted State"
+            rawValue={topStateName}
+            subtitle={topState ? `${topState.count} actions recorded` : undefined}
+            icon={<BarChart3 className="h-5 w-5" />}
+            iconBg="bg-[#1d4ed8]"
+            isLoading={isLoadingState}
           />
         </div>
       </div>
@@ -365,29 +398,40 @@ export default function Dashboard() {
 }
 
 function StatCard({
-  title, value, icon, iconBg, isLoading
+  title, value, rawValue, subtitle, icon, iconBg, isLoading
 }: {
   title: string;
   value?: number;
+  rawValue?: string;
+  subtitle?: string;
   icon: React.ReactNode;
   iconBg: string;
   isLoading: boolean;
 }) {
+  const displayValue = rawValue !== undefined
+    ? rawValue
+    : value !== undefined
+      ? value.toLocaleString()
+      : "—";
+
   return (
     <Card className="border-0 shadow-md bg-white">
       <CardContent className="p-5">
-        <div className="flex items-center gap-4">
-          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconBg} text-white shadow-sm`}>
+        <div className="flex items-start gap-4">
+          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconBg} text-white shadow-sm mt-0.5`}>
             {icon}
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide leading-tight">{title}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide leading-tight">{title}</p>
             {isLoading ? (
-              <Skeleton className="h-7 w-20 mt-1" />
+              <Skeleton className="h-7 w-24 mt-1.5" />
             ) : (
-              <div className="text-2xl font-extrabold text-[#1e3a5f] leading-tight mt-0.5">
-                {value !== undefined ? value.toLocaleString() : "—"}
+              <div className={`font-extrabold text-[#1e3a5f] leading-tight mt-0.5 ${rawValue ? "text-xl" : "text-2xl"}`}>
+                {displayValue}
               </div>
+            )}
+            {subtitle && !isLoading && (
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
             )}
           </div>
         </div>
