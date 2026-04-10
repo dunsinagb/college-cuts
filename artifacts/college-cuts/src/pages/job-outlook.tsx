@@ -1,0 +1,306 @@
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Search, TrendingUp, DollarSign, Briefcase, Users, GraduationCap,
+  Loader2, AlertCircle, ExternalLink, ChevronUp, ChevronDown, ChevronsUpDown
+} from "lucide-react";
+
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+
+interface Job {
+  soc: string;
+  title: string;
+  median_wage: number | null;
+  growth_pct: number | null;
+  employment_level: number | null;
+  annual_openings: number | null;
+  entry_education: string | null;
+  unemployment_rate: number | null;
+}
+
+type SortField = keyof Pick<Job, "title" | "median_wage" | "employment_level" | "annual_openings" | "growth_pct">;
+type SortDir = "asc" | "desc" | null;
+
+const POPULAR_MAJORS = [
+  "Computer Science", "Nursing", "Business Administration", "Psychology",
+  "Education", "Biology", "Engineering", "English", "Art", "History",
+  "Political Science", "Economics", "Social Work", "Communications", "Chemistry"
+];
+
+function fmt(n: number | null, prefix = "", suffix = "") {
+  if (n == null) return "N/A";
+  return `${prefix}${n.toLocaleString()}${suffix}`;
+}
+
+function SortIcon({ field, sortField, sortDir }: { field: SortField; sortField: SortField | null; sortDir: SortDir }) {
+  if (sortField !== field) return <ChevronsUpDown className="inline h-3 w-3 ml-1 text-muted-foreground" />;
+  return sortDir === "asc"
+    ? <ChevronUp className="inline h-3 w-3 ml-1" />
+    : <ChevronDown className="inline h-3 w-3 ml-1" />;
+}
+
+export default function JobOutlookPage() {
+  const [majorInput, setMajorInput] = useState("Computer Science");
+  const [searchMajor, setSearchMajor] = useState("Computer Science");
+  const [educationFilter, setEducationFilter] = useState("all");
+  const [salaryFilter, setSalaryFilter] = useState("all");
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>(null);
+
+  const { data, isLoading, isError } = useQuery<{ jobs: Job[] }>({
+    queryKey: ["job-outlook", searchMajor],
+    queryFn: async () => {
+      const res = await fetch(`${BASE_URL}/api/job-outlook?major=${encodeURIComponent(searchMajor)}`);
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    enabled: searchMajor.length >= 2,
+  });
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (majorInput.trim().length >= 2) setSearchMajor(majorInput.trim());
+  }
+
+  function toggleSort(field: SortField) {
+    if (sortField !== field) { setSortField(field); setSortDir("desc"); return; }
+    if (sortDir === "desc") { setSortDir("asc"); return; }
+    setSortField(null); setSortDir(null);
+  }
+
+  const jobs = data?.jobs ?? [];
+
+  const filtered = jobs.filter((j) => {
+    if (educationFilter !== "all" && j.entry_education !== educationFilter) return false;
+    if (salaryFilter !== "all" && j.median_wage != null) {
+      const w = j.median_wage;
+      if (salaryFilter === "low" && w >= 60000) return false;
+      if (salaryFilter === "medium" && (w < 60000 || w >= 100000)) return false;
+      if (salaryFilter === "high" && w < 100000) return false;
+    }
+    return true;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (!sortField || !sortDir) return 0;
+    const av = a[sortField] ?? -Infinity;
+    const bv = b[sortField] ?? -Infinity;
+    if (typeof av === "string" && typeof bv === "string") {
+      return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    }
+    return sortDir === "asc" ? Number(av) - Number(bv) : Number(bv) - Number(av);
+  });
+
+  const educationLevels = [...new Set(jobs.map(j => j.entry_education).filter(Boolean))] as string[];
+
+  return (
+    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      <div className="space-y-3">
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">Job Outlook</h1>
+        <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
+          Search any academic major to see what career paths open up — and what happens to job prospects when those programs get cut.
+        </p>
+      </div>
+
+      <Card className="shadow-md">
+        <CardContent className="p-6">
+          <form onSubmit={handleSearch} className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by major (e.g. Computer Science, Nursing, Art)"
+                value={majorInput}
+                onChange={(e) => setMajorInput(e.target.value)}
+                className="pl-9 h-12"
+              />
+            </div>
+            <Button type="submit" className="h-12 px-8" disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+            </Button>
+          </form>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {POPULAR_MAJORS.map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMajorInput(m); setSearchMajor(m); }}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  searchMajor === m
+                    ? "bg-primary text-white border-primary"
+                    : "bg-white text-muted-foreground border-border hover:border-primary hover:text-primary"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {isError && (
+        <div className="flex items-center gap-2 text-destructive bg-red-50 rounded-lg px-4 py-3">
+          <AlertCircle className="h-4 w-4" />
+          <span className="text-sm">Failed to load job data. The service may not be configured yet.</span>
+        </div>
+      )}
+
+      {sorted.length > 0 && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card className="shadow-sm">
+              <CardContent className="p-4 flex items-center gap-3">
+                <Briefcase className="h-8 w-8 text-primary/60" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Careers Found</p>
+                  <p className="text-2xl font-bold text-primary">{sorted.length}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardContent className="p-4 flex items-center gap-3">
+                <DollarSign className="h-8 w-8 text-green-500/60" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Avg Median Wage</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {sorted.filter(j => j.median_wage).length > 0
+                      ? `$${Math.round(sorted.filter(j => j.median_wage).reduce((s, j) => s + j.median_wage!, 0) / sorted.filter(j => j.median_wage).length / 1000)}k`
+                      : "N/A"}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardContent className="p-4 flex items-center gap-3">
+                <Users className="h-8 w-8 text-blue-500/60" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Jobs</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {sorted.reduce((s, j) => s + (j.employment_level ?? 0), 0).toLocaleString()}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardContent className="p-4 flex items-center gap-3">
+                <TrendingUp className="h-8 w-8 text-orange-500/60" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Annual Openings</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {sorted.reduce((s, j) => s + (j.annual_openings ?? 0), 0).toLocaleString()}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="shadow-md">
+            <CardHeader className="pb-4 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-xl">Career Pathways for <span className="text-primary">{searchMajor}</span></CardTitle>
+                <CardDescription>BLS occupational data for related careers</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Select value={educationFilter} onValueChange={setEducationFilter}>
+                  <SelectTrigger className="w-44 h-9">
+                    <SelectValue placeholder="Education level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Education</SelectItem>
+                    {educationLevels.map((e) => (
+                      <SelectItem key={e} value={e}>{e}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={salaryFilter} onValueChange={setSalaryFilter}>
+                  <SelectTrigger className="w-36 h-9">
+                    <SelectValue placeholder="Salary" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Salaries</SelectItem>
+                    <SelectItem value="low">Under $60k</SelectItem>
+                    <SelectItem value="medium">$60k–$100k</SelectItem>
+                    <SelectItem value="high">$100k+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="cursor-pointer hover:text-primary pl-6" onClick={() => toggleSort("title")}>
+                      Job Title <SortIcon field="title" sortField={sortField} sortDir={sortDir} />
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:text-primary" onClick={() => toggleSort("median_wage")}>
+                      Median Wage <SortIcon field="median_wage" sortField={sortField} sortDir={sortDir} />
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:text-primary" onClick={() => toggleSort("employment_level")}>
+                      Employment <SortIcon field="employment_level" sortField={sortField} sortDir={sortDir} />
+                    </TableHead>
+                    <TableHead className="cursor-pointer hover:text-primary" onClick={() => toggleSort("annual_openings")}>
+                      Annual Openings <SortIcon field="annual_openings" sortField={sortField} sortDir={sortDir} />
+                    </TableHead>
+                    <TableHead>Education</TableHead>
+                    <TableHead>Growth</TableHead>
+                    <TableHead className="pr-6">SOC</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sorted.map((job) => (
+                    <TableRow key={job.soc} className="hover:bg-muted/20">
+                      <TableCell className="font-medium pl-6">{job.title}</TableCell>
+                      <TableCell className="font-semibold text-green-700">
+                        {job.median_wage ? `$${job.median_wage.toLocaleString()}` : "N/A"}
+                      </TableCell>
+                      <TableCell>{fmt(job.employment_level)}</TableCell>
+                      <TableCell>{fmt(job.annual_openings)}</TableCell>
+                      <TableCell>
+                        {job.entry_education ? (
+                          <Badge variant="outline" className="text-xs whitespace-nowrap">
+                            <GraduationCap className="h-3 w-3 mr-1" />
+                            {job.entry_education}
+                          </Badge>
+                        ) : "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {job.growth_pct != null ? (
+                          <span className={`font-medium ${job.growth_pct >= 10 ? "text-green-600" : job.growth_pct >= 0 ? "text-blue-600" : "text-red-600"}`}>
+                            {job.growth_pct > 0 ? "+" : ""}{job.growth_pct}%
+                          </span>
+                        ) : "N/A"}
+                      </TableCell>
+                      <TableCell className="pr-6">
+                        <a
+                          href={`https://www.bls.gov/oes/current/oes${job.soc.replace("-", "")}.htm`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+                        >
+                          {job.soc} <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {!isLoading && sorted.length === 0 && searchMajor && !isError && (
+        <div className="text-center py-16 text-muted-foreground">
+          <GraduationCap className="h-12 w-12 mx-auto mb-4 opacity-30" />
+          <p className="text-lg font-medium">No careers found for "{searchMajor}"</p>
+          <p className="text-sm mt-1">Try a different major or check that the database is configured.</p>
+        </div>
+      )}
+    </div>
+  );
+}
