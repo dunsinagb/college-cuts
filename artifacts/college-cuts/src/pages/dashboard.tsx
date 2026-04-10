@@ -222,7 +222,7 @@ export default function Dashboard() {
                     <Skeleton className="h-full w-full" />
                   ) : statsByType && statsByType.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={statsByType} layout="vertical" margin={{ top: 5, right: 30, left: 110, bottom: 5 }}>
+                      <BarChart data={statsByType} layout="vertical" margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" />
                         <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                         <YAxis
@@ -232,6 +232,7 @@ export default function Dashboard() {
                           fontSize={12}
                           tickLine={false}
                           axisLine={false}
+                          width={112}
                           tickFormatter={(val) => val.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
                         />
                         <RechartsTooltip
@@ -278,7 +279,7 @@ export default function Dashboard() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-8">
+          <div className="space-y-8 min-w-0 overflow-hidden">
             <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold tracking-tight text-[#1e3a5f]">Recent Logged Actions</h2>
