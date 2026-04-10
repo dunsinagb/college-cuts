@@ -1,6 +1,8 @@
 import { Link } from "wouter";
 import { Rss } from "lucide-react";
 
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+
 export function Footer() {
   return (
     <footer className="border-t bg-muted/20">
@@ -20,7 +22,13 @@ export function Footer() {
               <li><Link href="/analytics" className="text-muted-foreground hover:text-primary transition-colors">Analytics</Link></li>
               <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">About</Link></li>
               <li>
-                <a href="/api/rss" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
+                <a
+                  href={`${BASE_URL}/api/rss`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+                  title="Open RSS feed in new tab — paste the URL into your feed reader"
+                >
                   <Rss className="h-3.5 w-3.5 text-orange-500" />
                   RSS Feed
                 </a>

@@ -24,7 +24,7 @@ import {
   Area,
   AreaChart
 } from "recharts";
-import { ArrowRight, AlertTriangle, Users, GraduationCap, MapPin, Lock, BarChart3, Briefcase, Calendar, RefreshCw } from "lucide-react";
+import { ArrowRight, AlertTriangle, GraduationCap, MapPin, Lock, BarChart3, Briefcase, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -246,33 +246,6 @@ export default function Dashboard() {
               </Card>
             </section>
 
-            {!subscribed && (
-              <section className="relative rounded-xl overflow-hidden border border-border">
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1e3a5f]/10">
-                    <Lock className="h-6 w-6 text-[#1e3a5f]" />
-                  </div>
-                  <div className="text-center space-y-1">
-                    <p className="text-lg font-bold text-[#1e3a5f]">Full Access Required</p>
-                    <p className="text-sm text-muted-foreground max-w-xs">Enter your email to unlock Analytics, Job Outlook, and the complete database.</p>
-                  </div>
-                  <Button asChild size="sm" className="bg-amber-500 hover:bg-amber-400 text-white border-0">
-                    <Link href="/subscribe">Unlock Free Access</Link>
-                  </Button>
-                </div>
-                <div className="p-4 sm:p-6 space-y-4 opacity-30 pointer-events-none select-none overflow-hidden">
-                  <h2 className="text-xl sm:text-2xl font-bold">Year-over-Year Comparison</h2>
-                  <div className="h-[180px] sm:h-[220px] bg-muted/40 rounded-lg flex items-end justify-around px-2 sm:px-8 pb-4 gap-1 overflow-hidden">
-                    {[3, 6, 4, 8, 5, 11, 9, 12, 7, 10, 8, 6].map((h, i) => (
-                      <div key={i} className="flex gap-px items-end">
-                        <div className="w-2 sm:w-4 bg-blue-400 rounded-t" style={{ height: `${h * 8}px` }} />
-                        <div className="w-2 sm:w-4 bg-amber-400 rounded-t" style={{ height: `${(h + 2) * 8}px` }} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
           </div>
 
           {/* Sidebar */}
