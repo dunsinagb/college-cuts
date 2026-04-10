@@ -1,12 +1,9 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="180" height="180" rx="36" fill="#1e3a5f"/>
-  <!-- Graduation cap flat top -->
-  <polygon points="90,44 152,76 90,108 28,76" fill="#f59e0b"/>
-  <!-- Cap standing portion (under brim, 3D illusion) -->
-  <path d="M55 88 L55 106 Q55 114 90 114 Q125 114 125 106 L125 88 L90 100 Z" fill="#d97706"/>
-  <!-- Tassel string going down right -->
-  <line x1="152" y1="76" x2="152" y2="110" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
-  <circle cx="152" cy="115" r="7" fill="#f59e0b"/>
-  <!-- White CC initials -->
-  <text x="90" y="102" font-family="Georgia, serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle" opacity="0">CC</text>
+  <!-- lucide GraduationCap paths, scaled from 24px to ~140px and centered -->
+  <g transform="translate(20, 20) scale(5.83)" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/>
+    <path d="M22 10v6"/>
+    <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>
+  </g>
 </svg>
