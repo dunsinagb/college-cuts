@@ -39,7 +39,17 @@ export function Navbar() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Buy Me a Coffee */}
+          <a
+            href="https://www.buymeacoffee.com/dunsinagb"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#FFDD00] hover:bg-yellow-300 transition-colors px-3 py-1.5 text-sm font-bold text-[#000000]"
+          >
+            <span>☕</span>
+            <span>Buy me a coffee</span>
+          </a>
           <Button
             asChild
             size="sm"

@@ -35,7 +35,16 @@ export function Footer() {
                 Olu A (@Dunsinagb)
               </a>
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <a
+              href="https://www.buymeacoffee.com/dunsinagb"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#FFDD00] hover:bg-yellow-300 transition-colors px-3 py-1.5 text-xs font-bold text-black"
+            >
+              <span>☕</span>
+              <span>Buy me a coffee</span>
+            </a>
+            <p className="mt-3 text-xs text-muted-foreground">
               Data coverage is based on public reporting and user submissions. Not guaranteed to be exhaustive.
             </p>
           </div>
