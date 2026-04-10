@@ -80,7 +80,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Strip */}
-      <div className="container mx-auto max-w-7xl px-4 -mt-6 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Actions Logged"
