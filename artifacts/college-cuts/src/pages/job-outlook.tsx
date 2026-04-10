@@ -117,27 +117,29 @@ export default function JobOutlookPage() {
   const educationLevels = [...new Set(jobs.map(j => j.entry_education).filter(Boolean))] as string[];
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-      <div className="space-y-3">
-        <h1 className="text-4xl font-extrabold tracking-tight text-primary">Job Outlook</h1>
-        <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-          Search any academic major to see what career paths open up — and what happens to job prospects when those programs get cut.
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#f0f4f9]">
+      {/* Navy header */}
+      <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
+        <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="space-y-2 mb-8">
+            <h1 className="text-4xl font-extrabold tracking-tight text-white">Job Outlook</h1>
+            <p className="text-lg text-blue-200 max-w-2xl">
+              Search any academic major to see what career paths open up — and what happens to job prospects when those programs get cut.
+            </p>
+          </div>
 
-      <Card className="shadow-md">
-        <CardContent className="p-6">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-5">
           <form onSubmit={handleSearch} className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
               <Input
                 placeholder="Search by major (e.g. Computer Science, Nursing, Art)"
                 value={majorInput}
                 onChange={(e) => setMajorInput(e.target.value)}
-                className="pl-9 h-12"
+                className="pl-9 h-12 bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30"
               />
             </div>
-            <Button type="submit" className="h-12 px-8" disabled={isLoading}>
+            <Button type="submit" className="h-12 px-8 bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold" disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
             </Button>
           </form>
@@ -148,16 +150,19 @@ export default function JobOutlookPage() {
                 onClick={() => { setMajorInput(m); setSearchMajor(m); }}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                   searchMajor === m
-                    ? "bg-primary text-white border-primary"
-                    : "bg-white text-muted-foreground border-border hover:border-primary hover:text-primary"
+                    ? "bg-amber-500 text-white border-amber-500"
+                    : "bg-white/10 text-blue-100 border-white/20 hover:bg-white/20 hover:text-white"
                 }`}
               >
                 {m}
               </button>
             ))}
           </div>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
 
       {isError && (
         <div className="flex items-center gap-2 text-destructive bg-red-50 rounded-lg px-4 py-3">
@@ -307,6 +312,7 @@ export default function JobOutlookPage() {
           <p className="text-sm mt-1">Try a different major or check that the database is configured.</p>
         </div>
       )}
+      </div>
     </div>
   );
 }

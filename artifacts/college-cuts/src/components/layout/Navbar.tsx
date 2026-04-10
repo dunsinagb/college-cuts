@@ -14,12 +14,12 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full shadow-md" style={{ background: "#1e3a5f" }}>
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="flex items-center gap-2">
-            <GraduationCap className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block text-xl tracking-tight">
+            <GraduationCap className="h-6 w-6 text-amber-400" />
+            <span className="hidden font-bold sm:inline-block text-xl tracking-tight text-white">
               CollegeCuts
             </span>
           </Link>
@@ -28,8 +28,10 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  location === link.href ? "text-primary" : "text-muted-foreground"
+                className={`text-sm font-medium transition-colors ${
+                  location === link.href
+                    ? "text-amber-400"
+                    : "text-blue-200 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -38,10 +40,13 @@ export function Navbar() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Button asChild variant="default" size="sm" className="hidden sm:flex">
+          <Button
+            asChild
+            size="sm"
+            className="hidden sm:flex bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold"
+          >
             <Link href="/submit-tip">Submit a Tip</Link>
           </Button>
-          {/* Mobile menu could be added here */}
         </div>
       </div>
     </header>

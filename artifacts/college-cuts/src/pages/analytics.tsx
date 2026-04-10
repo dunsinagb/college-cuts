@@ -169,25 +169,25 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc]">
+    <div className="min-h-screen bg-[#f0f4f9]">
       {/* ── hero header ── */}
-      <div className="bg-white border-b border-border">
+      <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
         <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <SectionBadge label="Live Data Dashboard" />
-              <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#1e3a5f]">
+              <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-white">
                 Analytics Overview
               </h1>
-              <p className="mt-2 text-muted-foreground max-w-xl">
+              <p className="mt-2 text-blue-200 max-w-xl">
                 Comprehensive intelligence on higher education cuts, closures, and workforce impacts across US institutions — updated in real time.
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-blue-300">
                 Updated {format(lastUpdated, "h:mm:ss aa")}
               </span>
-              <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-2">
+              <Button variant="outline" size="sm" onClick={handleRefresh} className="gap-2 border-white/30 text-white hover:bg-white/10 bg-transparent">
                 <RefreshCw className="h-3.5 w-3.5" />
                 Refresh
               </Button>
@@ -197,16 +197,16 @@ export default function Analytics() {
           {/* ── KPI strip ── */}
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {kpis.map((k) => (
-              <div key={k.label} className="bg-[#f8f9fc] rounded-xl p-4 border border-border/60">
+              <div key={k.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className={`${k.color} mb-2`}>{k.icon}</div>
                 {loadSummary ? (
-                  <Skeleton className="h-7 w-16 mb-1" />
+                  <Skeleton className="h-7 w-16 mb-1 bg-white/20" />
                 ) : (
-                  <div className="text-2xl font-bold text-[#1e3a5f]">
+                  <div className="text-2xl font-bold text-white">
                     {k.value !== undefined ? Number(k.value).toLocaleString() : "—"}
                   </div>
                 )}
-                <div className="text-xs text-muted-foreground font-medium mt-0.5">{k.label}</div>
+                <div className="text-xs text-blue-200 font-medium mt-0.5">{k.label}</div>
               </div>
             ))}
           </div>

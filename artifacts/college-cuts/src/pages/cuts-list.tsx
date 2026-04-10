@@ -147,25 +147,25 @@ export default function CutsList() {
   const total = reason ? shown : (data?.total ?? 0);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc]">
-      <div className="bg-white border-b border-border">
-        <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f0f4f9]">
+      <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
+        <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-[#1e3a5f]">All Actions Database</h1>
-              <p className="mt-1 text-muted-foreground">
+              <h1 className="text-3xl font-extrabold tracking-tight text-white">All Actions Database</h1>
+              <p className="mt-1 text-blue-200">
                 Complete, searchable index of reported program cuts, closures, and layoffs.
               </p>
             </div>
-            <Button variant="outline" size="sm" className="gap-2 shrink-0 mt-1">
+            <Button variant="outline" size="sm" className="gap-2 shrink-0 mt-1 border-white/30 text-white hover:bg-white/10 bg-transparent">
               <Download className="h-3.5 w-3.5" />
               Export ({total})
             </Button>
           </div>
 
           {/* ── filter bar ── */}
-          <div className="mt-5 bg-[#f8f9fc] border border-border rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#1e3a5f]">
+          <div className="mt-5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-white">
               <SlidersHorizontal className="h-4 w-4" />
               Advanced Filters
               {activeFilters > 0 && (
@@ -237,13 +237,13 @@ export default function CutsList() {
             </div>
 
             {/* result count */}
-            <div className="text-sm text-muted-foreground pt-1 border-t border-border/60">
+            <div className="text-sm text-blue-200 pt-1 border-t border-white/20">
               {isLoading ? (
-                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-4 w-40 bg-white/20" />
               ) : (
                 <span>
-                  Showing <span className="font-semibold text-[#1e3a5f]">{shown}</span> of{" "}
-                  <span className="font-semibold text-[#1e3a5f]">{total}</span> total cuts
+                  Showing <span className="font-semibold text-white">{shown}</span> of{" "}
+                  <span className="font-semibold text-white">{total}</span> total cuts
                 </span>
               )}
             </div>
