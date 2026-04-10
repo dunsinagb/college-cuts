@@ -22,7 +22,7 @@ import {
   Area,
   AreaChart
 } from "recharts";
-import { ArrowRight, AlertTriangle, Users, GraduationCap, MapPin, Lock, BarChart3, Briefcase } from "lucide-react";
+import { ArrowRight, AlertTriangle, Users, GraduationCap, MapPin, Lock, BarChart3, Briefcase, Calendar, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function isSubscribed() {
@@ -66,6 +66,16 @@ export default function Dashboard() {
             <p className="text-lg text-blue-200 leading-relaxed max-w-2xl">
               A civic data project monitoring program closures, department suspensions, and faculty layoffs across US colleges and universities.
             </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <span className="inline-flex items-center gap-1.5 text-xs text-blue-200 bg-white/10 border border-white/15 rounded-full px-3 py-1.5">
+                <Calendar className="h-3.5 w-3.5 text-amber-400" />
+                Tracking actions since <strong className="text-white">2024</strong>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-blue-200 bg-white/10 border border-white/15 rounded-full px-3 py-1.5">
+                <RefreshCw className="h-3.5 w-3.5 text-amber-400" />
+                Updated monthly — March data added in April, etc.
+              </span>
+            </div>
             {!subscribed && (
               <Button
                 asChild
