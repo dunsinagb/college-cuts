@@ -118,9 +118,9 @@ export default function Dashboard() {
       <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title="Institutions Impacted"
+            title="Total Actions"
             value={summary?.totalCuts}
-            subtitle="higher education institutions since 2024"
+            subtitle="higher education actions recorded since 2024"
             icon={<AlertTriangle className="h-5 w-5" />}
             iconBg="bg-[#9b1c2e]"
             isLoading={isLoadingSummary}
