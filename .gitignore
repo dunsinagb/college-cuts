@@ -48,5 +48,6 @@ Thumbs.db
 .cache/
 .local/
 
-# Auto-generated
+# Auto-generated / local only
 screenshots/
+attached_assets/
