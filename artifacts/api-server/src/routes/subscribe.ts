@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, subscribersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { supabase } from "../lib/supabase";
 import { Resend } from "resend";
 
 const router: IRouter = Router();
@@ -13,23 +12,32 @@ router.post("/subscribe", async (req, res): Promise<void> => {
     return;
   }
 
-  const existing = await db
-    .select()
-    .from(subscribersTable)
-    .where(eq(subscribersTable.email, email))
+  // Check if already subscribed
+  const { data: existing } = await supabase
+    .from("subscribers")
+    .select("id")
+    .eq("email", email)
     .limit(1);
 
-  const isNew = existing.length === 0;
+  const isNew = !existing || existing.length === 0;
 
   if (isNew) {
-    await db.insert(subscribersTable).values({ email });
+    const { error } = await supabase
+      .from("subscribers")
+      .insert({ email });
+
+    if (error) {
+      console.error("[subscribe] Supabase insert error:", error.message);
+      res.status(500).json({ error: "Failed to save subscription." });
+      return;
+    }
   }
 
   if (isNew && process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       await resend.emails.send({
-        from: "CollegeCuts <onboarding@resend.dev>",
+        from: "CollegeCuts <hello@college-cuts.com>",
         to: [email],
         subject: "Welcome to CollegeCuts Tracker!",
         html: `

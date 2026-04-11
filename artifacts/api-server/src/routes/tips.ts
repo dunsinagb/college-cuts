@@ -69,7 +69,7 @@ router.post("/tips", async (req, res): Promise<void> => {
 
       emails.push(
         resend.emails.send({
-          from: "CollegeCuts <onboarding@resend.dev>",
+          from: "CollegeCuts <hello@college-cuts.com>",
           to: [ADMIN_EMAIL],
           subject: `New Tip: ${safeInstitution} (${safeState})`,
           html: `
@@ -88,7 +88,7 @@ router.post("/tips", async (req, res): Promise<void> => {
       if (tip.submitterEmail) {
         emails.push(
           resend.emails.send({
-            from: "CollegeCuts <onboarding@resend.dev>",
+            from: "CollegeCuts <hello@college-cuts.com>",
             to: [tip.submitterEmail],
             subject: "We received your tip — thank you!",
             html: `
