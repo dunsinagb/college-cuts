@@ -1,0 +1,31 @@
+uploads = []
+
+[[generated]]
+id = "Et-LmRYzz0mZ8gJqTwNTc"
+uri = "file://screenshots/college-cuts-facebook-cover.png"
+type = "image"
+title = "CollegeCuts Facebook cover"
+
+[[generated]]
+id = "xi6RDO3Svfqg8ql5HhE6D"
+uri = "file://screenshots/college-cuts-linkedin-banner.png"
+type = "image"
+title = "CollegeCuts LinkedIn banner"
+
+[[outputs]]
+id = "lzcDp8xIYI5Y81f36lf35"
+uri = "file://screenshots/college-cuts-app-icon-512.png"
+type = "image"
+title = "App Icon — 512×512 PNG (profile photo for Facebook & LinkedIn)"
+
+[[outputs]]
+id = "ENP-NJMn89Eg2TWKM28uj"
+uri = "file://screenshots/college-cuts-facebook-cover.png"
+type = "image"
+title = "Facebook Cover Photo"
+
+[[outputs]]
+id = "bBB8U61fKY8t_X7PeVoZY"
+uri = "file://screenshots/college-cuts-linkedin-banner.png"
+type = "image"
+title = "LinkedIn Company Banner"
