@@ -145,7 +145,7 @@ export default function Dashboard() {
                 <RefreshCw className="h-3.5 w-3.5 text-amber-400" />
                 Refreshed monthly · prior month's data published each cycle
               </span>
-              {!isLoadingTrend && currentMonthCount > 0 && (
+              {!isLoadingTrend && (
                 <span className="inline-flex items-center gap-1.5 text-xs bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1.5">
                   <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                   <span className="text-amber-300 font-semibold">{currentMonthLabel}:</span>
