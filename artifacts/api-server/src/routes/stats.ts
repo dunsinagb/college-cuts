@@ -228,36 +228,16 @@ router.get("/stats/by-status", async (_req, res): Promise<void> => {
 router.get("/stats/by-reason", async (_req, res): Promise<void> => {
   try {
     const rows = await fetchAllCuts();
-    const reasons: Record<string, number> = {
-      "Budget / Financial Deficit": 0,
-      "Enrollment Decline":         0,
-      "State Funding Cuts":         0,
-      "Strategic Restructuring":    0,
-      "Accreditation Issues":       0,
-      "Merger / Consolidation":     0,
-      "Compliance / Policy":        0,
-    };
+    const tally: Record<string, number> = {};
 
     for (const r of rows) {
-      const n = (r.notes ?? "").toLowerCase();
-      if (n.includes("budget") || n.includes("financial") || n.includes("deficit") || n.includes("fiscal"))
-        reasons["Budget / Financial Deficit"]++;
-      if (n.includes("enrollment") || n.includes("declining enroll") || n.includes("low enroll"))
-        reasons["Enrollment Decline"]++;
-      if (n.includes("state") && (n.includes("fund") || n.includes("cut") || n.includes("alloc")))
-        reasons["State Funding Cuts"]++;
-      if (n.includes("restructur") || n.includes("reorganiz") || n.includes("consolid") || n.includes("strategic"))
-        reasons["Strategic Restructuring"]++;
-      if (n.includes("accredit"))
-        reasons["Accreditation Issues"]++;
-      if (n.includes("merger") || n.includes("merge") || n.includes("acqui"))
-        reasons["Merger / Consolidation"]++;
-      if (n.includes("compliance") || n.includes("mandate") || n.includes("sb1") || n.includes("policy") || n.includes("regulation"))
-        reasons["Compliance / Policy"]++;
+      const reason = extractPrimaryReason(r.notes);
+      if (reason) {
+        tally[reason] = (tally[reason] ?? 0) + 1;
+      }
     }
 
-    const result = Object.entries(reasons)
-      .filter(([, v]) => v > 0)
+    const result = Object.entries(tally)
       .sort((a, b) => b[1] - a[1])
       .map(([reason, count]) => ({ reason, count }));
 

@@ -76,7 +76,7 @@ const TYPE_COLORS: Record<string, string> = {
 const CONTROL_COLORS = [NAVY, C_CRIMSON, AMBER, C_VIOLET, SLATE];
 
 const REASON_COLORS: Record<string, string> = {
-  "Budget / Financial Deficit": C_CRIMSON,
+  "Budget Deficit": C_CRIMSON,
   "Enrollment Decline":         C_SIENNA,
   "State Funding Cuts":         C_COBALT,
   "Strategic Restructuring":    C_TEAL,
