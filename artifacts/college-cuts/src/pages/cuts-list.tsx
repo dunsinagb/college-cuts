@@ -341,7 +341,7 @@ export default function CutsList() {
                         {cut.facultyAffected != null ? (
                           <div>
                             <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
-                            <span className="text-xs text-muted-foreground block">Staff</span>
+                            <span className="text-xs text-muted-foreground block">{cut.cutType === "staff_layoff" ? "Staff" : "Faculty"}</span>
                           </div>
                         ) : (
                           <span className="text-muted-foreground">—</span>
