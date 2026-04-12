@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { format, parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
@@ -48,16 +49,26 @@ export default function Dashboard() {
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
   const subscribed = isSubscribed();
 
-  // Always show the preceding calendar month — data for month N is published
-  // in the first week of month N+1, so the current month is never complete.
-  const prevMonthDate = new Date();
-  prevMonthDate.setDate(1);
-  prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
-  const prevMonth = prevMonthDate.toISOString().slice(0, 7); // "YYYY-MM"
-  const prevMonthLabel = prevMonthDate.toLocaleString("en-US", { month: "long", year: "numeric" });
-  const latestMonthEntry = monthlyTrend?.find(d => d.month === prevMonth) ?? null;
-  const latestMonthCount = latestMonthEntry?.count ?? 0;
-  const latestMonthStates = latestMonthEntry?.states ?? 0;
+  // Derive available years from monthlyTrend (earliest → latest)
+  const availableYears = useMemo(() => {
+    if (!monthlyTrend) return [String(new Date().getFullYear())];
+    const yrs = [...new Set(monthlyTrend.map(d => d.month.slice(0, 4)))].sort();
+    return yrs.length > 0 ? yrs : [String(new Date().getFullYear())];
+  }, [monthlyTrend]);
+
+  const [selectedYear, setSelectedYear] = useState<string>(String(new Date().getFullYear()));
+
+  const { data: yearlySummary, isLoading: isLoadingYearly } = useQuery<{
+    year: string; actions: number; institutions: number; states: number;
+    studentsAffected: number; facultyAffected: number;
+  }>({
+    queryKey: ["stats/yearly-summary", selectedYear],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/stats/yearly-summary?year=${selectedYear}`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -145,18 +156,51 @@ export default function Dashboard() {
             <p className="text-lg text-blue-200 leading-relaxed max-w-2xl">
               A civic data project monitoring program closures, department suspensions, and faculty layoffs across US colleges and universities.
             </p>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <span className="inline-flex items-center gap-1.5 text-xs text-blue-200 bg-white/10 border border-white/15 rounded-full px-3 py-1.5">
-                <RefreshCw className="h-3.5 w-3.5 text-amber-400" />
-                Refreshed monthly · prior month's data published each cycle
-              </span>
-              {!isLoadingTrend && (
-                <span className="inline-flex items-center gap-1.5 text-xs bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-amber-300 font-semibold">{prevMonthLabel}:</span>
-                  <span className="text-blue-100">{latestMonthCount} new action{latestMonthCount !== 1 ? "s" : ""} across {latestMonthStates} state{latestMonthStates !== 1 ? "s" : ""}</span>
-                </span>
+            {/* ── Yearly insight bar — layoffs.fyi style ── */}
+            <div className="pt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+              {isLoadingYearly ? (
+                <div className="h-8 w-72 bg-white/10 animate-pulse rounded" />
+              ) : (
+                <>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-black text-amber-400 tabular-nums">
+                      {yearlySummary?.actions?.toLocaleString() ?? "—"}
+                    </span>
+                    <span className="text-sm text-blue-200">actions recorded</span>
+                  </span>
+                  <span className="text-blue-400/50 text-lg font-light">·</span>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-black text-amber-400 tabular-nums">
+                      {yearlySummary?.institutions?.toLocaleString() ?? "—"}
+                    </span>
+                    <span className="text-sm text-blue-200">institutions affected</span>
+                  </span>
+                  <span className="text-blue-400/50 text-lg font-light">·</span>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-black text-amber-400 tabular-nums">
+                      {yearlySummary?.states ?? "—"}
+                    </span>
+                    <span className="text-sm text-blue-200">states</span>
+                  </span>
+                  <span className="text-blue-400/50 text-lg font-light">·</span>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="bg-white/10 hover:bg-white/15 border border-white/25 rounded-lg text-white text-sm font-semibold px-3 py-1.5 cursor-pointer outline-none transition-colors appearance-none pr-7 relative"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center" }}
+                  >
+                    {availableYears.map(y => (
+                      <option key={y} value={y} className="bg-[#1e3a5f] text-white">In {y}</option>
+                    ))}
+                  </select>
+                </>
               )}
+            </div>
+            <div className="pt-1">
+              <span className="inline-flex items-center gap-1.5 text-xs text-blue-300/70">
+                <RefreshCw className="h-3 w-3 text-amber-400/70" />
+                Updated monthly · prior month&apos;s data published each cycle
+              </span>
             </div>
             {!subscribed && (
               <Button

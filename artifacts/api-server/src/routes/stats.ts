@@ -247,6 +247,22 @@ router.get("/stats/by-reason", async (_req, res): Promise<void> => {
   }
 });
 
+router.get("/stats/yearly-summary", async (req, res): Promise<void> => {
+  try {
+    const year = String(req.query.year ?? new Date().getFullYear());
+    const rows = await fetchAllCuts();
+    const filtered = rows.filter(r => r.announcement_date?.startsWith(year));
+    const institutions = new Set(filtered.map(r => r.institution)).size;
+    const states       = new Set(filtered.map(r => r.state)).size;
+    const actions      = filtered.length;
+    const studentsAffected = filtered.reduce((s, r) => s + (r.students_affected ?? 0), 0);
+    const facultyAffected  = filtered.reduce((s, r) => s + (r.faculty_affected  ?? 0), 0);
+    res.json({ year, actions, institutions, states, studentsAffected, facultyAffected });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/stats/recent", async (_req, res): Promise<void> => {
   try {
     const { data, error } = await supabase
