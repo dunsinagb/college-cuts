@@ -12,7 +12,6 @@ import {
   ArrowLeft, Building2, MapPin, Users, GraduationCap,
   Link2, Check, ExternalLink, Calendar
 } from "lucide-react";
-import { slugify } from "@/lib/slugify";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -52,18 +51,6 @@ const CUT_TYPE_LABELS: Record<string, string> = {
   campus_closure:       "Campus Closure",
   institution_closure:  "Institution Closure",
 };
-
-function StatPill({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="text-amber-500">{icon}</div>
-      <div>
-        <span className="text-2xl font-black text-[#1e3a5f] tabular-nums">{value.toLocaleString()}</span>
-        <span className="ml-1.5 text-sm text-slate-500">{label}</span>
-      </div>
-    </div>
-  );
-}
 
 export default function InstitutionPage() {
   const params = useParams<{ slug: string }>();
