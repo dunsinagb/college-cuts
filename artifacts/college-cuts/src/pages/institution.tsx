@@ -56,6 +56,7 @@ export default function InstitutionPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug ?? "";
   const [copied, setCopied] = useState(false);
+  const [linkedInCopied, setLinkedInCopied] = useState(false);
 
   const { data, isLoading, error } = useQuery<InstitutionData>({
     queryKey: ["institution", slug],
@@ -94,11 +95,14 @@ export default function InstitutionPage() {
   }
 
   function shareLinkedIn() {
+    const n = data?.stats.actions ?? 0;
+    const shareText = `${pageName} has ${n} recorded higher-ed action${n !== 1 ? "s" : ""} (program cuts, closures & layoffs) — tracked by College Cuts Tracker.\n\n${pageUrl}`;
+    navigator.clipboard.writeText(shareText).catch(() => {});
+    setLinkedInCopied(true);
+    setTimeout(() => setLinkedInCopied(false), 3500);
     const url = encodeURIComponent(pageUrl);
-    const title = encodeURIComponent(`${pageName} — CollegeCuts`);
-    const summary = encodeURIComponent("Program cuts, closures, and layoffs tracked by CollegeCuts, a civic higher-education data project.");
     window.open(
-      `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${summary}`,
+      `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
       "linkedin-share",
       "noopener,noreferrer,width=600,height=600,scrollbars=yes"
     );
@@ -237,15 +241,22 @@ export default function InstitutionPage() {
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.261 5.636 5.903-5.636zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </button>
-              <button
-                onClick={shareLinkedIn}
-                className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/25 text-white hover:bg-white/10 transition-colors"
-                title="Share on LinkedIn"
-              >
-                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current text-[#a8c4e5]" aria-hidden="true">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                </svg>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={shareLinkedIn}
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/25 text-white hover:bg-white/10 transition-colors"
+                  title="Share on LinkedIn"
+                >
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current text-[#a8c4e5]" aria-hidden="true">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                </button>
+                {linkedInCopied && (
+                  <div className="absolute bottom-full right-0 mb-2 w-44 rounded-md bg-white text-[#1e3a5f] text-xs px-2.5 py-1.5 shadow-lg pointer-events-none z-10 text-center leading-snug font-medium">
+                    Caption copied!<br />Paste it in LinkedIn ⌘V
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
