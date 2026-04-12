@@ -122,11 +122,35 @@ export default function CutDetail() {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={`https://college-cuts.com/cuts/${id}`} />
+        <link rel="canonical" href={institutionUrl} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={`https://college-cuts.com/cuts/${id}`} />
+        <meta property="og:url" content={institutionUrl} />
         <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://college-cuts.com/opengraph.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content="https://college-cuts.com/opengraph.jpg" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": pageTitle,
+          "description": pageDescription,
+          "url": institutionUrl,
+          "datePublished": cut.announcementDate ?? undefined,
+          "publisher": {
+            "@type": "Organization",
+            "name": "CollegeCuts Tracker",
+            "url": "https://college-cuts.com",
+            "logo": { "@type": "ImageObject", "url": "https://college-cuts.com/favicon-512.png" }
+          },
+          "about": {
+            "@type": "Organization",
+            "name": cut.institution,
+            "address": { "@type": "PostalAddress", "addressRegion": cut.state }
+          },
+        })}</script>
       </Helmet>
 
       {!subscribed && (

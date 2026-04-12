@@ -16,6 +16,7 @@ import Subscribe from "@/pages/subscribe";
 import JobOutlook from "@/pages/job-outlook";
 import News from "@/pages/news";
 import InstitutionPage from "@/pages/institution";
+import EmbedWidget from "@/pages/embed";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,21 +46,30 @@ function GatedPage({ path, component: Component }: { path: string; component: Re
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/">{() => <Dashboard />}</Route>
-        <Route path="/cuts">{() => <GatedPage path="/cuts" component={CutsList} />}</Route>
-        <Route path="/cuts/:id">{() => <CutDetail />}</Route>
-        <Route path="/institution/:slug">{() => <InstitutionPage />}</Route>
-        <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
-        <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
-        <Route path="/news">{() => <News />}</Route>
-        <Route path="/subscribe">{() => <Subscribe />}</Route>
-        <Route path="/submit-tip">{() => <SubmitTip />}</Route>
-        <Route path="/about">{() => <About />}</Route>
-        <Route>{() => <NotFound />}</Route>
-      </Switch>
-    </Layout>
+    <Switch>
+      <Route path="/embed/:slug">{() => (
+        <div className="p-3">
+          <EmbedWidget />
+        </div>
+      )}</Route>
+      <Route>{() => (
+        <Layout>
+          <Switch>
+            <Route path="/">{() => <Dashboard />}</Route>
+            <Route path="/cuts">{() => <GatedPage path="/cuts" component={CutsList} />}</Route>
+            <Route path="/cuts/:id">{() => <CutDetail />}</Route>
+            <Route path="/institution/:slug">{() => <InstitutionPage />}</Route>
+            <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
+            <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
+            <Route path="/news">{() => <News />}</Route>
+            <Route path="/subscribe">{() => <Subscribe />}</Route>
+            <Route path="/submit-tip">{() => <SubmitTip />}</Route>
+            <Route path="/about">{() => <About />}</Route>
+            <Route>{() => <NotFound />}</Route>
+          </Switch>
+        </Layout>
+      )}</Route>
+    </Switch>
   );
 }
 

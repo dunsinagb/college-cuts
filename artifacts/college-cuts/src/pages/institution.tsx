@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import {
   ArrowLeft, Building2, MapPin, Users, GraduationCap,
-  Link2, Check, ExternalLink, Calendar
+  Link2, Check, ExternalLink, Calendar, Bell
 } from "lucide-react";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -57,6 +57,9 @@ export default function InstitutionPage() {
   const slug = params.slug ?? "";
   const [copied, setCopied] = useState(false);
   const [linkedInCopied, setLinkedInCopied] = useState(false);
+  const [showAlertForm, setShowAlertForm] = useState(false);
+  const [alertEmail, setAlertEmail] = useState("");
+  const [alertStatus, setAlertStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
 
   const { data, isLoading, error } = useQuery<InstitutionData>({
     queryKey: ["institution", slug],
@@ -92,6 +95,28 @@ export default function InstitutionPage() {
     );
     const url = encodeURIComponent(pageUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener,noreferrer,width=550,height=450");
+  }
+
+  async function handleAlertSubscribe(e: React.FormEvent) {
+    e.preventDefault();
+    if (!alertEmail || !data) return;
+    setAlertStatus("loading");
+    try {
+      const r = await fetch(`${BASE_URL}/api/alert-subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: alertEmail,
+          institution_slug: slug,
+          institution_name: data.institution,
+          state: data.stats.state,
+        }),
+      });
+      if (!r.ok) throw new Error("failed");
+      setAlertStatus("success");
+    } catch {
+      setAlertStatus("error");
+    }
   }
 
   function shareLinkedIn() {
@@ -152,10 +177,31 @@ export default function InstitutionPage() {
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDesc} />
         <meta property="og:url" content={pageUrl} />
-        <meta property="og:type" content="profile" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://college-cuts.com/opengraph.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDesc} />
+        <meta name="twitter:image" content="https://college-cuts.com/opengraph.jpg" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Dataset",
+          "name": `${data.institution} — Higher Education Cuts & Closures`,
+          "description": pageDesc,
+          "url": pageUrl,
+          "publisher": {
+            "@type": "Organization",
+            "name": "CollegeCuts Tracker",
+            "url": "https://college-cuts.com"
+          },
+          "spatialCoverage": data.stats.state,
+          "temporalCoverage": "2023/..",
+          "variableMeasured": [
+            { "@type": "PropertyValue", "name": "Recorded Actions", "value": data.stats.actions },
+            ...(data.stats.studentsAffected > 0 ? [{ "@type": "PropertyValue", "name": "Students Affected", "value": data.stats.studentsAffected }] : []),
+            ...(data.stats.facultyAffected > 0 ? [{ "@type": "PropertyValue", "name": "Faculty/Staff Affected", "value": data.stats.facultyAffected }] : []),
+          ],
+        })}</script>
       </Helmet>
 
       <div className="min-h-screen bg-[#f0f4f9]">
@@ -257,6 +303,47 @@ export default function InstitutionPage() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Alert Me */}
+            <div className="mt-4 pt-4 border-t border-white/15">
+              {!showAlertForm ? (
+                <button
+                  onClick={() => setShowAlertForm(true)}
+                  className="inline-flex items-center gap-1.5 text-xs text-blue-200 hover:text-amber-400 transition-colors font-medium"
+                >
+                  <Bell className="h-3.5 w-3.5" />
+                  Alert me when new data is added for this institution
+                </button>
+              ) : alertStatus === "success" ? (
+                <div className="flex items-center gap-2 text-sm text-green-300">
+                  <Check className="h-4 w-4" />
+                  You'll be emailed when new data is added for {data.institution}.
+                </div>
+              ) : (
+                <form onSubmit={handleAlertSubscribe} className="flex items-center gap-2 flex-wrap">
+                  <Bell className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="your@email.com"
+                    value={alertEmail}
+                    onChange={e => setAlertEmail(e.target.value)}
+                    className="h-8 rounded-md bg-white/10 border border-white/20 text-white placeholder:text-blue-300 text-sm px-3 focus:outline-none focus:border-amber-400 w-48"
+                  />
+                  <button
+                    type="submit"
+                    disabled={alertStatus === "loading"}
+                    className="h-8 px-3 rounded-md bg-amber-500 hover:bg-amber-400 text-[#1e3a5f] text-xs font-bold transition-colors disabled:opacity-60"
+                  >
+                    {alertStatus === "loading" ? "Saving…" : "Alert me"}
+                  </button>
+                  <button type="button" onClick={() => setShowAlertForm(false)} className="text-blue-300 hover:text-white text-xs">
+                    Cancel
+                  </button>
+                  {alertStatus === "error" && <span className="text-red-300 text-xs">Something went wrong. Try again.</span>}
+                </form>
+              )}
             </div>
           </div>
         </div>

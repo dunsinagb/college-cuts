@@ -8,6 +8,8 @@ import jobOutlookRouter from "./job-outlook";
 import newsRouter from "./news";
 import rssRouter from "./rss";
 import sitemapRouter from "./sitemap";
+import digestRouter from "./digest";
+import alertsRouter from "./alerts";
 
 const router: IRouter = Router();
 
@@ -20,5 +22,7 @@ router.use(jobOutlookRouter);
 router.use(newsRouter);
 router.use(rssRouter);
 router.use(sitemapRouter);
+router.use(digestRouter);
+router.use(alertsRouter);
 
 export default router;
