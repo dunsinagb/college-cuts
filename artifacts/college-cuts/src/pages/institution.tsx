@@ -87,7 +87,7 @@ export default function InstitutionPage() {
 
   function shareTwitter() {
     const text = encodeURIComponent(
-      `${pageName} has ${data?.stats.actions} recorded higher-ed action${(data?.stats.actions ?? 0) !== 1 ? "s" : ""} (program cuts, closures & layoffs) tracked on @collegecutscom`
+      `${pageName} has ${data?.stats.actions} recorded higher-ed action${(data?.stats.actions ?? 0) !== 1 ? "s" : ""} (program cuts, closures & layoffs) tracked on College Cuts Tracker`
     );
     const url = encodeURIComponent(pageUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener,noreferrer,width=550,height=450");

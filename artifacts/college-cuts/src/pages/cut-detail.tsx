@@ -52,7 +52,7 @@ export default function CutDetail() {
 
   function handleShareTwitter() {
     const text = encodeURIComponent(
-      `${cut?.institution ?? "This institution"} has recorded program cuts, closures, or layoffs — tracked on @collegecutscom`
+      `${cut?.institution ?? "This institution"} has recorded program cuts, closures, or layoffs — tracked on College Cuts Tracker`
     );
     const url = encodeURIComponent(institutionUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener,noreferrer,width=550,height=450");
