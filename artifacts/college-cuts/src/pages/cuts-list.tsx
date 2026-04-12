@@ -329,10 +329,7 @@ export default function CutsList() {
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
                         {cut.studentsAffected != null ? (
-                          <div>
-                            <span className="font-medium">{cut.studentsAffected.toLocaleString()}</span>
-                            <span className="text-xs text-muted-foreground block">Students</span>
-                          </div>
+                          <span className="font-medium">{cut.studentsAffected.toLocaleString()}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
