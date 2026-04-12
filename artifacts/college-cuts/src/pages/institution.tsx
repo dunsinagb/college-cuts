@@ -95,7 +95,13 @@ export default function InstitutionPage() {
 
   function shareLinkedIn() {
     const url = encodeURIComponent(pageUrl);
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank", "noopener,noreferrer,width=600,height=500");
+    const title = encodeURIComponent(`${pageName} — CollegeCuts`);
+    const summary = encodeURIComponent("Program cuts, closures, and layoffs tracked by CollegeCuts, a civic higher-education data project.");
+    window.open(
+      `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${summary}`,
+      "linkedin-share",
+      "noopener,noreferrer,width=600,height=600,scrollbars=yes"
+    );
   }
 
   if (isLoading) {
