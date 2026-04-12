@@ -1,9 +1,9 @@
 import { Link } from "wouter";
 import { format, parseISO } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import {
   useGetStatsSummary,
-  useGetMonthlyTrend,
   useGetStatsByType,
   useGetRecentCuts
 } from "@workspace/api-client-react";
@@ -36,14 +36,23 @@ function isSubscribed() {
 
 export default function Dashboard() {
   const { data: summary, isLoading: isLoadingSummary } = useGetStatsSummary();
-  const { data: monthlyTrend, isLoading: isLoadingTrend } = useGetMonthlyTrend();
+  const { data: monthlyTrend, isLoading: isLoadingTrend } = useQuery<{ month: string; count: number; states: number }[]>({
+    queryKey: ["stats/monthly-trend"],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/stats/monthly-trend`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
   const { data: statsByType, isLoading: isLoadingType } = useGetStatsByType();
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
   const subscribed = isSubscribed();
 
   const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
   const currentMonthLabel = new Date().toLocaleString("en-US", { month: "long", year: "numeric" });
-  const currentMonthCount = monthlyTrend?.find(d => d.month === currentMonth)?.count ?? 0;
+  const currentMonthEntry = monthlyTrend?.find(d => d.month === currentMonth);
+  const currentMonthCount = currentMonthEntry?.count ?? 0;
+  const currentMonthStates = currentMonthEntry?.states ?? 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -140,7 +149,7 @@ export default function Dashboard() {
                 <span className="inline-flex items-center gap-1.5 text-xs bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1.5">
                   <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                   <span className="text-amber-300 font-semibold">{currentMonthLabel}:</span>
-                  <span className="text-blue-100">{currentMonthCount} new action{currentMonthCount !== 1 ? "s" : ""} recorded</span>
+                  <span className="text-blue-100">{currentMonthCount} new action{currentMonthCount !== 1 ? "s" : ""} across {currentMonthStates} state{currentMonthStates !== 1 ? "s" : ""}</span>
                 </span>
               )}
             </div>

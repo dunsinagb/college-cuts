@@ -104,15 +104,20 @@ router.get("/stats/by-type", async (_req, res): Promise<void> => {
 router.get("/stats/monthly-trend", async (_req, res): Promise<void> => {
   try {
     const rows = await fetchAllCuts();
-    const map: Record<string, number> = {};
+    const countMap: Record<string, number> = {};
+    const statesMap: Record<string, Set<string>> = {};
     for (const r of rows) {
       const month = r.announcement_date?.slice(0, 7); // "YYYY-MM"
-      if (month) map[month] = (map[month] ?? 0) + 1;
+      if (month) {
+        countMap[month] = (countMap[month] ?? 0) + 1;
+        if (!statesMap[month]) statesMap[month] = new Set();
+        statesMap[month].add(r.state);
+      }
     }
-    const result = Object.entries(map)
+    const result = Object.entries(countMap)
       .filter(([month]) => month >= "2024-01")
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([month, count]) => ({ month, count }));
+      .map(([month, count]) => ({ month, count, states: statesMap[month]?.size ?? 0 }));
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
