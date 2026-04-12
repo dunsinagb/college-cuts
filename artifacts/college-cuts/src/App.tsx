@@ -15,6 +15,7 @@ import About from "@/pages/about";
 import Subscribe from "@/pages/subscribe";
 import JobOutlook from "@/pages/job-outlook";
 import News from "@/pages/news";
+import InstitutionPage from "@/pages/institution";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,7 @@ function Router() {
         <Route path="/">{() => <Dashboard />}</Route>
         <Route path="/cuts">{() => <GatedPage path="/cuts" component={CutsList} />}</Route>
         <Route path="/cuts/:id">{() => <CutDetail />}</Route>
+        <Route path="/institution/:slug">{() => <InstitutionPage />}</Route>
         <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
         <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
         <Route path="/news">{() => <News />}</Route>

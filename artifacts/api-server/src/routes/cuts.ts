@@ -107,6 +107,53 @@ router.get("/cuts", async (req, res): Promise<void> => {
   });
 });
 
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[''`]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+router.get("/institution/:slug", async (req, res): Promise<void> => {
+  const { slug } = req.params;
+
+  const { data, error } = await supabase
+    .from("v_latest_cuts")
+    .select("*")
+    .order("announcement_date", { ascending: false });
+
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+
+  const allCuts = (data ?? []) as SupabaseCut[];
+  const matched = allCuts.find(c => slugify(c.institution) === slug);
+
+  if (!matched) {
+    res.status(404).json({ error: "Institution not found" });
+    return;
+  }
+
+  const institutionName = matched.institution;
+  const institutionCuts = allCuts.filter(c => c.institution === institutionName);
+
+  const stats = {
+    actions:          institutionCuts.length,
+    studentsAffected: institutionCuts.reduce((s, c) => s + (c.students_affected ?? 0), 0),
+    facultyAffected:  institutionCuts.reduce((s, c) => s + (c.faculty_affected  ?? 0), 0),
+    state:            matched.state,
+  };
+
+  res.json({
+    institution: institutionName,
+    slug,
+    stats,
+    cuts: institutionCuts.map(formatCut),
+  });
+});
+
 router.get("/cuts/:id", async (req, res): Promise<void> => {
   const params = GetCutParams.safeParse(req.params);
   if (!params.success) {
