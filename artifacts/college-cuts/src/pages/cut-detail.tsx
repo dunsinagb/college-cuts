@@ -37,7 +37,7 @@ export default function CutDetail() {
   const cutTypeLabel = cut?.cutType ? (CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ")) : "";
 
   const pageTitle = cut
-    ? `${cut.institution}${cut.programName ? ` — ${cut.programName}` : ""} | CollegeCuts`
+    ? `${cut.institution}${cut.programName ? ` — ${cut.programName}` : ""} (${cutTypeLabel}) | CollegeCuts`
     : "Higher Education Action | CollegeCuts";
 
   const pageDescription = cut
