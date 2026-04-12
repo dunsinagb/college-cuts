@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Database, ShieldAlert, GraduationCap, ArrowRight } from "lucide-react";
+import { Database, ShieldAlert, GraduationCap, ArrowRight, Mail } from "lucide-react";
 
 export default function About() {
   return (
@@ -113,6 +113,40 @@ export default function About() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+      </section>
+
+      {/* Creator */}
+      <section className="space-y-6" id="creator">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">Creator</h2>
+          <p className="text-muted-foreground">The person behind the data.</p>
+        </div>
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className="flex-1 space-y-4">
+                <div>
+                  <h3 className="text-xl font-bold text-primary">Oluwadunsin Agbolabori</h3>
+                  <p className="text-sm text-muted-foreground font-medium">Data Analyst & Independent Builder</p>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Oluwadunsin Agbolabori is a data analyst and independent builder focused on tracking and interpreting structural changes in U.S. higher education. He created CollegeCuts to systematically document program closures, layoffs, and institutional shifts, turning fragmented reporting into a clear, structured record of what's changing across colleges and universities. His work aims to provide journalists, researchers, and higher ed professionals with a reliable, data-driven view of emerging trends.
+                </p>
+                <div className="pt-2">
+                  <p className="text-sm font-semibold text-foreground mb-1">Contact</p>
+                  <p className="text-sm text-muted-foreground mb-3">For media inquiries, tips, corrections, or collaboration:</p>
+                  <a
+                    href="mailto:agbolaboridunsin@gmail.com"
+                    className="inline-flex items-center gap-2 text-primary font-semibold hover:underline text-sm"
+                  >
+                    <Mail className="h-4 w-4" />
+                    agbolaboridunsin@gmail.com
+                  </a>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {/* CTA */}

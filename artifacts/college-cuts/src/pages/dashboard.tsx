@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { format, parseISO } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import {
   useGetStatsSummary,
@@ -25,24 +24,11 @@ import {
   Area,
   AreaChart
 } from "recharts";
-import { ArrowRight, AlertTriangle, GraduationCap, MapPin, Lock, BarChart3, Briefcase, RefreshCw } from "lucide-react";
+import { ArrowRight, AlertTriangle, GraduationCap, MapPin, Lock, BarChart3, Briefcase, RefreshCw, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
-const STATE_NAMES: Record<string, string> = {
-  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",
-  CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",
-  HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",
-  KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",
-  MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",
-  MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",
-  NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",
-  OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",
-  SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",
-  VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",
-  DC:"Washington D.C.",
-};
 
 function isSubscribed() {
   return localStorage.getItem("cc_subscribed") === "1";
@@ -53,19 +39,11 @@ export default function Dashboard() {
   const { data: monthlyTrend, isLoading: isLoadingTrend } = useGetMonthlyTrend();
   const { data: statsByType, isLoading: isLoadingType } = useGetStatsByType();
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
-  const { data: byState, isLoading: isLoadingState } = useQuery<{ state: string; count: number }[]>({
-    queryKey: ["stats/by-state"],
-    queryFn: async () => {
-      const r = await fetch(`${BASE_URL}/api/stats/by-state`);
-      if (!r.ok) throw new Error("Failed");
-      return r.json();
-    },
-  });
-
-  const topState = byState && byState.length > 0 ? byState[0] : null;
-  const topStateName = topState ? (STATE_NAMES[topState.state] ?? topState.state) : undefined;
-
   const subscribed = isSubscribed();
+
+  const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+  const currentMonthLabel = new Date().toLocaleString("en-US", { month: "long", year: "numeric" });
+  const currentMonthCount = monthlyTrend?.find(d => d.month === currentMonth)?.count ?? 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -158,6 +136,13 @@ export default function Dashboard() {
                 <RefreshCw className="h-3.5 w-3.5 text-amber-400" />
                 Refreshed monthly · prior month's data published each cycle
               </span>
+              {!isLoadingTrend && currentMonthCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 text-xs bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="text-amber-300 font-semibold">{currentMonthLabel}:</span>
+                  <span className="text-blue-100">{currentMonthCount} new action{currentMonthCount !== 1 ? "s" : ""} recorded</span>
+                </span>
+              )}
             </div>
             {!subscribed && (
               <Button
@@ -192,20 +177,20 @@ export default function Dashboard() {
             isLoading={isLoadingSummary}
           />
           <StatCard
-            title="States Affected"
-            value={summary?.totalStatesAffected}
-            subtitle="states with higher ed actions since 2024"
-            icon={<MapPin className="h-5 w-5" />}
+            title="Faculty / Staff Affected"
+            value={summary?.totalFacultyAffected}
+            subtitle="estimated faculty & staff impacted"
+            icon={<Users className="h-5 w-5" />}
             iconBg="bg-[#0f766e]"
             isLoading={isLoadingSummary}
           />
           <StatCard
-            title="Most Impacted State"
-            rawValue={topStateName}
-            subtitle={topState ? `${topState.count} actions recorded` : undefined}
-            icon={<BarChart3 className="h-5 w-5" />}
+            title="States Affected"
+            value={summary?.totalStatesAffected}
+            subtitle="states with higher ed actions since 2024"
+            icon={<MapPin className="h-5 w-5" />}
             iconBg="bg-[#1d4ed8]"
-            isLoading={isLoadingState}
+            isLoading={isLoadingSummary}
           />
         </div>
       </div>
