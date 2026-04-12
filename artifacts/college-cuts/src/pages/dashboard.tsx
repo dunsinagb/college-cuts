@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { format, parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import {
   useGetStatsSummary,
   useGetMonthlyTrend,
@@ -66,7 +67,64 @@ export default function Dashboard() {
 
   const subscribed = isSubscribed();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Dataset",
+        "name": "CollegeCuts Higher Education Actions Database",
+        "description": "A comprehensive dataset tracking program closures, department suspensions, campus closures, teach-outs, and faculty layoffs at US colleges and universities since 2024.",
+        "url": "https://college-cuts.com/",
+        "keywords": [
+          "college closures", "university program cuts", "higher education layoffs",
+          "department suspensions", "campus closures", "teach-out", "higher education data",
+          "US college data", "faculty layoffs", "program suspension"
+        ],
+        "creator": {
+          "@type": "Organization",
+          "name": "CollegeCuts",
+          "url": "https://college-cuts.com/"
+        },
+        "temporalCoverage": "2024/..",
+        "spatialCoverage": "United States",
+        "license": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      {
+        "@type": "WebSite",
+        "name": "CollegeCuts",
+        "url": "https://college-cuts.com/",
+        "description": "Tracking the human cost of higher education cuts across the United States.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://college-cuts.com/cuts?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "CollegeCuts",
+        "url": "https://college-cuts.com/",
+        "description": "A civic data project documenting the contraction of US higher education.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "hello@college-cuts.com",
+          "contactType": "editorial"
+        }
+      }
+    ]
+  };
+
   return (
+    <>
+      <Helmet>
+        <title>CollegeCuts | US College Program Cuts, Closures & Layoffs Tracker</title>
+        <meta name="description" content="Track program closures, department suspensions, campus closures, and faculty layoffs across US colleges and universities. Civic data updated monthly since 2024." />
+        <link rel="canonical" href="https://college-cuts.com/" />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
       {/* Hero Banner */}
       <div
@@ -365,6 +423,7 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
+import { Helmet } from "react-helmet-async";
 import { ExternalLink, Newspaper, RefreshCw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -76,6 +77,12 @@ export default function News() {
       : (items ?? []).filter((item) => item.sourceId === activeSource);
 
   return (
+    <>
+      <Helmet>
+        <title>Higher Education News | CollegeCuts</title>
+        <meta name="description" content="The latest higher education news from Inside Higher Ed, Chronicle of Higher Education, EdScoop, and eCampus News — aggregated and updated daily." />
+        <link rel="canonical" href="https://college-cuts.com/news" />
+      </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
       <div
         className="relative overflow-hidden"
@@ -220,5 +227,6 @@ export default function News() {
         )}
       </div>
     </div>
+    </>
   );
 }

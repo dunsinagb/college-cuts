@@ -1,6 +1,7 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/Layout";
@@ -47,7 +48,7 @@ function Router() {
       <Switch>
         <Route path="/">{() => <Dashboard />}</Route>
         <Route path="/cuts">{() => <GatedPage path="/cuts" component={CutsList} />}</Route>
-        <Route path="/cuts/:id">{(params) => <GatedPage path={`/cuts/${params.id}`} component={CutDetail} />}</Route>
+        <Route path="/cuts/:id">{() => <CutDetail />}</Route>
         <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
         <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
         <Route path="/news">{() => <News />}</Route>
@@ -62,14 +63,16 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 

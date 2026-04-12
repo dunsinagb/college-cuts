@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useSubmitTip } from "@workspace/api-client-react";
+import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,10 @@ export default function SubmitTip() {
 
   if (isSubmitted) {
     return (
+      <>
+        <Helmet>
+          <title>Tip Submitted | CollegeCuts</title>
+        </Helmet>
       <div className="container mx-auto max-w-2xl px-4 py-16">
         <Card className="border-primary/20 shadow-lg text-center py-12">
           <CardContent className="space-y-6 flex flex-col items-center">
@@ -88,10 +93,17 @@ export default function SubmitTip() {
           </CardContent>
         </Card>
       </div>
+      </>
     );
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Submit a Tip | CollegeCuts — Report a College Cut or Closure</title>
+        <meta name="description" content="Know about a college program closure, department suspension, campus closure, or faculty layoff? Submit a tip to CollegeCuts and help keep the public record accurate." />
+        <link rel="canonical" href="https://college-cuts.com/submit-tip" />
+      </Helmet>
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <div className="mb-8 space-y-4">
         <h1 className="text-3xl font-extrabold tracking-tight text-primary">Report a Cut or Closure</h1>
@@ -276,5 +288,6 @@ export default function SubmitTip() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

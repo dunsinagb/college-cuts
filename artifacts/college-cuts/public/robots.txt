@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://college-cuts.com/sitemap.xml
+Sitemap: https://college-cuts.com/api/sitemap.xml

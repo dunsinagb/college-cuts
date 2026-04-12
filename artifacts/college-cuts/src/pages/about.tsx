@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -6,6 +7,12 @@ import { Database, ShieldAlert, GraduationCap, ArrowRight } from "lucide-react";
 
 export default function About() {
   return (
+    <>
+      <Helmet>
+        <title>About CollegeCuts | Civic Data Project on Higher Education Cuts</title>
+        <meta name="description" content="CollegeCuts is a civic data project documenting program closures, department suspensions, campus closures, and faculty layoffs at US colleges and universities. Learn about our methodology." />
+        <link rel="canonical" href="https://college-cuts.com/about" />
+      </Helmet>
     <div className="container mx-auto max-w-4xl px-4 py-12 space-y-16">
       
       {/* Mission */}
@@ -124,5 +131,6 @@ export default function About() {
       </section>
 
     </div>
+    </>
   );
 }
