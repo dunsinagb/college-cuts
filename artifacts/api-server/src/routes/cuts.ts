@@ -28,13 +28,13 @@ type SupabaseCut = {
 function extractPrimaryReason(notes: string | null): string | null {
   if (!notes) return null;
   const n = notes.toLowerCase();
-  if (n.includes("budget") || n.includes("financial") || n.includes("deficit") || n.includes("fiscal")) return "Budget Deficit";
-  if (n.includes("enrollment") || n.includes("low enroll") || n.includes("declining enroll")) return "Enrollment Decline";
-  if (n.includes("merger") || n.includes("merge") || n.includes("acqui")) return "Merger / Consolidation";
+  if (n.includes("budget") || n.includes("financial") || n.includes("deficit") || n.includes("fiscal") || n.includes("shortfall") || n.includes("underfund") || n.includes("cost saving") || n.includes("cost reduction") || n.includes("revenue")) return "Budget Deficit";
+  if (n.includes("enrollment") || n.includes("low enroll") || n.includes("declining enroll") || n.includes("student demand") || n.includes("declining student")) return "Enrollment Decline";
+  if (n.includes("merger") || n.includes("merge") || n.includes("acqui") || n.includes("consolidat")) return "Merger / Consolidation";
   if (n.includes("accredit")) return "Accreditation Issues";
-  if (n.includes("compliance") || n.includes("sb1") || n.includes("mandate") || n.includes("regulation")) return "Compliance / Policy";
-  if (n.includes("restructur") || n.includes("reorganiz") || n.includes("strategic")) return "Strategic Restructuring";
-  if (n.includes("state") && (n.includes("fund") || n.includes("cut") || n.includes("alloc"))) return "State Funding Cuts";
+  if (n.includes("compliance") || n.includes("sb1") || n.includes("mandate") || n.includes("regulation") || n.includes("executive order") || n.includes("dei") || n.includes("diversity")) return "Compliance / Policy";
+  if (n.includes("restructur") || n.includes("reorganiz") || n.includes("strategic") || n.includes("priorit")) return "Strategic Restructuring";
+  if (n.includes("state") && (n.includes("fund") || n.includes("cut") || n.includes("alloc") || n.includes("appropriat"))) return "State Funding Cuts";
   return null;
 }
 

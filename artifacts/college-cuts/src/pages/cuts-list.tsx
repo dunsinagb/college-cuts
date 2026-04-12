@@ -100,6 +100,7 @@ export default function CutsList() {
   const [control,   setControl]   = useState("");
   const [reason,    setReason]    = useState("");
   const [page,      setPage]      = useState(1);
+  const [isExporting, setIsExporting] = useState(false);
 
   /* Debounced search */
   useEffect(() => {
@@ -119,6 +120,46 @@ export default function CutsList() {
   function clearAll() {
     setState(""); setCutType(""); setStatus(""); setControl(""); setReason("");
     setSearch(""); setLiveSearch(""); setPage(1);
+  }
+
+  async function handleExport() {
+    setIsExporting(true);
+    try {
+      const q = new URLSearchParams();
+      q.set("limit", "1000");
+      if (search)  q.set("search",  search);
+      if (state)   q.set("state",   state);
+      if (cutType) q.set("cutType", cutType);
+      if (status)  q.set("status",  status);
+      if (control) q.set("control", control);
+      const r = await fetch(`${BASE_URL}/api/cuts?${q}`);
+      const json = await r.json();
+      let rows = json.data ?? [];
+      if (reason) rows = rows.filter((c: any) => c.primaryReason === reason);
+
+      const esc = (v: any) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const headers = ["Institution","State","Cut Type","Program/Department","Announcement Date","Effective Term","Students Affected","Faculty/Staff Affected","Primary Reason","Status","Source URL","Notes"];
+      const csvRows = [
+        headers.join(","),
+        ...rows.map((c: any) => [
+          esc(c.institution), c.state ?? "", c.cutType ?? "", esc(c.programName),
+          c.announcementDate ?? "", c.effectiveTerm ?? "",
+          c.studentsAffected ?? "", c.facultyAffected ?? "",
+          esc(c.primaryReason), c.status ?? "", esc(c.sourceUrl), esc(c.notes),
+        ].join(","))
+      ];
+      const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `college-cuts-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   const { data, isLoading } = useQuery<CutsResponse>({
@@ -164,9 +205,15 @@ export default function CutsList() {
                 Complete, searchable index of reported program cuts, closures, and layoffs.
               </p>
             </div>
-            <Button variant="outline" size="sm" className="gap-2 shrink-0 mt-1 border-white/30 text-white hover:bg-white/10 bg-transparent">
-              <Download className="h-3.5 w-3.5" />
-              Export ({total})
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 shrink-0 mt-1 border-white/30 text-white hover:bg-white/10 bg-transparent"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              <Download className={`h-3.5 w-3.5 ${isExporting ? "animate-bounce" : ""}`} />
+              {isExporting ? "Downloading…" : `Export (${total})`}
             </Button>
           </div>
 
