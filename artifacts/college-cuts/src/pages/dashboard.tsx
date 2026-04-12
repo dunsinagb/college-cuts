@@ -48,11 +48,16 @@ export default function Dashboard() {
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
   const subscribed = isSubscribed();
 
-  const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
-  const currentMonthLabel = new Date().toLocaleString("en-US", { month: "long", year: "numeric" });
-  const currentMonthEntry = monthlyTrend?.find(d => d.month === currentMonth);
-  const currentMonthCount = currentMonthEntry?.count ?? 0;
-  const currentMonthStates = currentMonthEntry?.states ?? 0;
+  // Use the most recently loaded month (last entry), since data for month N
+  // is published in the first week of month N+1 — not the current calendar month.
+  const latestMonthEntry = monthlyTrend && monthlyTrend.length > 0
+    ? monthlyTrend[monthlyTrend.length - 1]
+    : null;
+  const latestMonthLabel = latestMonthEntry
+    ? new Date(latestMonthEntry.month + "-02").toLocaleString("en-US", { month: "long", year: "numeric" })
+    : "";
+  const latestMonthCount = latestMonthEntry?.count ?? 0;
+  const latestMonthStates = latestMonthEntry?.states ?? 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -145,11 +150,11 @@ export default function Dashboard() {
                 <RefreshCw className="h-3.5 w-3.5 text-amber-400" />
                 Refreshed monthly · prior month's data published each cycle
               </span>
-              {!isLoadingTrend && (
+              {!isLoadingTrend && latestMonthEntry && (
                 <span className="inline-flex items-center gap-1.5 text-xs bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1.5">
                   <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-amber-300 font-semibold">{currentMonthLabel}:</span>
-                  <span className="text-blue-100">{currentMonthCount} new action{currentMonthCount !== 1 ? "s" : ""} across {currentMonthStates} state{currentMonthStates !== 1 ? "s" : ""}</span>
+                  <span className="text-amber-300 font-semibold">{latestMonthLabel}:</span>
+                  <span className="text-blue-100">{latestMonthCount} new action{latestMonthCount !== 1 ? "s" : ""} across {latestMonthStates} state{latestMonthStates !== 1 ? "s" : ""}</span>
                 </span>
               )}
             </div>
