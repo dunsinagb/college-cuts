@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,12 @@ export default function Subscribe() {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>Subscribe Free | CollegeCuts — Unlock the Higher Ed Database</title>
+        <meta name="description" content="Subscribe free to CollegeCuts to access the full database of US college program cuts, closures, department suspensions, and faculty layoffs." />
+        <link rel="canonical" href="https://college-cuts.com/subscribe" />
+      </Helmet>
     <div className="min-h-[80vh] bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         <Card className="shadow-2xl border-0">
@@ -127,5 +134,6 @@ export default function Subscribe() {
         </Card>
       </div>
     </div>
+    </>
   );
 }

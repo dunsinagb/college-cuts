@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -200,6 +201,12 @@ export default function Analytics() {
   ];
 
   return (
+    <>
+      <Helmet>
+        <title>Analytics Dashboard | CollegeCuts — Higher Education Trends</title>
+        <meta name="description" content="Explore trends in US higher education cuts: monthly timelines, breakdowns by state, institution type, and cut category. Data-driven analysis of college closures and layoffs." />
+        <link rel="canonical" href="https://college-cuts.com/analytics" />
+      </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
       {/* ── hero header ── */}
       <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
@@ -683,5 +690,6 @@ export default function Analytics() {
         </p>
       </div>
     </div>
+    </>
   );
 }

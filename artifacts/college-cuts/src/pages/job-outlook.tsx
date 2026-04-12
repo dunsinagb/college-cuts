@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -117,6 +118,12 @@ export default function JobOutlookPage() {
   const educationLevels = [...new Set(jobs.map(j => j.entry_education).filter(Boolean))] as string[];
 
   return (
+    <>
+      <Helmet>
+        <title>Job Outlook by Major | CollegeCuts — Career Data for Cut Programs</title>
+        <meta name="description" content="Search job outlook, median salaries, and employment data for academic majors affected by college program cuts and closures. Bureau of Labor Statistics data." />
+        <link rel="canonical" href="https://college-cuts.com/job-outlook" />
+      </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
       {/* Navy header */}
       <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
@@ -330,5 +337,6 @@ export default function JobOutlookPage() {
       )}
       </div>
     </div>
+    </>
   );
 }

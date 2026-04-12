@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
+import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { Input } from "@/components/ui/input";
@@ -147,6 +148,12 @@ export default function CutsList() {
   const total = reason ? shown : (data?.total ?? 0);
 
   return (
+    <>
+      <Helmet>
+        <title>All Actions Database | CollegeCuts — College Program Cuts & Closures</title>
+        <meta name="description" content="Browse the complete database of US college program cuts, department closures, campus closures, teach-outs, and faculty layoffs. Search and filter 214+ tracked actions since 2024." />
+        <link rel="canonical" href="https://college-cuts.com/cuts" />
+      </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
       <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
         <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -406,5 +413,6 @@ export default function CutsList() {
         </div>
       </div>
     </div>
+    </>
   );
 }
