@@ -48,7 +48,7 @@ function FilterSelect({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-0.5">{label}</span>
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-100 px-0.5">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -267,7 +267,7 @@ export default function CutsList() {
             <div className="flex flex-wrap gap-3 items-end">
               {/* Search */}
               <div className="flex flex-col gap-0.5 flex-1 min-w-[180px] max-w-[260px]">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-0.5">Search</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-100 px-0.5">Search</span>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input
