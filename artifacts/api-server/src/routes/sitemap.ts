@@ -66,14 +66,28 @@ ${cutUrls}
 
 router.get("/news-sitemap.xml", async (_req, res) => {
   try {
-    const since = new Date(Date.now() - 48 * 3600000).toISOString().slice(0, 10);
-    const { data, error } = await supabase
+    const since48h = new Date(Date.now() - 48 * 3600000).toISOString().slice(0, 10);
+    const since14d = new Date(Date.now() - 14 * 24 * 3600000).toISOString().slice(0, 10);
+
+    let { data, error } = await supabase
       .from("v_latest_cuts")
       .select("id, institution, program_name, announcement_date, created_at")
-      .gte("announcement_date", since)
+      .gte("announcement_date", since48h)
       .order("announcement_date", { ascending: false });
 
     if (error) throw error;
+
+    if (!data || data.length === 0) {
+      const fallback = await supabase
+        .from("v_latest_cuts")
+        .select("id, institution, program_name, announcement_date, created_at")
+        .gte("announcement_date", since14d)
+        .order("announcement_date", { ascending: false })
+        .limit(20);
+      if (fallback.error) throw fallback.error;
+      data = fallback.data ?? [];
+    }
+
     const rows = data ?? [];
 
     const urls = rows.map((row: any) => {
