@@ -91,14 +91,15 @@ interface CutsResponse {
 
 /* ═══════════════════════════════════════════════════════════ */
 export default function CutsList() {
-  /* ── local filter state (avoids URL-sync re-render killing dropdowns) ── */
-  const [search,    setSearch]    = useState("");
-  const [liveSearch, setLiveSearch] = useState("");
-  const [state,     setState]     = useState("");
-  const [cutType,   setCutType]   = useState("");
-  const [status,    setStatus]    = useState("");
-  const [control,   setControl]   = useState("");
-  const [reason,    setReason]    = useState("");
+  /* ── read initial values from URL query params (set by dashboard quick filters) ── */
+  const initialParams = new URLSearchParams(window.location.search);
+  const [search,    setSearch]    = useState(initialParams.get("q") || "");
+  const [liveSearch, setLiveSearch] = useState(initialParams.get("q") || "");
+  const [state,     setState]     = useState(initialParams.get("state") || "");
+  const [cutType,   setCutType]   = useState(initialParams.get("cutType") || "");
+  const [status,    setStatus]    = useState(initialParams.get("status") || "");
+  const [control,   setControl]   = useState(initialParams.get("control") || "");
+  const [reason,    setReason]    = useState(initialParams.get("reason") || "");
   const [page,      setPage]      = useState(1);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -321,7 +322,7 @@ export default function CutsList() {
                   <th className="px-4 py-3 text-left">Status</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">Students</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">Faculty/Staff</th>
-                  <th className="px-4 py-3 text-center">Source</th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">Source</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -391,20 +392,22 @@ export default function CutsList() {
                           <span className="text-muted-foreground">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-3 max-w-[160px]">
                         {cut.sourceUrl ? (
                           <a
                             href={cut.sourceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center justify-center text-muted-foreground hover:text-[#1e3a5f] transition-colors"
-                            title={cut.sourcePublication ?? "Source"}
+                            className="inline-flex items-center gap-1 text-xs text-[#1e3a5f] hover:underline underline-offset-2 font-medium"
                           >
-                            <ExternalLink className="h-4 w-4" />
+                            <span className="truncate block max-w-[140px]">
+                              {cut.sourcePublication || "Source"}
+                            </span>
+                            <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
                           </a>
                         ) : (
-                          <span className="text-muted-foreground/40">—</span>
+                          <span className="text-muted-foreground/40 text-xs">—</span>
                         )}
                       </td>
                     </tr>
