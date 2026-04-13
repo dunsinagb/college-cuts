@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import {
-  ArrowLeft, Building2, MapPin, Users, GraduationCap,
+  ArrowLeft, ArrowRight, Building2, MapPin, Users, GraduationCap,
   Link2, Check, ExternalLink, Calendar, Bell
 } from "lucide-react";
 
@@ -352,8 +352,31 @@ export default function InstitutionPage() {
           </div>
         </div>
 
+        {/* Affected worker banner */}
+        <div className="container mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
+          <a
+            href={`/talent?institution=${encodeURIComponent(data.institution)}&slug=${encodeURIComponent(slug)}`}
+            className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 group hover:bg-amber-100 transition-colors"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-400/20 shrink-0">
+              <Users className="h-5 w-5 text-amber-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-amber-900 text-sm leading-snug">
+                Were you or a colleague affected by cuts at {data.institution}?
+              </p>
+              <p className="text-amber-700 text-xs mt-0.5 leading-relaxed">
+                Create a free profile and get discovered by companies actively hiring in your field — no application needed.
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-amber-700 font-bold text-sm shrink-0 group-hover:text-amber-900">
+              Create your profile <ArrowRight className="h-4 w-4" />
+            </div>
+          </a>
+        </div>
+
         {/* Cuts list */}
-        <div className="container mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-4">
+        <div className="container mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
           <h2 className="text-xl font-bold text-[#1e3a5f]">
             All Recorded Actions ({data.cuts.length})
           </h2>

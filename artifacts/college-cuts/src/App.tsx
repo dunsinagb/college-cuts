@@ -20,6 +20,7 @@ import EmbedWidget from "@/pages/embed";
 import IntelligenceLanding from "@/pages/intelligence/index";
 import IntelligenceOnboarding from "@/pages/intelligence/onboarding";
 import IntelligenceDashboard from "@/pages/intelligence/dashboard";
+import TalentRegister from "@/pages/talent/index";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,6 +72,7 @@ function Router() {
             <Route path="/intelligence">{() => <IntelligenceLanding />}</Route>
             <Route path="/intelligence/onboarding">{() => <IntelligenceOnboarding />}</Route>
             <Route path="/intelligence/dashboard">{() => <IntelligenceDashboard />}</Route>
+            <Route path="/talent">{() => <TalentRegister />}</Route>
             <Route>{() => <NotFound />}</Route>
           </Switch>
         </Layout>

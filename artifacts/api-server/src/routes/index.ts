@@ -11,6 +11,7 @@ import sitemapRouter from "./sitemap";
 import digestRouter from "./digest";
 import alertsRouter from "./alerts";
 import intelligenceRouter from "./intelligence";
+import talentRouter from "./talent";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(sitemapRouter);
 router.use(digestRouter);
 router.use(alertsRouter);
 router.use(intelligenceRouter);
+router.use(talentRouter);
 
 export default router;
