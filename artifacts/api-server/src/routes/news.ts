@@ -19,11 +19,6 @@ const FEEDS = [
     url: "https://www.chronicle.com/feed",
   },
   {
-    id: "the-pie-news",
-    name: "The PIE News",
-    url: "https://thepienews.com/feed/",
-  },
-  {
     id: "edscoop",
     name: "EdScoop",
     url: "https://edscoop.com/feed/",
@@ -32,6 +27,11 @@ const FEEDS = [
     id: "ecampus-news",
     name: "eCampus News",
     url: "https://www.ecampusnews.com/feed/",
+  },
+  {
+    id: "higher-ed-dive",
+    name: "Higher Ed Dive",
+    url: "https://www.highereddive.com/feeds/news/",
   },
 ];
 

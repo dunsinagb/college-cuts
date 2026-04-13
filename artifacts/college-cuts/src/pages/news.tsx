@@ -22,16 +22,18 @@ type NewsItem = {
 const SOURCES = [
   { id: "all", name: "All" },
   { id: "inside-higher-ed", name: "Inside Higher Ed" },
-  { id: "the-pie-news", name: "The PIE News" },
+  { id: "chronicle", name: "Chronicle of Higher Education" },
   { id: "edscoop", name: "EdScoop" },
   { id: "ecampus-news", name: "eCampus News" },
+  { id: "higher-ed-dive", name: "Higher Ed Dive" },
 ];
 
 const SOURCE_COLORS: Record<string, { bg: string; text: string }> = {
   "inside-higher-ed": { bg: "bg-blue-100", text: "text-blue-800" },
-  "the-pie-news": { bg: "bg-purple-100", text: "text-purple-800" },
+  chronicle: { bg: "bg-purple-100", text: "text-purple-800" },
   edscoop: { bg: "bg-green-100", text: "text-green-800" },
   "ecampus-news": { bg: "bg-amber-100", text: "text-amber-800" },
+  "higher-ed-dive": { bg: "bg-indigo-100", text: "text-indigo-800" },
 };
 
 function SkeletonCard() {
@@ -73,11 +75,7 @@ export default function News() {
   });
 
   const filtered =
-    activeSource === "all"
-      ? (items ?? [])
-      : (items ?? []).filter((item) =>
-          activeSource === "the-pie-news" ? item.sourceId === activeSource : item.sourceId === activeSource
-        );
+    activeSource === "all" ? (items ?? []) : (items ?? []).filter((item) => item.sourceId === activeSource);
 
   return (
     <>
