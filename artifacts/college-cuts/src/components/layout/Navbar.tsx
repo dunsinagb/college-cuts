@@ -10,12 +10,13 @@ export function Navbar() {
   const { user, role, signOut, loading } = useAuth();
 
   const links = [
-    { href: "/",             label: "Dashboard",   highlight: false },
-    { href: "/cuts",         label: "All Actions", highlight: false },
-    { href: "/analytics",    label: "Analytics",   highlight: false },
-    { href: "/news",         label: "News",        highlight: false },
-    { href: "/job-outlook",  label: "Job Outlook", highlight: false },
-    { href: "/about",        label: "About",       highlight: false },
+    { href: "/",             label: "Dashboard",   highlight: false, comingSoon: false },
+    { href: "/cuts",         label: "All Actions", highlight: false, comingSoon: false },
+    { href: "/analytics",    label: "Analytics",   highlight: false, comingSoon: false },
+    { href: "/news",         label: "News",        highlight: false, comingSoon: false },
+    { href: "/job-outlook",  label: "Job Outlook", highlight: false, comingSoon: false },
+    { href: "/about",        label: "About",       highlight: false, comingSoon: false },
+    { href: "#",             label: "Intelligence", highlight: false, comingSoon: true },
   ];
 
   const displayName = user?.email?.split("@")[0] ?? "";
@@ -30,9 +31,20 @@ export function Navbar() {
             <GraduationCap className="h-6 w-6 text-amber-400" />
             <span className="font-bold text-xl tracking-tight text-white">CollegeCuts</span>
           </Link>
-          <nav className="hidden gap-5 md:flex">
+          <nav className="hidden gap-5 md:flex items-center">
             {links.map((link) => (
-              link.highlight ? (
+              link.comingSoon ? (
+                <span
+                  key={link.href}
+                  className="flex items-center gap-1.5 text-sm font-medium text-blue-300/50 cursor-not-allowed select-none"
+                  title="Coming soon"
+                >
+                  {link.label}
+                  <span className="text-[9px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300/70 px-1.5 py-0.5 rounded-full border border-amber-400/20">
+                    Soon
+                  </span>
+                </span>
+              ) : link.highlight ? (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -124,22 +136,34 @@ export function Navbar() {
         <div className="md:hidden border-t border-white/10" style={{ background: "#1a3352" }}>
           <nav className="flex flex-col px-4 py-3 gap-1">
             {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                  link.highlight
-                    ? location.startsWith("/intelligence")
-                      ? "bg-amber-400 text-white"
-                      : "border border-amber-400/50 text-amber-300 hover:bg-amber-400/10"
-                    : location === link.href
-                      ? "bg-white/10 text-amber-400"
-                      : "text-blue-100 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                {link.label}
-              </Link>
+              link.comingSoon ? (
+                <span
+                  key={link.href}
+                  className="flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium text-blue-300/40 cursor-not-allowed select-none"
+                >
+                  {link.label}
+                  <span className="text-[9px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300/60 px-1.5 py-0.5 rounded-full border border-amber-400/20">
+                    Coming Soon
+                  </span>
+                </span>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+                    link.highlight
+                      ? location.startsWith("/intelligence")
+                        ? "bg-amber-400 text-white"
+                        : "border border-amber-400/50 text-amber-300 hover:bg-amber-400/10"
+                      : location === link.href
+                        ? "bg-white/10 text-amber-400"
+                        : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
             <div className="mt-2 pt-2 border-t border-white/10 space-y-2">
               {user ? (
