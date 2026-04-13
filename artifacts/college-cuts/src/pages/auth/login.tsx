@@ -74,24 +74,27 @@ export default function Login() {
     if (!email.includes("@")) { setError("Enter a valid email first"); return; }
     setError("");
     setMagicLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
-      options: {
-        emailRedirectTo: `${window.location.origin}${BASE_URL}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
-        shouldCreateUser: true,
-      },
-    });
-    if (error) {
-      const msg = error.message.toLowerCase();
-      if (msg.includes("rate limit") || msg.includes("too many") || msg.includes("429")) {
-        setError("Too many requests. Please wait at least 60 seconds before requesting another sign-in link.");
-      } else if (msg.includes("not found") || msg.includes("user not found")) {
-        setError("No account found with that email. Create a free account first.");
+
+    const redirectTo = `${window.location.origin}${BASE_URL}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`;
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/magic-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), redirectTo }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 429) {
+          setError("Too many requests. Please wait a few minutes before trying again.");
+        } else {
+          setError(data?.error || "Could not send sign-in link. Please try again.");
+        }
       } else {
-        setError(error.message);
+        setMagicSent(true);
       }
-    } else {
-      setMagicSent(true);
+    } catch {
+      setError("Network error. Please check your connection and try again.");
     }
     setMagicLoading(false);
   }

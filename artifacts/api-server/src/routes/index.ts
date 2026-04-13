@@ -12,6 +12,7 @@ import digestRouter from "./digest";
 import alertsRouter from "./alerts";
 import intelligenceRouter from "./intelligence";
 import talentRouter from "./talent";
+import authRouter from "./auth";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(digestRouter);
 router.use(alertsRouter);
 router.use(intelligenceRouter);
 router.use(talentRouter);
+router.use(authRouter);
 
 export default router;
