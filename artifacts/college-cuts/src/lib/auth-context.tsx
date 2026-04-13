@@ -38,6 +38,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }
 
+  // Silently ensures the user exists in the subscribers table.
+  // Idempotent — the subscribe endpoint skips insert + email if already present.
+  async function ensureSubscriber(email: string) {
+    try {
+      await fetch(`${BASE_URL}/api/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+    } catch {}
+  }
+
   async function refreshRole() {
     if (!user?.email) { setRole(null); return; }
     const r = await detectRole(user.email);
@@ -49,11 +61,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user?.email) {
-        const r = await detectRole(session.user.email);
+        const email = session.user.email;
+        const r = await detectRole(email);
         setRole(r);
-        // Any signed-in user gets access — set flags regardless of sign-in method
+        // Ensure they're in the subscribers table regardless of sign-in method
+        if (!r) ensureSubscriber(email);
         localStorage.setItem("cc_subscribed", "1");
-        localStorage.setItem("cc_user_email", session.user.email);
+        localStorage.setItem("cc_user_email", email);
         if (r === "employer") localStorage.setItem("cc_employer", "1");
       }
       setLoading(false);
@@ -63,11 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user?.email) {
-        const r = await detectRole(session.user.email);
+        const email = session.user.email;
+        const r = await detectRole(email);
         setRole(r);
-        // Any signed-in user gets access — set flags regardless of sign-in method
+        // Ensure they're in the subscribers table regardless of sign-in method
+        if (!r) ensureSubscriber(email);
         localStorage.setItem("cc_subscribed", "1");
-        localStorage.setItem("cc_user_email", session.user.email);
+        localStorage.setItem("cc_user_email", email);
         if (r === "employer") localStorage.setItem("cc_employer", "1");
       } else {
         setRole(null);
