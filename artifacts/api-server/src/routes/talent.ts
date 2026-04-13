@@ -1,9 +1,7 @@
 import { Router, type IRouter } from "express";
-import { Pool } from "pg";
+import { supabase } from "../lib/supabase";
 
 const router: IRouter = Router();
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 function slugify(name: string): string {
   return name.toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -21,12 +19,14 @@ router.post("/talent/register", async (req, res): Promise<void> => {
     if (!body.role_title?.trim()) { res.status(400).json({ error: "Role title is required" }); return; }
 
     const email = body.email.trim().toLowerCase();
-    const { rows: existing } = await pool.query(
-      "SELECT id FROM talent_profiles WHERE email = $1 LIMIT 1",
-      [email]
-    );
 
-    if (existing.length > 0) {
+    const { data: existing } = await supabase
+      .from("talent_profiles")
+      .select("id")
+      .eq("email", email)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
       res.json({ ok: true, duplicate: true, message: "A profile with this email already exists." });
       return;
     }
@@ -40,29 +40,28 @@ router.post("/talent/register", async (req, res): Promise<void> => {
     const open_to = Array.isArray(body.open_to) ? body.open_to.filter(Boolean) : [];
     const institution_slug = body.institution_slug || slugify(body.institution.trim());
 
-    await pool.query(
-      `INSERT INTO talent_profiles
-        (name, email, institution, institution_slug, department, role_title,
-         degree_level, years_experience, specializations, open_to, state,
-         linkedin_url, bio, visible)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-      [
-        body.name.trim(),
-        email,
-        body.institution.trim(),
-        institution_slug,
-        body.department?.trim() || null,
-        body.role_title.trim(),
-        body.degree_level || null,
-        body.years_experience ? Number(body.years_experience) : null,
-        specializations,
-        open_to,
-        body.state || null,
-        body.linkedin_url?.trim() || null,
-        body.bio?.trim() || null,
-        body.visible !== false,
-      ]
-    );
+    const { error } = await supabase.from("talent_profiles").insert({
+      name: body.name.trim(),
+      email,
+      institution: body.institution.trim(),
+      institution_slug,
+      department: body.department?.trim() || null,
+      role_title: body.role_title.trim(),
+      degree_level: body.degree_level || null,
+      years_experience: body.years_experience ? Number(body.years_experience) : null,
+      specializations,
+      open_to,
+      state: body.state || null,
+      linkedin_url: body.linkedin_url?.trim() || null,
+      bio: body.bio?.trim() || null,
+      visible: body.visible !== false,
+    });
+
+    if (error) {
+      console.error("[talent] insert error:", error.message);
+      res.status(500).json({ error: "Failed to save profile. Please try again." });
+      return;
+    }
 
     res.json({ ok: true });
   } catch (err: any) {
@@ -76,20 +75,20 @@ router.get("/talent", async (req, res): Promise<void> => {
     const { state, institution_slug, limit: limitParam } = req.query;
     const limit = Math.min(Number(limitParam) || 50, 100);
 
-    let sql = `SELECT id, name, institution, institution_slug, department, role_title,
-      degree_level, years_experience, specializations, open_to, state,
-      linkedin_url, bio, created_at
-      FROM talent_profiles WHERE visible = TRUE`;
-    const params: any[] = [];
+    let query = supabase
+      .from("talent_profiles")
+      .select("id, name, institution, institution_slug, department, role_title, degree_level, years_experience, specializations, open_to, state, linkedin_url, bio, created_at")
+      .eq("visible", true)
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-    if (state) { params.push(state); sql += ` AND state = $${params.length}`; }
-    if (institution_slug) { params.push(institution_slug); sql += ` AND institution_slug = $${params.length}`; }
+    if (state) query = query.eq("state", String(state));
+    if (institution_slug) query = query.eq("institution_slug", String(institution_slug));
 
-    params.push(limit);
-    sql += ` ORDER BY created_at DESC LIMIT $${params.length}`;
+    const { data, error } = await query;
+    if (error) throw error;
 
-    const { rows } = await pool.query(sql, params);
-    res.json(rows);
+    res.json(data ?? []);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -97,10 +96,13 @@ router.get("/talent", async (req, res): Promise<void> => {
 
 router.get("/talent/stats", async (_req, res): Promise<void> => {
   try {
-    const { rows } = await pool.query(
-      "SELECT COUNT(*) as count FROM talent_profiles WHERE visible = TRUE"
-    );
-    res.json({ count: Number(rows[0]?.count ?? 0) });
+    const { count, error } = await supabase
+      .from("talent_profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("visible", true);
+
+    if (error) throw error;
+    res.json({ count: count ?? 0 });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
