@@ -169,7 +169,7 @@ export default function News() {
               <Newspaper className="h-7 w-7 text-gray-400" />
             </div>
             <p className="text-lg font-semibold text-gray-700">No articles found</p>
-            <p className="text-sm text-gray-500">No articles are available for this source right now.</p>
+            <p className="text-sm text-gray-500">No articles are available right now. Try Refresh.</p>
           </div>
         ) : (
           <>
