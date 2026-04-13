@@ -22,7 +22,7 @@ type NewsItem = {
 const SOURCES = [
   { id: "all", name: "All" },
   { id: "inside-higher-ed", name: "Inside Higher Ed" },
-  { id: "chronicle", name: "Chronicle" },
+  { id: "chronicle", name: "Chronicle of Higher Education" },
   { id: "edscoop", name: "EdScoop" },
   { id: "ecampus-news", name: "eCampus News" },
 ];
@@ -174,7 +174,11 @@ export default function News() {
               <Newspaper className="h-7 w-7 text-gray-400" />
             </div>
             <p className="text-lg font-semibold text-gray-700">No articles found</p>
-            <p className="text-sm text-gray-500">No articles are available right now. Try Refresh.</p>
+            <p className="text-sm text-gray-500">
+              {activeSource === "chronicle"
+                ? "The Chronicle feed has no recent articles right now."
+                : "No articles are available right now. Try Refresh."}
+            </p>
           </div>
         ) : (
           <>
