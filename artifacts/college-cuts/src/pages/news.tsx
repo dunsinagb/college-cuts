@@ -66,7 +66,8 @@ export default function News() {
     queryFn: async () => {
       const r = await fetch(`${BASE_URL}/api/news`);
       if (!r.ok) throw new Error("Failed to load news feed");
-      return r.json();
+      const data = await r.json();
+      return Array.isArray(data) ? data : [];
     },
     staleTime: 1000 * 60 * 30,
   });

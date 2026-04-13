@@ -112,9 +112,13 @@ export default function InstitutionPage() {
           state: data.stats.state,
         }),
       });
-      if (!r.ok) throw new Error("failed");
+      if (!r.ok) {
+        const body = await r.json().catch(() => null);
+        throw new Error(body?.error || "failed");
+      }
       setAlertStatus("success");
-    } catch {
+    } catch (err) {
+      console.error("alert subscribe failed", err);
       setAlertStatus("error");
     }
   }
