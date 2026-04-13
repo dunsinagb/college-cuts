@@ -1,7 +1,11 @@
 import { Router, type IRouter } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import pg from "pg";
 import { ROLE_CATEGORIES, getRolesByIds, mapProgramToRoles } from "../lib/skills-taxonomy";
+
+const { Pool } = pg;
+const pgPool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const router: IRouter = Router();
 
@@ -381,6 +385,119 @@ router.post("/admin/send-intelligence-alerts", async (req, res): Promise<void> =
     res.json({ ok: true, sent, totalCuts: recentCuts.length, totalEmployers: employers.length });
   } catch (err: any) {
     console.error("[intelligence-alerts] error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/intelligence/connect", async (req, res): Promise<void> => {
+  try {
+    const { employer_email, employer_company, talent_id, talent_name, message } = req.body as {
+      employer_email: string;
+      employer_company: string;
+      talent_id: string;
+      talent_name: string;
+      message?: string;
+    };
+
+    if (!employer_email || !talent_id) {
+      res.status(400).json({ error: "employer_email and talent_id are required" });
+      return;
+    }
+
+    const client = await pgPool.connect();
+    try {
+      await client.query(
+        `INSERT INTO connection_requests (employer_email, employer_company, talent_id, talent_name, message)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (employer_email, talent_id) DO NOTHING`,
+        [employer_email, employer_company || "", talent_id, talent_name || "", message || null]
+      );
+    } finally {
+      client.release();
+    }
+
+    // Look up talent email from Supabase to notify them
+    const supabase = getSupabase();
+    const { data: talentData } = await supabase
+      .from("talent_profiles")
+      .select("email, name, role_title, institution")
+      .eq("id", talent_id)
+      .single();
+
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey && talentData?.email) {
+      const resend = new Resend(resendKey);
+      const msgBlock = message
+        ? `<blockquote style="border-left:3px solid #1e3a5f;margin:16px 0;padding:8px 16px;color:#475569;font-style:italic;">${message}</blockquote>`
+        : "";
+      try {
+        await resend.emails.send({
+          from: "CollegeCuts <noreply@college-cuts.com>",
+          to: talentData.email,
+          subject: `${employer_company} is interested in connecting with you`,
+          html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
+            <img src="https://college-cuts.com/logo.png" alt="CollegeCuts" style="height:32px;margin-bottom:20px;" />
+            <h2 style="color:#1e3a5f;margin-bottom:8px;">An employer wants to connect</h2>
+            <p style="color:#475569;margin-bottom:16px;">Hi ${talentData.name || talent_name},</p>
+            <p style="color:#475569;margin-bottom:16px;"><strong>${employer_company}</strong> found your profile on CollegeCuts and would like to connect about potential opportunities.</p>
+            ${msgBlock}
+            <p style="color:#475569;margin-bottom:16px;">Reply to this email to connect with the team at ${employer_company}, or visit your profile to update your availability.</p>
+            <a href="https://college-cuts.com/talent" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;margin-bottom:20px;">View Your Profile →</a>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;"/>
+            <p style="font-size:11px;color:#94a3b8;margin:0;">CollegeCuts · college-cuts.com</p>
+          </div>`,
+          replyTo: employer_email,
+        });
+      } catch (emailErr: any) {
+        console.warn("[connect] talent email failed:", emailErr.message);
+      }
+    }
+
+    // Confirmation to employer
+    if (resendKey) {
+      const resend = new Resend(resendKey);
+      try {
+        await resend.emails.send({
+          from: "CollegeCuts <noreply@college-cuts.com>",
+          to: employer_email,
+          subject: `Connection request sent to ${talent_name}`,
+          html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:24px;">
+            <h2 style="color:#1e3a5f;margin-bottom:8px;">Your connection request was sent</h2>
+            <p style="color:#475569;margin-bottom:16px;">We've notified <strong>${talent_name}</strong> that you're interested in connecting. They'll be in touch via the email you used to sign up.</p>
+            <a href="https://college-cuts.com/intelligence/dashboard" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;margin-bottom:20px;">Back to Dashboard →</a>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0;"/>
+            <p style="font-size:11px;color:#94a3b8;margin:0;">CollegeCuts · college-cuts.com</p>
+          </div>`,
+        });
+      } catch {}
+    }
+
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error("[connect] error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/intelligence/connections", async (req, res): Promise<void> => {
+  try {
+    const { employer_email } = req.query as { employer_email?: string };
+    if (!employer_email) {
+      res.status(400).json({ error: "employer_email is required" });
+      return;
+    }
+
+    const client = await pgPool.connect();
+    try {
+      const { rows } = await client.query(
+        `SELECT talent_id, talent_name, status, created_at FROM connection_requests WHERE employer_email = $1 ORDER BY created_at DESC`,
+        [employer_email]
+      );
+      res.json(rows);
+    } finally {
+      client.release();
+    }
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });

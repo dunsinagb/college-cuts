@@ -4,8 +4,8 @@ import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import {
-  AlertTriangle, ArrowRight, BarChart3, Bell, Building2, ExternalLink,
-  Info, Lock, RefreshCw, Save, Settings, TrendingDown, Users, X, Zap,
+  AlertTriangle, ArrowRight, BarChart3, Bell, CheckCircle2, ExternalLink,
+  Info, Lock, RefreshCw, Save, Send, Settings, Users, X, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -205,15 +205,24 @@ function RiskCard({ result, isBlurred, onUpgrade }: { result: RiskResult; isBlur
 
 type TalentProfile = {
   id: string;
-  full_name: string;
-  title: string;
+  name: string;
+  role_title: string;
   institution: string;
   state: string;
-  discipline: string;
+  department: string | null;
   years_experience: number | null;
-  availability: string;
+  availability: string | null;
   linkedin_url: string | null;
+  specializations: string[];
+  open_to: string[];
   created_at: string;
+};
+
+type ConnectModal = {
+  talent: TalentProfile;
+  message: string;
+  sending: boolean;
+  done: boolean;
 };
 
 const FREQ_OPTIONS = [
@@ -235,6 +244,8 @@ export default function IntelligenceDashboard() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [settingsDraft, setSettingsDraft] = useState<Partial<EmployerProfile>>({});
   const [settingsSaving, setSettingsSaving] = useState(false);
+  const [connectModal, setConnectModal] = useState<ConnectModal | null>(null);
+  const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const saved = localStorage.getItem("cc_employer");
@@ -283,6 +294,46 @@ export default function IntelligenceDashboard() {
     },
     staleTime: 1000 * 60 * 10,
   });
+
+  const { data: existingConnections = [] } = useQuery<{ talent_id: string }[]>({
+    queryKey: ["intelligence-connections", profile?.email],
+    queryFn: async () => {
+      if (!profile?.email) return [];
+      const r = await fetch(`${BASE_URL}/api/intelligence/connections?employer_email=${encodeURIComponent(profile.email)}`);
+      if (!r.ok) return [];
+      return r.json();
+    },
+    enabled: !!profile?.email,
+    staleTime: 1000 * 60 * 2,
+  });
+
+  useEffect(() => {
+    if (existingConnections.length > 0) {
+      setConnectedIds(new Set(existingConnections.map((c) => c.talent_id)));
+    }
+  }, [existingConnections]);
+
+  async function handleConnect() {
+    if (!connectModal || !profile) return;
+    setConnectModal((m) => m ? { ...m, sending: true } : null);
+    try {
+      await fetch(`${BASE_URL}/api/intelligence/connect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          employer_email: profile.email,
+          employer_company: profile.company,
+          talent_id: connectModal.talent.id,
+          talent_name: connectModal.talent.name,
+          message: connectModal.message || undefined,
+        }),
+      });
+      setConnectedIds((prev) => new Set([...prev, connectModal.talent.id]));
+      setConnectModal((m) => m ? { ...m, sending: false, done: true } : null);
+    } catch {
+      setConnectModal((m) => m ? { ...m, sending: false } : null);
+    }
+  }
 
   async function saveSettings() {
     if (!profile) return;
@@ -414,6 +465,65 @@ export default function IntelligenceDashboard() {
                   Cancel
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {connectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <Card className="max-w-md w-full border-0 shadow-2xl">
+            <CardContent className="p-6 space-y-4">
+              {connectModal.done ? (
+                <div className="text-center space-y-3 py-2">
+                  <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+                  <h2 className="text-lg font-extrabold text-[#1e3a5f]">Request sent!</h2>
+                  <p className="text-sm text-gray-500">
+                    We've notified <strong>{connectModal.talent.name}</strong> that you'd like to connect. You'll also receive a confirmation email.
+                  </p>
+                  <Button onClick={() => setConnectModal(null)} className="w-full bg-[#1e3a5f] hover:bg-[#2a4e7c] text-white font-bold">
+                    Done
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-extrabold text-[#1e3a5f]">Connect with {connectModal.talent.name}</h2>
+                    <button onClick={() => setConnectModal(null)} className="text-gray-400 hover:text-gray-600">
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="rounded-lg bg-[#f0f4f9] px-4 py-3 text-sm text-[#1e3a5f]">
+                    <div className="font-semibold">{connectModal.talent.role_title}</div>
+                    <div className="text-gray-500 text-xs mt-0.5">{connectModal.talent.institution} · {connectModal.talent.state}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                      Personal message <span className="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder={`Hi, I'm reaching out from ${profile?.company ?? "our company"}...`}
+                      value={connectModal.message}
+                      onChange={(e) => setConnectModal((m) => m ? { ...m, message: e.target.value } : null)}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] resize-none"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    We'll send your request to {connectModal.talent.name} by email and copy you on the confirmation.
+                  </p>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleConnect}
+                      disabled={connectModal.sending}
+                      className="flex-1 bg-[#1e3a5f] hover:bg-[#2a4e7c] text-white font-bold"
+                    >
+                      {connectModal.sending ? "Sending…" : <><Send className="h-4 w-4 mr-1.5" />Send Request</>}
+                    </Button>
+                    <Button variant="outline" onClick={() => setConnectModal(null)} className="flex-1">Cancel</Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -642,44 +752,68 @@ export default function IntelligenceDashboard() {
                 Professionals displaced by recent program cuts who are open to industry roles — sourced directly from CollegeCuts.
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {talentProfiles.slice(0, 6).map((t) => (
-                  <Card key={t.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-4 space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="font-bold text-[#1e3a5f] text-sm truncate">{t.full_name}</div>
-                          <div className="text-xs text-gray-600 truncate">{t.title}</div>
+                {talentProfiles.slice(0, 6).map((t) => {
+                  const alreadyConnected = connectedIds.has(t.id);
+                  return (
+                    <Card key={t.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                      <CardContent className="p-4 space-y-2 flex flex-col flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="font-bold text-[#1e3a5f] text-sm truncate">{t.name}</div>
+                            <div className="text-xs text-gray-600 truncate">{t.role_title}</div>
+                          </div>
+                          {t.availability && (
+                            <span className={`shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                              t.availability === "immediate" ? "bg-green-100 text-green-700" :
+                              t.availability === "within_3_months" ? "bg-blue-100 text-blue-700" :
+                              "bg-gray-100 text-gray-600"
+                            }`}>
+                              {t.availability === "immediate" ? "Available now" :
+                               t.availability === "within_3_months" ? "Avail. soon" : "Exploring"}
+                            </span>
+                          )}
                         </div>
-                        {t.availability && (
-                          <span className={`shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                            t.availability === "immediate" ? "bg-green-100 text-green-700" :
-                            t.availability === "within_3_months" ? "bg-blue-100 text-blue-700" :
-                            "bg-gray-100 text-gray-600"
-                          }`}>
-                            {t.availability === "immediate" ? "Available now" :
-                             t.availability === "within_3_months" ? "Avail. soon" : "Exploring"}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-xs text-gray-500 space-y-0.5">
-                        <div className="truncate"><span className="font-medium">From:</span> {t.institution}</div>
-                        <div><span className="font-medium">Discipline:</span> {t.discipline}</div>
-                        <div><span className="font-medium">State:</span> {t.state}</div>
-                        {t.years_experience && <div><span className="font-medium">Experience:</span> {t.years_experience} yrs</div>}
-                      </div>
-                      {t.linkedin_url && (
-                        <a
-                          href={t.linkedin_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-[#1e3a5f] hover:text-amber-600 font-semibold"
-                        >
-                          LinkedIn <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                        <div className="text-xs text-gray-500 space-y-0.5 flex-1">
+                          <div className="truncate"><span className="font-medium">From:</span> {t.institution}</div>
+                          {t.department && <div className="truncate"><span className="font-medium">Dept:</span> {t.department}</div>}
+                          <div><span className="font-medium">State:</span> {t.state}</div>
+                          {t.years_experience && <div><span className="font-medium">Experience:</span> {t.years_experience} yrs</div>}
+                          {t.specializations?.length > 0 && (
+                            <div className="flex flex-wrap gap-1 pt-1">
+                              {t.specializations.slice(0, 2).map((s) => (
+                                <span key={s} className="bg-[#1e3a5f]/5 text-[#1e3a5f] text-[10px] font-medium px-1.5 py-0.5 rounded">{s}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between pt-1 border-t border-gray-100 mt-auto">
+                          {t.linkedin_url ? (
+                            <a
+                              href={t.linkedin_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-[#1e3a5f] hover:text-amber-600 font-semibold"
+                            >
+                              LinkedIn <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : <span />}
+                          {alreadyConnected ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-green-600">
+                              <CheckCircle2 className="h-3.5 w-3.5" /> Request sent
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setConnectModal({ talent: t, message: "", sending: false, done: false })}
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[#1e3a5f] hover:text-amber-600 border border-[#1e3a5f]/30 hover:border-amber-400 rounded-full px-2.5 py-1 transition-colors"
+                            >
+                              <Send className="h-3 w-3" /> Connect
+                            </button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
               {talentProfiles.length > 6 && (
                 <div className="mt-4 text-center">
