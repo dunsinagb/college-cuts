@@ -5,6 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/Layout";
+import { AuthProvider, useAuth } from "@/lib/auth-context";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import CutsList from "@/pages/cuts-list";
@@ -21,30 +22,39 @@ import IntelligenceLanding from "@/pages/intelligence/index";
 import IntelligenceOnboarding from "@/pages/intelligence/onboarding";
 import IntelligenceDashboard from "@/pages/intelligence/dashboard";
 import TalentRegister from "@/pages/talent/index";
+import Login from "@/pages/auth/login";
+import Signup from "@/pages/auth/signup";
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
+    queries: { refetchOnWindowFocus: false, retry: 1 },
   },
 });
 
-function isSubscribed() {
-  return localStorage.getItem("cc_subscribed") === "1";
-}
-
 function GatedPage({ path, component: Component }: { path: string; component: React.ComponentType }) {
   const [, navigate] = useLocation();
+  const { user, role, loading } = useAuth();
+
+  const legacyAccess = localStorage.getItem("cc_subscribed") === "1";
 
   useEffect(() => {
-    if (!isSubscribed()) {
-      navigate(`/subscribe?redirect=${encodeURIComponent(path)}`, { replace: true });
+    if (loading) return;
+    const hasAccess = legacyAccess || user !== null;
+    if (!hasAccess) {
+      navigate(`/auth/login?redirect=${encodeURIComponent(path)}`, { replace: true });
     }
-  }, [path, navigate]);
+  }, [loading, user, path, navigate]);
 
-  if (!isSubscribed()) return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="h-8 w-8 rounded-full border-2 border-[#1e3a5f] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  const hasAccess = legacyAccess || user !== null;
+  if (!hasAccess) return null;
   return <Component />;
 }
 
@@ -52,9 +62,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/embed/:slug">{() => (
-        <div className="p-3">
-          <EmbedWidget />
-        </div>
+        <div className="p-3"><EmbedWidget /></div>
       )}</Route>
       <Route>{() => (
         <Layout>
@@ -67,6 +75,8 @@ function Router() {
             <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
             <Route path="/news">{() => <News />}</Route>
             <Route path="/subscribe">{() => <Subscribe />}</Route>
+            <Route path="/auth/login">{() => <Login />}</Route>
+            <Route path="/auth/signup">{() => <Signup />}</Route>
             <Route path="/submit-tip">{() => <SubmitTip />}</Route>
             <Route path="/about">{() => <About />}</Route>
             <Route path="/intelligence">{() => <IntelligenceLanding />}</Route>
@@ -86,9 +96,11 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
+          <AuthProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          </AuthProvider>
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

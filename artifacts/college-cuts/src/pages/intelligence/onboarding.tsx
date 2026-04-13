@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet-async";
-import { ArrowLeft, ArrowRight, BarChart3, Bell, Building2, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BarChart3, Bell, Building2, CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase-client";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -65,6 +66,10 @@ export default function IntelligenceOnboarding() {
     tier: "free",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [password, setPassword] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [finishing, setFinishing] = useState(false);
 
   const { data: roles = [], isLoading: rolesLoading } = useQuery<RoleOption[]>({
     queryKey: ["intelligence-roles"],
@@ -104,6 +109,8 @@ export default function IntelligenceOnboarding() {
       if (!profile.company.trim()) e.company = "Company name required";
       if (!profile.industry) e.industry = "Select your industry";
       if (!profile.size) e.size = "Select company size";
+      if (password.length < 8) e.password = "Password must be at least 8 characters";
+      if (password !== confirmPw) e.confirmPw = "Passwords don't match";
     }
     if (step === 1) {
       if (profile.roleIds.length === 0) e.roles = "Select at least one role category";
@@ -119,15 +126,38 @@ export default function IntelligenceOnboarding() {
 
   async function handleFinish() {
     if (!validateStep()) return;
+    setFinishing(true);
+
+    const cleanEmail = profile.email.trim().toLowerCase();
+
+    const { data: existingUser } = await supabase.auth.getUser();
+    if (!existingUser.user) {
+      const { error: authError } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}${BASE_URL}/intelligence/dashboard` },
+      });
+      if (authError && authError.message !== "User already registered") {
+        setErrors((e) => ({ ...e, email: authError.message }));
+        setFinishing(false);
+        return;
+      }
+      if (authError?.message === "User already registered") {
+        await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+      }
+    }
+
     localStorage.setItem("cc_employer", JSON.stringify(profile));
+    localStorage.setItem("cc_user_email", cleanEmail);
+
     try {
       await fetch(`${BASE_URL}/api/intelligence/employer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile),
       });
-    } catch {
-    }
+    } catch {}
+
     navigate("/intelligence/dashboard");
   }
 
@@ -208,6 +238,36 @@ export default function IntelligenceOnboarding() {
                       className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] ${errors.company ? "border-red-400" : "border-gray-300"}`}
                     />
                     {errors.company && <p className="text-red-500 text-xs mt-1">{errors.company}</p>}
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Create Password *</label>
+                    <div className="relative">
+                      <input
+                        type={showPw ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Min. 8 characters"
+                        className={`w-full rounded-lg border pr-10 px-3 py-2.5 text-sm outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] ${errors.password ? "border-red-400" : "border-gray-300"}`}
+                      />
+                      <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password *</label>
+                    <input
+                      type="password"
+                      value={confirmPw}
+                      onChange={(e) => setConfirmPw(e.target.value)}
+                      placeholder="Repeat password"
+                      className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-[#1e3a5f] focus:ring-1 focus:ring-[#1e3a5f] ${errors.confirmPw ? "border-red-400" : "border-gray-300"}`}
+                    />
+                    {errors.confirmPw && <p className="text-red-500 text-xs mt-1">{errors.confirmPw}</p>}
                   </div>
                 </div>
                 <div>
@@ -405,7 +465,7 @@ export default function IntelligenceOnboarding() {
                   <div className="flex justify-between"><span className="font-semibold text-gray-600">Plan</span><span className="text-amber-600 font-bold">Freemium</span></div>
                 </div>
                 <p className="text-xs text-gray-400">
-                  Your configuration is saved locally. Upgrade to Professional or Enterprise to enable cloud sync, team sharing, and PDF export.
+                  Your account will be created and your dashboard configuration saved. You can sign in at any time with your email and password.
                 </p>
               </CardContent>
             </Card>
@@ -424,13 +484,13 @@ export default function IntelligenceOnboarding() {
             </Button>
             {step < 3 ? (
               <Button onClick={handleNext} className="bg-[#1e3a5f] hover:bg-[#2a4e7c] text-white font-bold">
-                Continue
-                <ArrowRight className="h-4 w-4 ml-1" />
+                Continue <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
-              <Button onClick={handleFinish} className="bg-amber-500 hover:bg-amber-400 text-white font-bold">
-                Launch My Dashboard
-                <ArrowRight className="h-4 w-4 ml-1" />
+              <Button onClick={handleFinish} disabled={finishing} className="bg-amber-500 hover:bg-amber-400 text-white font-bold">
+                {finishing
+                  ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Setting up…</>
+                  : <>Launch My Dashboard <ArrowRight className="h-4 w-4 ml-1" /></>}
               </Button>
             )}
           </div>
