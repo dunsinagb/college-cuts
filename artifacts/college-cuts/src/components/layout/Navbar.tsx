@@ -75,23 +75,38 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           {!loading && (
             user ? (
-              <div className="hidden sm:flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1.5">
-                  <User className="h-3.5 w-3.5 text-amber-400" />
-                  <span className="text-xs font-medium text-white max-w-[120px] truncate">{displayName}</span>
-                  {role === "employer" && (
-                    <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wide">Pro</span>
-                  )}
+              <>
+                {/* Desktop: user pill + sign out */}
+                <div className="hidden sm:flex items-center gap-2">
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5 transition-colors"
+                  >
+                    <User className="h-3.5 w-3.5 text-amber-400" />
+                    <span className="text-xs font-medium text-white max-w-[120px] truncate">{displayName}</span>
+                    {role === "employer" && (
+                      <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wide">Pro</span>
+                    )}
+                  </Link>
+                  <button
+                    onClick={signOut}
+                    className="flex items-center gap-1 text-xs text-blue-300 hover:text-white transition-colors px-2 py-1.5 rounded-md hover:bg-white/10"
+                    title="Sign out"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    <span className="hidden lg:block">Sign out</span>
+                  </button>
                 </div>
-                <button
-                  onClick={signOut}
-                  className="flex items-center gap-1 text-xs text-blue-300 hover:text-white transition-colors px-2 py-1.5 rounded-md hover:bg-white/10"
-                  title="Sign out"
+                {/* Mobile: profile icon always visible next to hamburger */}
+                <Link
+                  href="/profile"
+                  onClick={() => setOpen(false)}
+                  className="sm:hidden flex items-center justify-center rounded-full w-8 h-8 bg-white/10 hover:bg-white/20 transition-colors"
+                  title="My account"
                 >
-                  <LogOut className="h-3.5 w-3.5" />
-                  <span className="hidden lg:block">Sign out</span>
-                </button>
-              </div>
+                  <User className="h-4 w-4 text-amber-400" />
+                </Link>
+              </>
             ) : (
               <div className="hidden sm:flex items-center gap-2">
                 <Link
@@ -111,14 +126,15 @@ export function Navbar() {
             )
           )}
 
-          <Button
-            asChild
-            size="sm"
-            className="hidden sm:flex bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold"
-            style={{ display: user ? "none" : undefined }}
-          >
-            <Link href="/submit-tip">Submit a Tip</Link>
-          </Button>
+          {!user && (
+            <Button
+              asChild
+              size="sm"
+              className="hidden sm:flex bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold"
+            >
+              <Link href="/submit-tip">Submit a Tip</Link>
+            </Button>
+          )}
 
           {/* Hamburger */}
           <button
@@ -165,10 +181,17 @@ export function Navbar() {
                 </Link>
               )
             ))}
-            <div className="mt-2 pt-2 border-t border-white/10 space-y-2">
+            <div className="mt-2 pt-2 border-t border-white/10 space-y-1">
               {user ? (
                 <>
-                  <div className="px-3 py-1.5 text-xs text-blue-300">{user.email}</div>
+                  <div className="px-3 py-1.5 text-xs text-blue-300 truncate">{user.email}</div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setOpen(false)}
+                    className="w-full rounded-md px-3 py-2.5 text-sm text-blue-100 hover:bg-white/10 flex items-center gap-2"
+                  >
+                    <User className="h-4 w-4" /> My Account
+                  </Link>
                   <button
                     onClick={() => { signOut(); setOpen(false); }}
                     className="w-full text-left rounded-md px-3 py-2.5 text-sm text-blue-200 hover:bg-white/10 flex items-center gap-2"

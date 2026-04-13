@@ -74,7 +74,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
       options: {
-        emailRedirectTo: `${window.location.origin}${BASE_URL}${redirect ? `/auth/callback?redirect=${encodeURIComponent(redirect)}` : "/cuts"}`,
+        emailRedirectTo: `${window.location.origin}${BASE_URL}/auth/callback${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
         shouldCreateUser: true,
       },
     });

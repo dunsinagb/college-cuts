@@ -25,6 +25,7 @@ import TalentRegister from "@/pages/talent/index";
 import Login from "@/pages/auth/login";
 import Signup from "@/pages/auth/signup";
 import AuthCallback from "@/pages/auth/callback";
+import Profile from "@/pages/profile";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +80,7 @@ function Router() {
             <Route path="/auth/login">{() => <Login />}</Route>
             <Route path="/auth/signup">{() => <Signup />}</Route>
             <Route path="/auth/callback">{() => <AuthCallback />}</Route>
+            <Route path="/profile">{() => <Profile />}</Route>
             <Route path="/submit-tip">{() => <SubmitTip />}</Route>
             <Route path="/about">{() => <About />}</Route>
             <Route path="/intelligence">{() => <IntelligenceLanding />}</Route>
