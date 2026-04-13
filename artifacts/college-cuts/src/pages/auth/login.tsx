@@ -43,8 +43,11 @@ export default function Login() {
       password,
     });
     if (error) {
-      if (error.message === "Invalid login credentials") {
-        setError("Incorrect email or password. If you subscribed before accounts were added, use \"Send me a sign-in link\" below.");
+      const msg = error.message.toLowerCase();
+      if (msg.includes("email not confirmed")) {
+        setError("Your email isn't confirmed yet. Check your inbox for the confirmation email we sent when you signed up, then click the link to activate your account.");
+      } else if (msg.includes("invalid login credentials") || msg.includes("invalid credentials")) {
+        setError("Incorrect email or password. If you subscribed before accounts were added, use \"Email link (no password)\" above.");
       } else {
         setError(error.message);
       }
@@ -79,7 +82,14 @@ export default function Login() {
       },
     });
     if (error) {
-      setError(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("rate limit") || msg.includes("too many") || msg.includes("429")) {
+        setError("Too many requests. Please wait at least 60 seconds before requesting another sign-in link.");
+      } else if (msg.includes("not found") || msg.includes("user not found")) {
+        setError("No account found with that email. Create a free account first.");
+      } else {
+        setError(error.message);
+      }
     } else {
       setMagicSent(true);
     }

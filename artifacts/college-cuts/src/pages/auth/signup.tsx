@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet-async";
-import { GraduationCap, Loader2, Eye, EyeOff, CheckCircle2, ArrowRight, Database, BarChart3, TrendingUp, Shield } from "lucide-react";
+import {
+  GraduationCap, Loader2, Eye, EyeOff, ArrowRight,
+  Database, BarChart3, TrendingUp, Shield, Mail,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase-client";
 
@@ -16,24 +19,22 @@ export default function Signup() {
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [emailConfirmNeeded, setEmailConfirmNeeded] = useState(false);
+
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect") || "/cuts";
 
   async function handleGoogleSignUp() {
     setGoogleLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}${BASE_URL}/auth/callback`,
-      },
+      options: { redirectTo: `${window.location.origin}${BASE_URL}/auth/callback` },
     });
     if (error) {
       setError(error.message);
       setGoogleLoading(false);
     }
   }
-
-  const params = new URLSearchParams(window.location.search);
-  const redirect = params.get("redirect") || "/cuts";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,10 +46,12 @@ export default function Signup() {
     setSubmitting(true);
     const cleanEmail = email.trim().toLowerCase();
 
-    const { error: authError } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email: cleanEmail,
       password,
-      options: { emailRedirectTo: `${window.location.origin}${BASE_URL}/auth/login` },
+      options: {
+        emailRedirectTo: `${window.location.origin}${BASE_URL}/auth/callback${redirect !== "/cuts" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
+      },
     });
 
     if (authError) {
@@ -57,28 +60,54 @@ export default function Signup() {
       return;
     }
 
-    await fetch(`${BASE_URL}/api/subscribe`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: cleanEmail }),
-    });
+    // Always create the subscriber record regardless of confirmation status
+    try {
+      await fetch(`${BASE_URL}/api/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail }),
+      });
+    } catch {}
 
+    // If Supabase email confirmation is enabled, data.session will be null
+    // and the user needs to click their confirmation email before they can sign in
+    if (!data.session) {
+      setEmailConfirmNeeded(true);
+      setSubmitting(false);
+      return;
+    }
+
+    // Email confirmation disabled — user is signed in immediately
     localStorage.setItem("cc_subscribed", "1");
     localStorage.setItem("cc_user_email", cleanEmail);
-
-    setSuccess(true);
-    setTimeout(() => navigate(redirect), 2000);
+    navigate(redirect);
   }
 
-  if (success) {
+  // --- Confirm email state ---
+  if (emailConfirmNeeded) {
     return (
       <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-sm">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 mx-auto">
+              <Mail className="h-8 w-8 text-blue-600" />
+            </div>
+            <h2 className="text-xl font-extrabold text-[#1e3a5f]">Check your inbox</h2>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              We sent a confirmation link to <strong className="text-[#1e3a5f]">{email}</strong>.
+              Click the link in that email to activate your account and sign in — no extra steps needed.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-800 text-left space-y-1">
+              <div className="font-semibold">Can't find the email?</div>
+              <div>Check your spam or promotions folder. The email is from <em>noreply@mail.supabase.io</em>.</div>
+            </div>
+            <button
+              className="text-sm text-[#1e3a5f] font-semibold hover:underline"
+              onClick={() => { setEmailConfirmNeeded(false); setPassword(""); setConfirm(""); }}
+            >
+              ← Use a different email
+            </button>
           </div>
-          <h2 className="text-xl font-extrabold text-[#1e3a5f]">You're in!</h2>
-          <p className="text-gray-500 text-sm">Account created. Taking you to the database now…</p>
         </div>
       </div>
     );
