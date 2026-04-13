@@ -26,13 +26,30 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) { res.status(500).json({ error: "Resend not configured" }); return; }
 
-  const days = Number(req.query.days) || 7;
-  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const now = new Date();
+  let periodLabel: string;
+  let since: string;
+  let until: string;
+
+  if (req.query.days) {
+    const days = Number(req.query.days);
+    since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+    until = now.toISOString().slice(0, 10);
+    periodLabel = `past ${days} days`;
+  } else {
+    const firstOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const firstOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastOfPrevMonth = new Date(firstOfThisMonth.getTime() - 1);
+    since = firstOfPrevMonth.toISOString().slice(0, 10);
+    until = lastOfPrevMonth.toISOString().slice(0, 10);
+    periodLabel = firstOfPrevMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  }
 
   const { data: cuts, error: cutsErr } = await supabase
     .from("v_latest_cuts")
     .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url")
     .gte("announcement_date", since)
+    .lte("announcement_date", until)
     .order("announcement_date", { ascending: false });
 
   if (cutsErr) { res.status(500).json({ error: cutsErr.message }); return; }
@@ -80,13 +97,13 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
   <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
     <div style="background:#1e3a5f;padding:28px 32px;display:flex;align-items:center;gap:16px">
       <div>
-        <div style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Weekly Digest</div>
+        <div style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Monthly Recap</div>
         <div style="color:#fff;font-size:22px;font-weight:800;margin:0">CollegeCuts Tracker</div>
       </div>
     </div>
     <div style="padding:28px 32px">
-      <h2 style="color:#1e3a5f;margin:0 0 4px">${rows.length} new action${rows.length !== 1 ? "s" : ""} in the past ${days} days</h2>
-      <p style="color:#6b7280;margin:0 0 24px;font-size:14px">Here's what's been added to the CollegeCuts database recently.</p>
+      <h2 style="color:#1e3a5f;margin:0 0 4px">${rows.length} action${rows.length !== 1 ? "s" : ""} tracked in ${periodLabel}</h2>
+      <p style="color:#6b7280;margin:0 0 24px;font-size:14px">Here's every program cut, layoff, and closure added to the CollegeCuts database this month.</p>
       <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
         <thead>
           <tr style="background:#f8fafc">
@@ -117,7 +134,7 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
       await resend.emails.send({
         from: "CollegeCuts <hello@college-cuts.com>",
         to: [email],
-        subject: `📋 ${rows.length} new higher-ed action${rows.length !== 1 ? "s" : ""} tracked this week — CollegeCuts`,
+        subject: `CollegeCuts ${periodLabel} Recap — ${rows.length} higher-ed action${rows.length !== 1 ? "s" : ""} tracked`,
         html,
       });
       sent++;
