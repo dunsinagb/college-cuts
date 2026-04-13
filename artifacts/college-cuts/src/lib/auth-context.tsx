@@ -51,6 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user?.email) {
         const r = await detectRole(session.user.email);
         setRole(r);
+        // Any signed-in user gets access — set flags regardless of sign-in method
+        localStorage.setItem("cc_subscribed", "1");
+        localStorage.setItem("cc_user_email", session.user.email);
+        if (r === "employer") localStorage.setItem("cc_employer", "1");
       }
       setLoading(false);
     });
@@ -61,9 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user?.email) {
         const r = await detectRole(session.user.email);
         setRole(r);
-        if (session.user.email) {
-          localStorage.setItem("cc_user_email", session.user.email);
-        }
+        // Any signed-in user gets access — set flags regardless of sign-in method
+        localStorage.setItem("cc_subscribed", "1");
+        localStorage.setItem("cc_user_email", session.user.email);
+        if (r === "employer") localStorage.setItem("cc_employer", "1");
       } else {
         setRole(null);
         localStorage.removeItem("cc_user_email");

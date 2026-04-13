@@ -211,14 +211,24 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
 
     const actionUrl = mlData?.properties?.action_link || safeRedirect;
 
-    // Step 3: Add to subscribers table
+    // Step 3: Add to subscribers table (direct DB insert — no HTTP self-call)
     try {
-      await fetch(`http://localhost:${process.env.PORT || 8080}/api/subscribe`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: cleanEmail }),
-      });
-    } catch {}
+      const { data: existing } = await supabase
+        .from("subscribers")
+        .select("id")
+        .eq("email", cleanEmail)
+        .limit(1)
+        .maybeSingle();
+
+      if (!existing) {
+        const { error: subError } = await supabase
+          .from("subscribers")
+          .insert({ email: cleanEmail });
+        if (subError) console.error("[signup] subscriber insert error:", subError.message);
+      }
+    } catch (subErr) {
+      console.error("[signup] subscriber step error:", subErr);
+    }
 
     // Step 4: Send branded welcome email via Resend (with one-click sign-in button)
     const resend = getResend();
