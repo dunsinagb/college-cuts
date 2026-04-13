@@ -10,6 +10,7 @@ import rssRouter from "./rss";
 import sitemapRouter from "./sitemap";
 import digestRouter from "./digest";
 import alertsRouter from "./alerts";
+import intelligenceRouter from "./intelligence";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(rssRouter);
 router.use(sitemapRouter);
 router.use(digestRouter);
 router.use(alertsRouter);
+router.use(intelligenceRouter);
 
 export default router;

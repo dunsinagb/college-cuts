@@ -8,12 +8,13 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "/",           label: "Dashboard"   },
-    { href: "/cuts",       label: "All Actions" },
-    { href: "/analytics",  label: "Analytics"   },
-    { href: "/news",       label: "News"        },
-    { href: "/job-outlook",label: "Job Outlook" },
-    { href: "/about",      label: "About"       },
+    { href: "/",               label: "Dashboard",   highlight: false },
+    { href: "/cuts",           label: "All Actions", highlight: false },
+    { href: "/analytics",      label: "Analytics",   highlight: false },
+    { href: "/news",           label: "News",        highlight: false },
+    { href: "/job-outlook",    label: "Job Outlook", highlight: false },
+    { href: "/about",          label: "About",       highlight: false },
+    { href: "/intelligence",   label: "Intelligence",highlight: true  },
   ];
 
   return (
@@ -30,17 +31,31 @@ export function Navbar() {
           </Link>
           <nav className="hidden gap-6 md:flex">
             {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  location === link.href
-                    ? "text-amber-400"
-                    : "text-blue-200 hover:text-white"
-                }`}
-              >
-                {link.label}
-              </Link>
+              link.highlight ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-bold transition-colors px-2.5 py-1 rounded-full border ${
+                    location.startsWith("/intelligence")
+                      ? "bg-amber-400 text-white border-amber-400"
+                      : "border-amber-400/60 text-amber-300 hover:bg-amber-400/10 hover:text-amber-200"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors ${
+                    location === link.href
+                      ? "text-amber-400"
+                      : "text-blue-200 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </nav>
         </div>
@@ -76,9 +91,13 @@ export function Navbar() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                  location === link.href
-                    ? "bg-white/10 text-amber-400"
-                    : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  link.highlight
+                    ? location.startsWith("/intelligence")
+                      ? "bg-amber-400 text-white"
+                      : "border border-amber-400/50 text-amber-300 hover:bg-amber-400/10"
+                    : location === link.href
+                      ? "bg-white/10 text-amber-400"
+                      : "text-blue-100 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {link.label}

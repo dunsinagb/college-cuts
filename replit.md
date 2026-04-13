@@ -29,6 +29,9 @@ A civic data tracker that monitors college program cuts, university closures, de
 - `/subscribe` — Email subscription gate (localStorage: cc_subscribed)
 - `/submit-tip` — Form for users to submit new tips about cuts (sends Resend confirmation)
 - `/about` — Mission, methodology, FAQ
+- `/intelligence` — B2B Skills Gap Intelligence landing page (pricing, how it works)
+- `/intelligence/onboarding` — 4-step employer onboarding wizard (company profile → roles → alerts → dashboard)
+- `/intelligence/dashboard` — Personalized Pipeline Risk Dashboard (freemium: 3 roles free, blur on 4+)
 
 ## Key Commands
 
@@ -56,6 +59,9 @@ A civic data tracker that monitors college program cuts, university closures, de
 - `POST /api/tips` — submit a new tip (sends Resend confirmation email)
 - `POST /api/subscribe` — email subscription (saves to local DB, sends Resend welcome email)
 - `GET /api/job-outlook?major=X` — BLS wage/employment data via Supabase CIP/SOC crosswalk
+- `GET /api/intelligence/roles` — list all 17 O*NET-mapped role categories
+- `POST /api/intelligence/risks` — compute pipeline risk scores per role from cuts data (body: {roleIds, states})
+- `GET /api/intelligence/recent-disruptions` — last 30 days of cuts mapped to corporate job functions
 
 ## Environment Variables
 

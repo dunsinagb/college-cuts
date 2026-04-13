@@ -17,6 +17,9 @@ import JobOutlook from "@/pages/job-outlook";
 import News from "@/pages/news";
 import InstitutionPage from "@/pages/institution";
 import EmbedWidget from "@/pages/embed";
+import IntelligenceLanding from "@/pages/intelligence/index";
+import IntelligenceOnboarding from "@/pages/intelligence/onboarding";
+import IntelligenceDashboard from "@/pages/intelligence/dashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,6 +68,9 @@ function Router() {
             <Route path="/subscribe">{() => <Subscribe />}</Route>
             <Route path="/submit-tip">{() => <SubmitTip />}</Route>
             <Route path="/about">{() => <About />}</Route>
+            <Route path="/intelligence">{() => <IntelligenceLanding />}</Route>
+            <Route path="/intelligence/onboarding">{() => <IntelligenceOnboarding />}</Route>
+            <Route path="/intelligence/dashboard">{() => <IntelligenceDashboard />}</Route>
             <Route>{() => <NotFound />}</Route>
           </Switch>
         </Layout>
