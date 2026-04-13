@@ -29,3 +29,15 @@ id = "bBB8U61fKY8t_X7PeVoZY"
 uri = "file://screenshots/college-cuts-linkedin-banner.png"
 type = "image"
 title = "LinkedIn Company Banner"
+
+[[outputs]]
+id = "wwv_rKExum_gKrLBzi1EB"
+uri = "file://screenshots/dashboard.jpg"
+type = "image"
+title = "CollegeCuts Dashboard — for Facebook Post 1"
+
+[[outputs]]
+id = "N-LbJV1caPPHkA5egseL1"
+uri = "file://screenshots/talent.jpg"
+type = "image"
+title = "CollegeCuts Talent Pool — for Facebook Post 2"
