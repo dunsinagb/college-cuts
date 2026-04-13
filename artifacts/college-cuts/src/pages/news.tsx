@@ -78,7 +78,7 @@ export default function News() {
       ? (items ?? [])
       : (items ?? []).filter((item) =>
           activeSource === "chronicle"
-            ? item.sourceId === "chronicle" || item.sourceId === "chronicle-of-higher-education"
+            ? item.sourceId.toLowerCase().includes("chronicle")
             : item.sourceId === activeSource
         );
 
@@ -174,11 +174,7 @@ export default function News() {
               <Newspaper className="h-7 w-7 text-gray-400" />
             </div>
             <p className="text-lg font-semibold text-gray-700">No articles found</p>
-            <p className="text-sm text-gray-500">
-              {activeSource === "chronicle"
-                ? "The Chronicle feed has no recent articles right now."
-                : "No articles are available right now. Try Refresh."}
-            </p>
+            <p className="text-sm text-gray-500">No stories match this filter right now.</p>
           </div>
         ) : (
           <>
