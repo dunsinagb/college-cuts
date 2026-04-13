@@ -348,6 +348,9 @@ export default function CutsList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-[#f8f9fc] text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th className="px-4 py-3 text-center" title="Alert me when new data is added">
+                    <Bell className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
+                  </th>
                   <th className="px-4 py-3 text-left whitespace-nowrap">Date</th>
                   <th className="px-4 py-3 text-left">Institution</th>
                   <th className="px-4 py-3 text-left whitespace-nowrap">Control</th>
@@ -358,9 +361,6 @@ export default function CutsList() {
                   <th className="px-4 py-3 text-right whitespace-nowrap">Students</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">Faculty/Staff</th>
                   <th className="px-4 py-3 text-left whitespace-nowrap">Source</th>
-                  <th className="px-4 py-3 text-center" title="Alert me when new data is added">
-                    <Bell className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -380,6 +380,58 @@ export default function CutsList() {
                       key={cut.id}
                       className="hover:bg-[#f8f9fc] transition-colors group"
                     >
+                      {/* Bell / alert cell */}
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        {activeAlert === cut.id ? (
+                          alertStatus === "success" ? (
+                            <div className="flex items-center gap-1 text-green-600 text-xs font-semibold">
+                              <Check className="h-3.5 w-3.5" /> Set!
+                            </div>
+                          ) : (
+                            <form
+                              onSubmit={(e) => handleAlertSubmit(cut, e)}
+                              className="flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <input
+                                type="email"
+                                required
+                                autoFocus
+                                placeholder="your@email.com"
+                                value={alertEmail}
+                                onChange={e => setAlertEmail(e.target.value)}
+                                className="h-7 w-36 rounded border border-gray-300 px-2 text-xs focus:outline-none focus:border-amber-400"
+                              />
+                              <button
+                                type="submit"
+                                disabled={alertStatus === "loading"}
+                                className="h-7 px-2 rounded bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-colors disabled:opacity-60"
+                              >
+                                {alertStatus === "loading" ? "…" : "OK"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setActiveAlert(null)}
+                                className="text-gray-400 hover:text-gray-600"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                              {alertStatus === "error" && (
+                                <span className="text-red-500 text-xs">!</span>
+                              )}
+                            </form>
+                          )
+                        ) : (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openAlert(cut.id); }}
+                            className="p-1.5 rounded-md text-gray-300 hover:text-amber-500 hover:bg-amber-50 transition-colors"
+                            title={`Alert me when new data is added for ${cut.institution}`}
+                          >
+                            <Bell className="h-4 w-4" />
+                          </button>
+                        )}
+                      </td>
+
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground text-xs">
                         {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : "—"}
                       </td>
@@ -441,58 +493,6 @@ export default function CutsList() {
                           </a>
                         ) : (
                           <span className="text-muted-foreground/40 text-xs">—</span>
-                        )}
-                      </td>
-
-                      {/* Bell / alert cell */}
-                      <td className="px-3 py-3 text-center whitespace-nowrap">
-                        {activeAlert === cut.id ? (
-                          alertStatus === "success" ? (
-                            <div className="flex items-center gap-1 text-green-600 text-xs font-semibold">
-                              <Check className="h-3.5 w-3.5" /> Set!
-                            </div>
-                          ) : (
-                            <form
-                              onSubmit={(e) => handleAlertSubmit(cut, e)}
-                              className="flex items-center gap-1"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <input
-                                type="email"
-                                required
-                                autoFocus
-                                placeholder="your@email.com"
-                                value={alertEmail}
-                                onChange={e => setAlertEmail(e.target.value)}
-                                className="h-7 w-36 rounded border border-gray-300 px-2 text-xs focus:outline-none focus:border-amber-400"
-                              />
-                              <button
-                                type="submit"
-                                disabled={alertStatus === "loading"}
-                                className="h-7 px-2 rounded bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-colors disabled:opacity-60"
-                              >
-                                {alertStatus === "loading" ? "…" : "OK"}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setActiveAlert(null)}
-                                className="text-gray-400 hover:text-gray-600"
-                              >
-                                <X className="h-3.5 w-3.5" />
-                              </button>
-                              {alertStatus === "error" && (
-                                <span className="text-red-500 text-xs">!</span>
-                              )}
-                            </form>
-                          )
-                        ) : (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); openAlert(cut.id); }}
-                            className="p-1.5 rounded-md text-gray-300 hover:text-amber-500 hover:bg-amber-50 transition-colors"
-                            title={`Alert me when new data is added for ${cut.institution}`}
-                          >
-                            <Bell className="h-4 w-4" />
-                          </button>
                         )}
                       </td>
                     </tr>
