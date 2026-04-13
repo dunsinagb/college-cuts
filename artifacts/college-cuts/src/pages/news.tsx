@@ -30,6 +30,7 @@ const SOURCES = [
 const SOURCE_COLORS: Record<string, { bg: string; text: string }> = {
   "inside-higher-ed": { bg: "bg-blue-100", text: "text-blue-800" },
   chronicle: { bg: "bg-purple-100", text: "text-purple-800" },
+  "chronicle-of-higher-education": { bg: "bg-purple-100", text: "text-purple-800" },
   edscoop: { bg: "bg-green-100", text: "text-green-800" },
   "ecampus-news": { bg: "bg-amber-100", text: "text-amber-800" },
 };
@@ -75,7 +76,11 @@ export default function News() {
   const filtered =
     activeSource === "all"
       ? (items ?? [])
-      : (items ?? []).filter((item) => item.sourceId === activeSource);
+      : (items ?? []).filter((item) =>
+          activeSource === "chronicle"
+            ? item.sourceId === "chronicle" || item.sourceId === "chronicle-of-higher-education"
+            : item.sourceId === activeSource
+        );
 
   return (
     <>
