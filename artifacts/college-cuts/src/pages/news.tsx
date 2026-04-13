@@ -22,15 +22,14 @@ type NewsItem = {
 const SOURCES = [
   { id: "all", name: "All" },
   { id: "inside-higher-ed", name: "Inside Higher Ed" },
-  { id: "chronicle", name: "Chronicle of Higher Education" },
+  { id: "hechinger", name: "Hechinger Report" },
   { id: "edscoop", name: "EdScoop" },
   { id: "ecampus-news", name: "eCampus News" },
 ];
 
 const SOURCE_COLORS: Record<string, { bg: string; text: string }> = {
   "inside-higher-ed": { bg: "bg-blue-100", text: "text-blue-800" },
-  chronicle: { bg: "bg-purple-100", text: "text-purple-800" },
-  "chronicle-of-higher-education": { bg: "bg-purple-100", text: "text-purple-800" },
+  hechinger: { bg: "bg-purple-100", text: "text-purple-800" },
   edscoop: { bg: "bg-green-100", text: "text-green-800" },
   "ecampus-news": { bg: "bg-amber-100", text: "text-amber-800" },
 };
@@ -77,8 +76,8 @@ export default function News() {
     activeSource === "all"
       ? (items ?? [])
       : (items ?? []).filter((item) =>
-          activeSource === "chronicle"
-            ? item.sourceId.toLowerCase().includes("chronicle")
+          activeSource === "hechinger"
+            ? item.sourceId.toLowerCase().includes("hechinger")
             : item.sourceId === activeSource
         );
 
