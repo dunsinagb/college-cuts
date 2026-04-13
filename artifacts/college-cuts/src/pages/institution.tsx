@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import {
   ArrowLeft, ArrowRight, Building2, MapPin, Users, GraduationCap,
-  Link2, Check, ExternalLink, Calendar, Bell
+  Link2, Check, ExternalLink, Calendar, Bell, ChevronDown, ChevronUp,
 } from "lucide-react";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -60,6 +60,46 @@ export default function InstitutionPage() {
   const [showAlertForm, setShowAlertForm] = useState(false);
   const [alertEmail, setAlertEmail] = useState("");
   const [alertStatus, setAlertStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
+  const [showActionsExpanded, setShowActionsExpanded] = useState(false);
+
+  // Inline affected-worker registration
+  const [regName, setRegName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regTitle, setRegTitle] = useState("");
+  const [regStatus, setRegStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
+  const [regErrors, setRegErrors] = useState<Record<string,string>>({});
+
+  async function handleAffectedSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const errs: Record<string,string> = {};
+    if (!regName.trim()) errs.name = "Name required";
+    if (!regEmail.includes("@")) errs.email = "Valid email required";
+    if (!regTitle.trim()) errs.title = "Your title/role is required";
+    setRegErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    setRegStatus("loading");
+    try {
+      const r = await fetch(`${BASE_URL}/api/talent/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: regName.trim(),
+          email: regEmail.trim().toLowerCase(),
+          institution: data?.institution ?? "",
+          institution_slug: slug,
+          role_title: regTitle.trim(),
+          visible: true,
+        }),
+      });
+      if (!r.ok) {
+        const body = await r.json().catch(() => null);
+        throw new Error(body?.error || "failed");
+      }
+      setRegStatus("success");
+    } catch {
+      setRegStatus("error");
+    }
+  }
 
   const { data, isLoading, error } = useQuery<InstitutionData>({
     queryKey: ["institution", slug],
@@ -352,37 +392,132 @@ export default function InstitutionPage() {
           </div>
         </div>
 
-        {/* Affected worker banner */}
+        {/* Were you affected? — inline registration (FIRST, before action cards) */}
         <div className="container mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
-          <a
-            href={`/talent?institution=${encodeURIComponent(data.institution)}&slug=${encodeURIComponent(slug)}`}
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 group hover:bg-amber-100 transition-colors"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-400/20 shrink-0">
-              <Users className="h-5 w-5 text-amber-600" />
+          <Card className="border-0 shadow-md overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500 to-amber-400 px-6 py-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 shrink-0">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="font-extrabold text-white text-base leading-tight">
+                  Were you or a colleague affected by cuts at {data.institution}?
+                </h2>
+                <p className="text-amber-100 text-xs mt-0.5">
+                  Add your name to our displaced talent pool — companies actively recruiting from this list will reach out to you directly.
+                </p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-amber-900 text-sm leading-snug">
-                Were you or a colleague affected by cuts at {data.institution}?
-              </p>
-              <p className="text-amber-700 text-xs mt-0.5 leading-relaxed">
-                Create a free profile and get discovered by companies actively hiring in your field — no application needed.
-              </p>
-            </div>
-            <div className="flex items-center gap-1 text-amber-700 font-bold text-sm shrink-0 group-hover:text-amber-900">
-              Create your profile <ArrowRight className="h-4 w-4" />
-            </div>
-          </a>
+
+            <CardContent className="p-6">
+              {regStatus === "success" ? (
+                <div className="flex flex-col items-center gap-3 py-4 text-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+                    <Check className="h-7 w-7 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#1e3a5f] text-lg">You're in the pool!</p>
+                    <p className="text-gray-500 text-sm mt-1 max-w-sm">
+                      Your profile has been added. Employers searching for talent from {data.institution} will be able to find and contact you.
+                    </p>
+                  </div>
+                  <a
+                    href={`/talent?institution=${encodeURIComponent(data.institution)}&slug=${encodeURIComponent(slug)}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600 hover:text-amber-700"
+                  >
+                    Add more details to your profile <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+              ) : (
+                <form onSubmit={handleAffectedSubmit} className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Takes 30 seconds. No account needed — just your name, email, and role. We'll never spam you.
+                  </p>
+                  <div className="grid sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name *</label>
+                      <input
+                        type="text"
+                        value={regName}
+                        onChange={e => setRegName(e.target.value)}
+                        placeholder="Dr. Jane Smith"
+                        className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 ${regErrors.name ? "border-red-400" : "border-gray-300"}`}
+                      />
+                      {regErrors.name && <p className="text-red-500 text-xs mt-0.5">{regErrors.name}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Email Address *</label>
+                      <input
+                        type="email"
+                        value={regEmail}
+                        onChange={e => setRegEmail(e.target.value)}
+                        placeholder="you@email.com"
+                        className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 ${regErrors.email ? "border-red-400" : "border-gray-300"}`}
+                      />
+                      {regErrors.email && <p className="text-red-500 text-xs mt-0.5">{regErrors.email}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">Your Title / Role *</label>
+                      <input
+                        type="text"
+                        value={regTitle}
+                        onChange={e => setRegTitle(e.target.value)}
+                        placeholder="Associate Professor, CS"
+                        className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 ${regErrors.title ? "border-red-400" : "border-gray-300"}`}
+                      />
+                      {regErrors.title && <p className="text-red-500 text-xs mt-0.5">{regErrors.title}</p>}
+                    </div>
+                  </div>
+
+                  {regStatus === "error" && (
+                    <p className="text-red-500 text-sm">Something went wrong. Please try again.</p>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <Button
+                      type="submit"
+                      disabled={regStatus === "loading"}
+                      className="bg-amber-500 hover:bg-amber-400 text-white font-bold px-6"
+                    >
+                      {regStatus === "loading"
+                        ? <><span className="animate-spin mr-2">⏳</span>Saving…</>
+                        : <>Join the Talent Pool <ArrowRight className="ml-1.5 h-4 w-4" /></>
+                      }
+                    </Button>
+                    <a
+                      href={`/talent?institution=${encodeURIComponent(data.institution)}&slug=${encodeURIComponent(slug)}`}
+                      className="text-xs text-gray-500 hover:text-[#1e3a5f] underline underline-offset-2"
+                    >
+                      Add full profile with LinkedIn, bio & more →
+                    </a>
+                  </div>
+                </form>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Cuts list */}
         <div className="container mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
-          <h2 className="text-xl font-bold text-[#1e3a5f]">
-            All Recorded Actions ({data.cuts.length})
-          </h2>
+          <button
+            onClick={() => setShowActionsExpanded(v => !v)}
+            className="w-full flex items-center justify-between text-left group"
+          >
+            <h2 className="text-xl font-bold text-[#1e3a5f] group-hover:text-[#2a4e7c]">
+              Recorded Actions ({data.cuts.length})
+            </h2>
+            <span className="flex items-center gap-1.5 text-sm text-gray-500 group-hover:text-[#1e3a5f] font-medium">
+              {showActionsExpanded ? (
+                <><ChevronUp className="h-4 w-4" /> Hide</>
+              ) : (
+                <><ChevronDown className="h-4 w-4" /> View all actions</>
+              )}
+            </span>
+          </button>
 
+          {/* Always show first action; rest are behind the toggle */}
           <div className="space-y-3">
-            {data.cuts.map((cut) => {
+            {data.cuts.slice(0, showActionsExpanded ? data.cuts.length : 1).map((cut) => {
               const typeLabel = CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ");
               return (
                 <Card key={cut.id} className="shadow-sm border-0 hover:shadow-md transition-shadow">
@@ -456,6 +591,15 @@ export default function InstitutionPage() {
               );
             })}
           </div>
+
+          {data.cuts.length > 1 && !showActionsExpanded && (
+            <button
+              onClick={() => setShowActionsExpanded(true)}
+              className="w-full text-center text-sm font-semibold text-[#1e3a5f] hover:text-amber-600 py-2 border border-dashed border-gray-300 rounded-xl hover:border-amber-400 transition-colors"
+            >
+              Show {data.cuts.length - 1} more action{data.cuts.length - 1 !== 1 ? "s" : ""} <ChevronDown className="inline h-4 w-4 ml-1" />
+            </button>
+          )}
 
           <div className="pt-4 border-t border-slate-200">
             <p className="text-xs text-slate-400 text-center">

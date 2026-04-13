@@ -16,7 +16,6 @@ export function Navbar() {
     { href: "/news",         label: "News",        highlight: false },
     { href: "/job-outlook",  label: "Job Outlook", highlight: false },
     { href: "/about",        label: "About",       highlight: false },
-    { href: "/intelligence", label: "Intelligence",highlight: true  },
   ];
 
   const displayName = user?.email?.split("@")[0] ?? "";
@@ -72,14 +71,6 @@ export function Navbar() {
                     <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wide">Pro</span>
                   )}
                 </div>
-                {role === "employer" && (
-                  <Link
-                    href="/intelligence/dashboard"
-                    className="text-xs font-semibold text-amber-300 hover:text-white transition-colors hidden lg:block"
-                  >
-                    Dashboard
-                  </Link>
-                )}
                 <button
                   onClick={signOut}
                   className="flex items-center gap-1 text-xs text-blue-300 hover:text-white transition-colors px-2 py-1.5 rounded-md hover:bg-white/10"
@@ -154,12 +145,6 @@ export function Navbar() {
               {user ? (
                 <>
                   <div className="px-3 py-1.5 text-xs text-blue-300">{user.email}</div>
-                  {role === "employer" && (
-                    <Link href="/intelligence/dashboard" onClick={() => setOpen(false)}
-                      className="block w-full rounded-md border border-amber-400/50 text-amber-300 px-3 py-2.5 text-center text-sm font-semibold">
-                      My Dashboard
-                    </Link>
-                  )}
                   <button
                     onClick={() => { signOut(); setOpen(false); }}
                     className="w-full text-left rounded-md px-3 py-2.5 text-sm text-blue-200 hover:bg-white/10 flex items-center gap-2"
