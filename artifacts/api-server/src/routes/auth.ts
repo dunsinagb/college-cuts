@@ -160,19 +160,17 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
   const supabase = getSupabaseAdmin();
 
   try {
-    // Try to create a new user with email confirmation
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: "signup",
+    // Step 1: Create the user via admin API
+    const { data: createData, error: createError } = await supabase.auth.admin.createUser({
       email: cleanEmail,
       password,
-      options: { redirectTo: safeRedirect },
+      email_confirm: true, // Auto-confirm immediately — no click required
     });
 
-    if (error) {
-      console.error("generateLink signup error:", error.message);
+    if (createError) {
+      console.error("createUser error:", createError.message);
 
-      // For any signup error (user already exists, OAuth conflict, etc.)
-      // fall back to sending a magic link so the user can get in
+      // User already exists — send them a magic sign-in link instead
       const { data: mlData, error: mlError } = await supabase.auth.admin.generateLink({
         type: "magiclink",
         email: cleanEmail,
@@ -180,7 +178,6 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
       });
 
       if (mlError || !mlData?.properties?.action_link) {
-        // Magic link also failed — likely a completely invalid email or Supabase issue
         console.error("Magic link fallback error:", mlError?.message);
         res.status(400).json({ error: "Could not create account. If you already have an account, try signing in with your email link or Google." });
         return;
@@ -188,7 +185,6 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
 
       const actionUrl = mlData.properties.action_link;
       const resend = getResend();
-
       await resend.emails.send({
         from: "CollegeCuts <hello@college-cuts.com>",
         to: cleanEmail,
@@ -206,14 +202,16 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
       return;
     }
 
-    if (!data?.properties?.action_link) {
-      res.status(500).json({ error: "Could not create account. Please try again." });
-      return;
-    }
+    // Step 2: Generate a magic sign-in link so the welcome email signs them in with one click
+    const { data: mlData } = await supabase.auth.admin.generateLink({
+      type: "magiclink",
+      email: cleanEmail,
+      options: { redirectTo: safeRedirect },
+    });
 
-    const actionUrl = data.properties.action_link;
+    const actionUrl = mlData?.properties?.action_link || safeRedirect;
 
-    // Add to subscribers table
+    // Step 3: Add to subscribers table
     try {
       await fetch(`http://localhost:${process.env.PORT || 8080}/api/subscribe`, {
         method: "POST",
@@ -222,16 +220,16 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
       });
     } catch {}
 
-    // Send branded confirmation email via Resend
+    // Step 4: Send branded welcome email via Resend (with one-click sign-in button)
     const resend = getResend();
     const { error: emailError } = await resend.emails.send({
       from: "CollegeCuts <hello@college-cuts.com>",
       to: cleanEmail,
-      subject: "Confirm your CollegeCuts account",
+      subject: "Welcome to CollegeCuts — you're in",
       html: emailLayout(linkEmailBody(
         "Welcome to CollegeCuts",
-        "Click the button below to confirm your email and activate your account. Your access to the full higher education database will be ready immediately.",
-        "Confirm my account →",
+        "Your account is ready. Click the button below to sign in and access the full higher education cuts database — no confirmation step needed.",
+        "Access my account →",
         actionUrl,
         `This link expires in 24 hours and can only be used once.<br />If you didn't create an account, you can safely ignore this email.`,
       )),
