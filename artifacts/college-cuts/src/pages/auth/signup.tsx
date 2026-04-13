@@ -45,42 +45,29 @@ export default function Signup() {
 
     setSubmitting(true);
     const cleanEmail = email.trim().toLowerCase();
+    const redirectTo = `${window.location.origin}${BASE_URL}/auth/callback${redirect !== "/cuts" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`;
 
-    const { data, error: authError } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}${BASE_URL}/auth/callback${redirect !== "/cuts" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`,
-      },
-    });
-
-    if (authError) {
-      setError(authError.message);
-      setSubmitting(false);
-      return;
-    }
-
-    // Always create the subscriber record regardless of confirmation status
     try {
-      await fetch(`${BASE_URL}/api/subscribe`, {
+      const res = await fetch(`${BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: cleanEmail }),
+        body: JSON.stringify({ email: cleanEmail, password, redirectTo }),
       });
-    } catch {}
+      const data = await res.json();
 
-    // If Supabase email confirmation is enabled, data.session will be null
-    // and the user needs to click their confirmation email before they can sign in
-    if (!data.session) {
+      if (!res.ok) {
+        setError(data?.error || "Could not create account. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Account created (or already existed) — confirmation email sent via Resend
       setEmailConfirmNeeded(true);
       setSubmitting(false);
-      return;
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+      setSubmitting(false);
     }
-
-    // Email confirmation disabled — user is signed in immediately
-    localStorage.setItem("cc_subscribed", "1");
-    localStorage.setItem("cc_user_email", cleanEmail);
-    navigate(redirect);
   }
 
   // --- Confirm email state ---
@@ -99,7 +86,7 @@ export default function Signup() {
             </p>
             <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-800 text-left space-y-1">
               <div className="font-semibold">Can't find the email?</div>
-              <div>Check your spam or promotions folder. The email is from <em>noreply@mail.supabase.io</em>.</div>
+              <div>Check your spam or promotions folder. The email is from <em>hello@college-cuts.com</em>.</div>
             </div>
             <button
               className="text-sm text-[#1e3a5f] font-semibold hover:underline"
