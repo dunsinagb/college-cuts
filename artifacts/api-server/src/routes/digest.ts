@@ -61,7 +61,8 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
   if (subsErr) { res.status(500).json({ error: subsErr.message }); return; }
 
   const rows = cuts ?? [];
-  const emails = (subs ?? []).map((s: any) => s.email);
+  const testTo = req.query.to as string | undefined;
+  const emails = testTo ? [testTo] : (subs ?? []).map((s: any) => s.email);
 
   if (!rows.length) { res.json({ ok: true, sent: 0, reason: "No new cuts this period" }); return; }
   if (!emails.length) { res.json({ ok: true, sent: 0, reason: "No subscribers" }); return; }
