@@ -84,7 +84,7 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
         </td>
         <td style="padding:12px 8px;border-bottom:1px solid #e5e7eb;color:#374151;font-size:13px;vertical-align:top">${date}</td>
         <td style="padding:12px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top">
-          <a href="${SITE_URL}/cuts/${c.id}" style="color:#d97706;font-size:12px;text-decoration:none">View →</a>
+          <a href="${SITE_URL}/institution/${slug}" style="color:#d97706;font-size:12px;text-decoration:none">View →</a>
         </td>
       </tr>`;
   }).join("");
@@ -115,7 +115,7 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
         <tbody>${rows_html}</tbody>
       </table>
       <div style="margin-top:28px;text-align:center">
-        <a href="${SITE_URL}/cuts" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 28px;border-radius:6px;font-weight:700;text-decoration:none;font-size:14px">Browse Full Database →</a>
+        <a href="${SITE_URL}" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 28px;border-radius:6px;font-weight:700;text-decoration:none;font-size:14px">Browse Full Database →</a>
       </div>
     </div>
     <div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;text-align:center">
