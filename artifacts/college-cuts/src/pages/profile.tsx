@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLocation } from "wouter";
-import { LogOut, Mail, ShieldCheck, User, ExternalLink } from "lucide-react";
+import { LogOut, Mail, ShieldCheck, User, ExternalLink, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
