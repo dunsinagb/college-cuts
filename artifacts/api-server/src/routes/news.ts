@@ -14,11 +14,6 @@ const FEEDS = [
     url: "https://www.insidehighered.com/rss.xml",
   },
   {
-    id: "chronicle",
-    name: "Chronicle of Higher Education",
-    url: "https://www.chronicle.com/feed",
-  },
-  {
     id: "edscoop",
     name: "EdScoop",
     url: "https://edscoop.com/feed/",
