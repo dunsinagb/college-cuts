@@ -117,9 +117,17 @@ export default function IntelligenceOnboarding() {
     if (step < 3) setStep((s) => s + 1);
   }
 
-  function handleFinish() {
+  async function handleFinish() {
     if (!validateStep()) return;
     localStorage.setItem("cc_employer", JSON.stringify(profile));
+    try {
+      await fetch(`${BASE_URL}/api/intelligence/employer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile),
+      });
+    } catch {
+    }
     navigate("/intelligence/dashboard");
   }
 

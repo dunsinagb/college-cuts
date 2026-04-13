@@ -155,4 +155,89 @@ router.get("/intelligence/recent-disruptions", async (req, res): Promise<void> =
   }
 });
 
+router.post("/intelligence/employer", async (req, res): Promise<void> => {
+  try {
+    const body = req.body as Record<string, any>;
+
+    if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      res.status(400).json({ error: "Valid email is required" }); return;
+    }
+    if (!body.company?.trim()) { res.status(400).json({ error: "Company name is required" }); return; }
+    if (!body.industry) { res.status(400).json({ error: "Industry is required" }); return; }
+
+    const supabase = getSupabase();
+    const email = body.email.trim().toLowerCase();
+
+    const record = {
+      email,
+      company: body.company.trim(),
+      industry: body.industry,
+      size: body.size || null,
+      states: Array.isArray(body.states) ? body.states : [],
+      role_ids: Array.isArray(body.roleIds) ? body.roleIds : [],
+      alert_frequency: body.alertFrequency || "realtime",
+      risk_threshold: body.riskThreshold || "medium",
+      tier: body.tier || "free",
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data: existing } = await supabase
+      .from("employer_profiles")
+      .select("id")
+      .eq("email", email)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      const { error } = await supabase
+        .from("employer_profiles")
+        .update(record)
+        .eq("email", email);
+      if (error) throw error;
+      res.json({ ok: true, action: "updated" });
+    } else {
+      const { error } = await supabase
+        .from("employer_profiles")
+        .insert(record);
+      if (error) throw error;
+      res.json({ ok: true, action: "created" });
+    }
+  } catch (err: any) {
+    console.error("[intelligence] employer save error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/intelligence/employer/:email", async (req, res): Promise<void> => {
+  try {
+    const email = decodeURIComponent(req.params.email).toLowerCase();
+    const supabase = getSupabase();
+
+    const { data, error } = await supabase
+      .from("employer_profiles")
+      .select("*")
+      .eq("email", email)
+      .limit(1)
+      .single();
+
+    if (error && error.code === "PGRST116") {
+      res.status(404).json({ error: "Profile not found" }); return;
+    }
+    if (error) throw error;
+
+    res.json({
+      email: data.email,
+      company: data.company,
+      industry: data.industry,
+      size: data.size,
+      states: data.states,
+      roleIds: data.role_ids,
+      alertFrequency: data.alert_frequency,
+      riskThreshold: data.risk_threshold,
+      tier: data.tier,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
