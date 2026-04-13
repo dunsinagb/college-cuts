@@ -342,25 +342,25 @@ export default function CutsList() {
       </div>
 
       {/* ── table ── */}
-      <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full px-4 py-6 sm:px-6">
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-border bg-[#f8f9fc] text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  <th className="px-4 py-3 text-center" title="Alert me when new data is added">
+                <tr className="border-b border-border bg-[#f8f9fc] text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <th className="px-2 py-3 text-center w-8" title="Alert me when new data is added">
                     <Bell className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
                   </th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap">Date</th>
-                  <th className="px-4 py-3 text-left">Institution</th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap">Control</th>
-                  <th className="px-4 py-3 text-left">State</th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap">Action Type</th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap">Primary Reason</th>
-                  <th className="px-4 py-3 text-left">Status</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">Students</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">Faculty/Staff</th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap">Source</th>
+                  <th className="px-2 py-3 text-left whitespace-nowrap">Date</th>
+                  <th className="px-2 py-3 text-left">Institution</th>
+                  <th className="px-2 py-3 text-left whitespace-nowrap">Control</th>
+                  <th className="px-2 py-3 text-left">St.</th>
+                  <th className="px-2 py-3 text-left whitespace-nowrap">Type</th>
+                  <th className="px-2 py-3 text-left whitespace-nowrap">Reason</th>
+                  <th className="px-2 py-3 text-left">Status</th>
+                  <th className="px-2 py-3 text-right whitespace-nowrap">Students</th>
+                  <th className="px-2 py-3 text-right whitespace-nowrap">Faculty</th>
+                  <th className="px-2 py-3 text-left whitespace-nowrap">Source</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -368,7 +368,7 @@ export default function CutsList() {
                   Array(10).fill(0).map((_, i) => (
                     <tr key={i}>
                       {Array(11).fill(0).map((_, j) => (
-                        <td key={j} className="px-4 py-3">
+                        <td key={j} className="px-2 py-3">
                           <Skeleton className="h-4 w-full" />
                         </td>
                       ))}
@@ -381,7 +381,7 @@ export default function CutsList() {
                       className="hover:bg-[#f8f9fc] transition-colors group"
                     >
                       {/* Bell / alert cell */}
-                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                      <td className="px-2 py-3 text-center whitespace-nowrap w-8">
                         {activeAlert === cut.id ? (
                           alertStatus === "success" ? (
                             <div className="flex items-center gap-1 text-green-600 text-xs font-semibold">
@@ -432,10 +432,10 @@ export default function CutsList() {
                         )}
                       </td>
 
-                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground text-xs">
+                      <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">
                         {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : "—"}
                       </td>
-                      <td className="px-4 py-3 font-medium max-w-[220px]">
+                      <td className="px-2 py-3 font-medium max-w-[180px]">
                         <Link
                           href={`/cuts/${cut.id}`}
                           className="hover:text-[#1e3a5f] hover:underline underline-offset-2 line-clamp-2 block"
@@ -443,56 +443,53 @@ export default function CutsList() {
                           {cut.institution}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
+                      <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">
                         {cut.control ?? "—"}
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center justify-center w-8 h-6 rounded text-xs font-bold bg-[#1e3a5f]/10 text-[#1e3a5f]">
+                      <td className="px-2 py-3">
+                        <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-bold bg-[#1e3a5f]/10 text-[#1e3a5f]">
                           {cut.state}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-2 py-3">
                         <CutTypeBadge cutType={cut.cutType} />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-2 py-3">
                         <ReasonBadge reason={cut.primaryReason} />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-2 py-3">
                         <StatusBadge status={cut.status} />
                       </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
+                      <td className="px-2 py-3 text-right tabular-nums">
                         {cut.studentsAffected != null ? (
                           <span className="font-medium">{cut.studentsAffected.toLocaleString()}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
+                      <td className="px-2 py-3 text-right tabular-nums">
                         {cut.facultyAffected != null ? (
-                          <div>
-                            <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
-                            <span className="text-xs text-muted-foreground block">{cut.cutType === "staff_layoff" ? "Staff" : "Faculty"}</span>
-                          </div>
+                          <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 max-w-[160px]">
+                      <td className="px-2 py-3 max-w-[120px]">
                         {cut.sourceUrl ? (
                           <a
                             href={cut.sourceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 text-xs text-[#1e3a5f] hover:underline underline-offset-2 font-medium"
+                            className="inline-flex items-center gap-1 text-[#1e3a5f] hover:underline underline-offset-2 font-medium"
                           >
-                            <span className="truncate block max-w-[140px]">
+                            <span className="truncate block max-w-[100px]">
                               {cut.sourcePublication || "Source"}
                             </span>
                             <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
                           </a>
                         ) : (
-                          <span className="text-muted-foreground/40 text-xs">—</span>
+                          <span className="text-muted-foreground/40">—</span>
                         )}
                       </td>
                     </tr>
