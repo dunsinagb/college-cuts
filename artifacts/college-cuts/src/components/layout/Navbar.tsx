@@ -10,14 +10,21 @@ export function Navbar() {
   const { user, role, signOut, loading } = useAuth();
 
   const links = [
-    { href: "/",             label: "Dashboard",   highlight: false, comingSoon: false },
-    { href: "/cuts",         label: "All Actions", highlight: false, comingSoon: false },
-    { href: "/analytics",    label: "Analytics",   highlight: false, comingSoon: false },
-    { href: "/news",         label: "News",        highlight: false, comingSoon: false },
-    { href: "/job-outlook",  label: "Job Outlook", highlight: false, comingSoon: false },
-    { href: "/about",        label: "About",       highlight: false, comingSoon: false },
-    { href: "#",             label: "Intelligence", highlight: false, comingSoon: true },
+    { href: "/",             label: "Dashboard",    highlight: false, comingSoon: false, matchPrefixes: ["/"] },
+    { href: "/cuts",         label: "All Actions",  highlight: false, comingSoon: false, matchPrefixes: ["/cuts", "/institution/", "/cut/"] },
+    { href: "/analytics",    label: "Analytics",    highlight: false, comingSoon: false, matchPrefixes: ["/analytics"] },
+    { href: "/news",         label: "News",         highlight: false, comingSoon: false, matchPrefixes: ["/news"] },
+    { href: "/job-outlook",  label: "Job Outlook",  highlight: false, comingSoon: false, matchPrefixes: ["/job-outlook"] },
+    { href: "/about",        label: "About",         highlight: false, comingSoon: false, matchPrefixes: ["/about"] },
+    { href: "#",             label: "Intelligence",  highlight: false, comingSoon: true,  matchPrefixes: [] },
   ];
+
+  function isActive(link: typeof links[0]) {
+    if (link.comingSoon) return false;
+    return link.matchPrefixes.some((prefix) =>
+      prefix === "/" ? location === "/" : location.startsWith(prefix)
+    );
+  }
 
   const displayName = user?.email?.split("@")[0] ?? "";
 
@@ -61,7 +68,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`text-sm font-medium transition-colors ${
-                    location === link.href ? "text-amber-400" : "text-blue-200 hover:text-white"
+                    isActive(link) ? "text-amber-400" : "text-blue-200 hover:text-white"
                   }`}
                 >
                   {link.label}
@@ -172,7 +179,7 @@ export function Navbar() {
                       ? location.startsWith("/intelligence")
                         ? "bg-amber-400 text-white"
                         : "border border-amber-400/50 text-amber-300 hover:bg-amber-400/10"
-                      : location === link.href
+                      : isActive(link)
                         ? "bg-white/10 text-amber-400"
                         : "text-blue-100 hover:bg-white/10 hover:text-white"
                   }`}
