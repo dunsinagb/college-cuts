@@ -10,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import {
   Search, SlidersHorizontal, ChevronLeft, ChevronRight,
-  ExternalLink, Download, Filter, X
+  ExternalLink, Download, Filter, X, Bell, Check
 } from "lucide-react";
+import { slugify } from "@/lib/slugify";
 import { STATES, CUT_TYPE_LABELS } from "@/lib/constants";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -102,6 +103,40 @@ export default function CutsList() {
   const [reason,    setReason]    = useState(initialParams.get("reason") || "");
   const [page,      setPage]      = useState(1);
   const [isExporting, setIsExporting] = useState(false);
+
+  /* ── inline bell alert ── */
+  const [activeAlert, setActiveAlert] = useState<number | null>(null);
+  const [alertEmail, setAlertEmail]   = useState("");
+  const [alertStatus, setAlertStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
+
+  function openAlert(id: number) {
+    setActiveAlert(id);
+    setAlertEmail("");
+    setAlertStatus("idle");
+  }
+
+  async function handleAlertSubmit(cut: Cut, e: React.FormEvent) {
+    e.preventDefault();
+    if (!alertEmail) return;
+    setAlertStatus("loading");
+    try {
+      const r = await fetch(`${BASE_URL}/api/alert-subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: alertEmail,
+          institution_slug: slugify(cut.institution),
+          institution_name: cut.institution,
+          state: cut.state,
+        }),
+      });
+      if (!r.ok) throw new Error("failed");
+      setAlertStatus("success");
+      setTimeout(() => setActiveAlert(null), 2000);
+    } catch {
+      setAlertStatus("error");
+    }
+  }
 
   /* Debounced search */
   useEffect(() => {
@@ -323,13 +358,16 @@ export default function CutsList() {
                   <th className="px-4 py-3 text-right whitespace-nowrap">Students</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">Faculty/Staff</th>
                   <th className="px-4 py-3 text-left whitespace-nowrap">Source</th>
+                  <th className="px-4 py-3 text-center" title="Alert me when new data is added">
+                    <Bell className="h-3.5 w-3.5 mx-auto text-muted-foreground" />
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
                 {isLoading ? (
                   Array(10).fill(0).map((_, i) => (
                     <tr key={i}>
-                      {Array(10).fill(0).map((_, j) => (
+                      {Array(11).fill(0).map((_, j) => (
                         <td key={j} className="px-4 py-3">
                           <Skeleton className="h-4 w-full" />
                         </td>
@@ -352,11 +390,6 @@ export default function CutsList() {
                         >
                           {cut.institution}
                         </Link>
-                        {cut.programName && (
-                          <span className="text-xs text-muted-foreground block truncate mt-0.5">
-                            {cut.programName}
-                          </span>
-                        )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
                         {cut.control ?? "—"}
@@ -410,11 +443,63 @@ export default function CutsList() {
                           <span className="text-muted-foreground/40 text-xs">—</span>
                         )}
                       </td>
+
+                      {/* Bell / alert cell */}
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        {activeAlert === cut.id ? (
+                          alertStatus === "success" ? (
+                            <div className="flex items-center gap-1 text-green-600 text-xs font-semibold">
+                              <Check className="h-3.5 w-3.5" /> Set!
+                            </div>
+                          ) : (
+                            <form
+                              onSubmit={(e) => handleAlertSubmit(cut, e)}
+                              className="flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <input
+                                type="email"
+                                required
+                                autoFocus
+                                placeholder="your@email.com"
+                                value={alertEmail}
+                                onChange={e => setAlertEmail(e.target.value)}
+                                className="h-7 w-36 rounded border border-gray-300 px-2 text-xs focus:outline-none focus:border-amber-400"
+                              />
+                              <button
+                                type="submit"
+                                disabled={alertStatus === "loading"}
+                                className="h-7 px-2 rounded bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition-colors disabled:opacity-60"
+                              >
+                                {alertStatus === "loading" ? "…" : "OK"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setActiveAlert(null)}
+                                className="text-gray-400 hover:text-gray-600"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                              {alertStatus === "error" && (
+                                <span className="text-red-500 text-xs">!</span>
+                              )}
+                            </form>
+                          )
+                        ) : (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openAlert(cut.id); }}
+                            className="p-1.5 rounded-md text-gray-300 hover:text-amber-500 hover:bg-amber-50 transition-colors"
+                            title={`Alert me when new data is added for ${cut.institution}`}
+                          >
+                            <Bell className="h-4 w-4" />
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={10} className="py-20 text-center text-muted-foreground">
+                    <td colSpan={11} className="py-20 text-center text-muted-foreground">
                       <Filter className="h-10 w-10 mx-auto mb-3 opacity-20" />
                       <p className="font-medium">No records found matching your filters.</p>
                       {activeFilters > 0 && (
