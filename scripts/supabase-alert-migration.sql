@@ -1,26 +1,19 @@
--- Run this once in your Supabase SQL Editor (dashboard.supabase.com → SQL Editor)
--- Creates the alert_subscriptions table for institution-level email alerts
-
-CREATE TABLE IF NOT EXISTS public.alert_subscriptions (
-  id            BIGSERIAL PRIMARY KEY,
-  email         TEXT NOT NULL,
-  institution_slug TEXT NOT NULL,
-  institution_name TEXT,
-  state         TEXT,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (email, institution_slug)
+create table if not exists public.alert_subscriptions (
+  id bigserial primary key,
+  email text not null,
+  institution_slug text not null,
+  institution_name text,
+  state text,
+  created_at timestamptz not null default now(),
+  unique (email, institution_slug)
 );
 
--- Row-level security (same pattern as subscribers table)
-ALTER TABLE public.alert_subscriptions ENABLE ROW LEVEL SECURITY;
+alter table public.alert_subscriptions enable row level security;
 
--- Allow the service role (used by the API server) full access
-CREATE POLICY "service role full access"
-  ON public.alert_subscriptions
-  FOR ALL
-  USING (true)
-  WITH CHECK (true);
+create policy if not exists "service role full access" on public.alert_subscriptions
+for all
+using (true)
+with check (true);
 
--- Index for fast lookups by institution slug
-CREATE INDEX IF NOT EXISTS alert_subs_slug_idx ON public.alert_subscriptions (institution_slug);
-CREATE INDEX IF NOT EXISTS alert_subs_email_idx ON public.alert_subscriptions (email);
+create index if not exists alert_subscriptions_institution_slug_idx on public.alert_subscriptions (institution_slug);
+create index if not exists alert_subscriptions_email_idx on public.alert_subscriptions (email);
