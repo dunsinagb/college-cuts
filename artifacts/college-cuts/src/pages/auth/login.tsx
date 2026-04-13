@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet-async";
-import { GraduationCap, Loader2, Eye, EyeOff, ArrowRight, Mail, Check } from "lucide-react";
+import { GraduationCap, Loader2, Eye, EyeOff, ArrowRight, Mail, Check, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase-client";
 import { useAuth } from "@/lib/auth-context";
@@ -274,6 +274,17 @@ export default function Login() {
                   Create one free
                 </a>
               </p>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 text-center">
+              <p className="text-xs text-gray-400 mb-1.5">For organizations &amp; HR teams</p>
+              <a
+                href="/intelligence/onboarding"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600 hover:text-amber-700 hover:underline"
+              >
+                <Building2 className="h-3.5 w-3.5" />
+                Set up your Pipeline Risk Dashboard →
+              </a>
             </div>
           </div>
         </div>

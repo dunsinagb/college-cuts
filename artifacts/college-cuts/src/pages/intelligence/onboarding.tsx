@@ -213,6 +213,7 @@ export default function IntelligenceOnboarding() {
         <div className="container mx-auto max-w-3xl px-4 py-8">
           {/* Step 0: Company Profile */}
           {step === 0 && (
+            <>
             <Card className="border-0 shadow-sm">
               <CardContent className="p-6 space-y-5">
                 <h2 className="text-xl font-bold text-[#1e3a5f]">Company Profile</h2>
@@ -333,6 +334,13 @@ export default function IntelligenceOnboarding() {
                 </div>
               </CardContent>
             </Card>
+            <p className="text-center text-sm text-gray-500 mt-3">
+              Already have an organization account?{" "}
+              <a href="/auth/login?redirect=/intelligence/dashboard" className="text-[#1e3a5f] font-semibold hover:underline">
+                Sign in →
+              </a>
+            </p>
+            </>
           )}
 
           {/* Step 1: Role Selection */}

@@ -130,6 +130,12 @@ export default function IntelligenceLanding() {
                   <Link href="#how-it-works">See How It Works</Link>
                 </Button>
               </div>
+              <p className="mt-5 text-sm text-blue-300">
+                Already have an organization account?{" "}
+                <Link href="/auth/login?redirect=/intelligence/dashboard" className="text-amber-400 font-semibold hover:underline">
+                  Sign in to your dashboard →
+                </Link>
+              </p>
             </div>
           </div>
         </div>
