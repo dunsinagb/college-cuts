@@ -81,7 +81,7 @@ export default function News() {
     <>
       <Helmet>
         <title>Higher Education News | CollegeCuts</title>
-        <meta name="description" content="The latest higher education news from Inside Higher Ed, Chronicle of Higher Education, EdScoop, and eCampus News — aggregated and updated daily." />
+        <meta name="description" content="The latest higher education news from Inside Higher Ed, EdScoop, eCampus News, and Higher Ed Dive — aggregated and updated daily." />
         <link rel="canonical" href="https://college-cuts.com/news" />
       </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
@@ -99,7 +99,7 @@ export default function News() {
                 Higher Ed News
               </h1>
               <p className="text-blue-200 text-base max-w-2xl">
-                The latest from Inside Higher Ed, Chronicle of Higher Education, EdScoop, and eCampus News — aggregated and updated automatically.
+                The latest from Inside Higher Ed, EdScoop, eCampus News, and Higher Ed Dive — aggregated and updated automatically.
               </p>
             </div>
           </div>
