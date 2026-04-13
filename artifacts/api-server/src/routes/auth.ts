@@ -169,42 +169,40 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
     });
 
     if (error) {
-      const errMsg = error.message.toLowerCase();
+      console.error("generateLink signup error:", error.message);
 
-      // User already exists — send a magic link instead so they can just sign in
-      if (errMsg.includes("already registered") || errMsg.includes("already exists") || errMsg.includes("duplicate")) {
-        const { data: mlData, error: mlError } = await supabase.auth.admin.generateLink({
-          type: "magiclink",
-          email: cleanEmail,
-          options: { redirectTo: safeRedirect },
-        });
+      // For any signup error (user already exists, OAuth conflict, etc.)
+      // fall back to sending a magic link so the user can get in
+      const { data: mlData, error: mlError } = await supabase.auth.admin.generateLink({
+        type: "magiclink",
+        email: cleanEmail,
+        options: { redirectTo: safeRedirect },
+      });
 
-        if (mlError || !mlData?.properties?.action_link) {
-          res.status(409).json({ alreadyExists: true });
-          return;
-        }
-
-        const actionUrl = mlData.properties.action_link;
-        const resend = getResend();
-
-        await resend.emails.send({
-          from: "CollegeCuts <hello@college-cuts.com>",
-          to: cleanEmail,
-          subject: "Sign in to CollegeCuts",
-          html: emailLayout(linkEmailBody(
-            "You already have an account",
-            "An account for this email already exists. Click below to sign in instantly — no password needed.",
-            "Sign in to CollegeCuts →",
-            actionUrl,
-            `If you didn't request this, you can safely ignore this email.`,
-          )),
-        });
-
-        res.json({ ok: true, alreadyExists: true });
+      if (mlError || !mlData?.properties?.action_link) {
+        // Magic link also failed — likely a completely invalid email or Supabase issue
+        console.error("Magic link fallback error:", mlError?.message);
+        res.status(400).json({ error: "Could not create account. If you already have an account, try signing in with your email link or Google." });
         return;
       }
 
-      res.status(400).json({ error: error.message });
+      const actionUrl = mlData.properties.action_link;
+      const resend = getResend();
+
+      await resend.emails.send({
+        from: "CollegeCuts <hello@college-cuts.com>",
+        to: cleanEmail,
+        subject: "Sign in to CollegeCuts",
+        html: emailLayout(linkEmailBody(
+          "You already have an account",
+          "An account for this email already exists. Click below to sign in instantly — no password needed.",
+          "Sign in to CollegeCuts →",
+          actionUrl,
+          `If you didn't request this, you can safely ignore this email.`,
+        )),
+      });
+
+      res.json({ ok: true, alreadyExists: true });
       return;
     }
 
