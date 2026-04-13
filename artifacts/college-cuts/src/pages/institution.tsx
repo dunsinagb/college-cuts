@@ -310,6 +310,20 @@ export default function InstitutionPage() {
               )}
             </div>
 
+            {/* Affected CTA — primary action */}
+            <div className="mb-5">
+              <a
+                href="#affected-form"
+                className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-900/30 transition-colors"
+              >
+                <Users className="h-4 w-4" />
+                Were you or a colleague affected here? Join the talent pool →
+              </a>
+              <p className="text-blue-300 text-xs mt-2">
+                Free · 30 seconds · employers recruiting from this institution will find you directly
+              </p>
+            </div>
+
             {/* Share toolbar */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs text-blue-300">Share this page:</span>
@@ -393,7 +407,7 @@ export default function InstitutionPage() {
         </div>
 
         {/* Were you affected? — inline registration (FIRST, before action cards) */}
-        <div className="container mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
+        <div id="affected-form" className="container mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
           <Card className="border-0 shadow-md overflow-hidden">
             <div className="bg-gradient-to-r from-amber-500 to-amber-400 px-6 py-4 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 shrink-0">

@@ -215,6 +215,57 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Talent Marketplace Banner */}
+      <div className="bg-white border-b border-amber-100">
+        <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500 shadow-md">
+              <Briefcase className="h-7 w-7 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h2 className="text-lg font-extrabold text-[#1e3a5f]">Displaced Academic Workers — Talent Pool</h2>
+                <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full uppercase tracking-wide">Free</span>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
+                Affected by higher education cuts? Add yourself to our talent pool and get discovered by employers actively recruiting from academia — researchers, faculty, administrators, and staff.
+              </p>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <Link
+                  href="/talent"
+                  className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors shadow-sm"
+                >
+                  <Users className="h-4 w-4" />
+                  I was affected — join the pool
+                </Link>
+                <Link
+                  href="/cuts"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1e3a5f] hover:text-amber-600 px-4 py-2 rounded-lg border border-[#1e3a5f]/20 hover:border-amber-400 transition-colors"
+                >
+                  Browse affected institutions <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+            <div className="hidden lg:flex items-center gap-8 shrink-0 text-center">
+              <div>
+                <div className="text-2xl font-black text-amber-500">30s</div>
+                <div className="text-xs text-gray-400 mt-0.5">to register</div>
+              </div>
+              <div className="w-px h-10 bg-gray-200" />
+              <div>
+                <div className="text-2xl font-black text-[#1e3a5f]">Free</div>
+                <div className="text-xs text-gray-400 mt-0.5">always</div>
+              </div>
+              <div className="w-px h-10 bg-gray-200" />
+              <div>
+                <div className="text-2xl font-black text-[#1e3a5f]">Direct</div>
+                <div className="text-xs text-gray-400 mt-0.5">employer contact</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* KPI Strip */}
       <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
