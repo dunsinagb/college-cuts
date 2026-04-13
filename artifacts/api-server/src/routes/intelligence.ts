@@ -187,21 +187,21 @@ router.post("/intelligence/employer", async (req, res): Promise<void> => {
     };
 
     const { data: existing } = await supabase
-      .from("organizations")
+      .from("employer_profiles")
       .select("id")
       .eq("email", email)
       .limit(1);
 
     if (existing && existing.length > 0) {
       const { error } = await supabase
-        .from("organizations")
+        .from("employer_profiles")
         .update(record)
         .eq("email", email);
       if (error) throw error;
       res.json({ ok: true, action: "updated" });
     } else {
       const { error } = await supabase
-        .from("organizations")
+        .from("employer_profiles")
         .insert(record);
       if (error) throw error;
 
@@ -256,7 +256,7 @@ router.get("/intelligence/employer/:email", async (req, res): Promise<void> => {
     const supabase = getSupabase();
 
     const { data, error } = await supabase
-      .from("organizations")
+      .from("employer_profiles")
       .select("*")
       .eq("email", email)
       .limit(1)
@@ -305,7 +305,7 @@ router.post("/admin/send-intelligence-alerts", async (req, res): Promise<void> =
     }
 
     const { data: employers, error: employerError } = await supabase
-      .from("organizations")
+      .from("employer_profiles")
       .select("email, company, role_ids, states, alert_frequency, risk_threshold, tier");
 
     if (employerError) throw employerError;
