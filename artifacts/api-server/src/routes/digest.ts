@@ -95,11 +95,19 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f0f4f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
   <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-    <div style="background:#1e3a5f;padding:28px 32px;display:flex;align-items:center;gap:16px">
-      <div>
-        <div style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Monthly Recap</div>
-        <div style="color:#fff;font-size:22px;font-weight:800;margin:0">CollegeCuts Tracker</div>
-      </div>
+    <div style="background:#1e3a5f;padding:28px 32px">
+      <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+        <tr>
+          <td style="vertical-align:middle;width:56px">
+            <img src="${SITE_URL}/favicon-512.png" alt="CollegeCuts" width="48" height="48"
+                 style="display:block;border-radius:8px;border:0" />
+          </td>
+          <td style="vertical-align:middle;padding-left:16px">
+            <div style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Monthly Recap</div>
+            <div style="color:#fff;font-size:22px;font-weight:800;margin:0">CollegeCuts Tracker</div>
+          </td>
+        </tr>
+      </table>
     </div>
     <div style="padding:28px 32px">
       <h2 style="color:#1e3a5f;margin:0 0 4px">${rows.length} action${rows.length !== 1 ? "s" : ""} tracked in ${periodLabel}</h2>
