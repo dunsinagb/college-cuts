@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "wouter";
 import { useGetCut } from "@workspace/api-client-react";
+import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { getGetCutQueryKey } from "@workspace/api-client-react";
 import { Helmet } from "react-helmet-async";
@@ -10,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import { ArrowLeft, ExternalLink, Calendar, Users, GraduationCap, Building2, MapPin, Lock, BarChart3, Briefcase, Link2, Check } from "lucide-react";
 import { slugify } from "@/lib/slugify";
+
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 const CUT_TYPE_LABELS: Record<string, string> = {
   staff_layoff: "Staff Layoff",
@@ -243,7 +246,7 @@ export default function CutDetail() {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3" itemScope itemType="https://schema.org/Event">
           <div className="md:col-span-2 space-y-8">
             <Card>
               <CardHeader className="bg-muted/30 border-b">
@@ -396,7 +399,61 @@ export default function CutDetail() {
             )}
           </div>
         </div>
+        <RelatedCutsSection state={cut.state} currentId={id} />
       </div>
     </>
+  );
+}
+
+function RelatedCutsSection({ state, currentId }: { state: string; currentId: string }) {
+  const { data, isLoading } = useQuery<{ cuts: { id: string; institution: string; programName: string | null; cutType: string; announcementDate: string | null; state: string }[] }>({
+    queryKey: ["cuts/by-state", state],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/cuts?state=${encodeURIComponent(state)}&limit=6`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+    enabled: !!state,
+  });
+
+  const related = (data?.cuts ?? []).filter(c => c.id !== currentId).slice(0, 4);
+  if (!isLoading && related.length === 0) return null;
+
+  return (
+    <section className="border-t pt-8 mt-4">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-bold text-[#1e3a5f]">
+          More higher education cuts in {state}
+        </h2>
+        <Link href={`/cuts?state=${encodeURIComponent(state)}`} className="text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors">
+          View all in {state} →
+        </Link>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {isLoading
+          ? Array(4).fill(0).map((_, i) => <Card key={i}><CardContent className="p-4"><Skeleton className="h-16 w-full" /></CardContent></Card>)
+          : related.map(cut => (
+            <Link key={cut.id} href={`/cuts/${cut.id}`} className="block group">
+              <Card className="h-full transition-all hover:border-[#1e3a5f]/40 hover:shadow-md border-0 shadow-sm bg-white">
+                <CardContent className="p-4 space-y-2">
+                  <h3 className="font-semibold text-sm leading-tight group-hover:text-[#1e3a5f] transition-colors line-clamp-2">
+                    {cut.institution}
+                  </h3>
+                  {cut.programName && (
+                    <p className="text-xs text-muted-foreground line-clamp-1">{cut.programName}</p>
+                  )}
+                  <div className="flex items-center justify-between mt-2">
+                    <CutTypeBadge cutType={cut.cutType} className="text-[10px] px-1.5 py-0 h-5" />
+                    <span className="text-xs text-muted-foreground">
+                      {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : "—"}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))
+        }
+      </div>
+    </section>
   );
 }

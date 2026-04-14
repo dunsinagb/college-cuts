@@ -615,7 +615,22 @@ export default function InstitutionPage() {
             </button>
           )}
 
-          <div className="pt-4 border-t border-slate-200">
+          <div className="pt-4 border-t border-slate-200 space-y-3">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <Link
+                href={`/cuts?state=${encodeURIComponent(data.stats.state)}`}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1e3a5f] hover:text-amber-600 transition-colors"
+              >
+                <MapPin className="h-4 w-4" />
+                See all higher education cuts in {data.stats.state} →
+              </Link>
+              <Link
+                href="/"
+                className="text-xs text-slate-400 hover:text-[#1e3a5f] transition-colors"
+              >
+                ← Back to CollegeCuts database
+              </Link>
+            </div>
             <p className="text-xs text-slate-400 text-center">
               Data sourced from public announcements and news reports. Tracked by{" "}
               <a href="https://college-cuts.com" className="text-[#1e3a5f] hover:underline">CollegeCuts</a>.

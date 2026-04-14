@@ -70,9 +70,40 @@ export default function Dashboard() {
     },
   });
 
+  const faqItems = [
+    {
+      q: "Which colleges are cutting programs in 2025?",
+      a: "Dozens of US colleges and universities have cut or suspended academic programs in 2025. CollegeCuts tracks program suspensions, department closures, and campus-wide cuts across all 50 states. Browse the full database to filter by state, institution type, or action type."
+    },
+    {
+      q: "Which universities have had faculty layoffs recently?",
+      a: "Faculty layoffs and staff reductions have been recorded at public and private universities across the country, driven by enrollment declines, state funding cuts, and post-pandemic budget pressures. CollegeCuts logs each action with announcement dates, affected program counts, and source links."
+    },
+    {
+      q: "What is a teach-out in higher education?",
+      a: "A teach-out is a plan that allows enrolled students to complete their degree after a program is discontinued or a campus closes. It's often the final phase before a program suspension or institution closure becomes permanent."
+    },
+    {
+      q: "How can I find higher education program closures by state?",
+      a: "CollegeCuts lets you filter all recorded actions by US state. Each state view shows every institution affected, the type of cut, and the date announced — making it easy to track higher ed budget cuts in your region."
+    },
+    {
+      q: "Are these college and university cuts publicly documented?",
+      a: "Yes. Every record in CollegeCuts is sourced from public announcements, accreditor filings, institutional press releases, and news reports. Source links are included on each record for full transparency."
+    }
+  ];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
+      {
+        "@type": "FAQPage",
+        "mainEntity": faqItems.map(({ q, a }) => ({
+          "@type": "Question",
+          "name": q,
+          "acceptedAnswer": { "@type": "Answer", "text": a }
+        }))
+      },
       {
         "@type": "Dataset",
         "name": "CollegeCuts Higher Education Actions Database",
@@ -515,6 +546,29 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+
+        {/* FAQ Section */}
+        <div className="mt-16 mb-8 max-w-3xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6 text-center">
+            Frequently asked questions about higher education cuts
+          </h2>
+          <div className="space-y-4">
+            {faqItems.map(({ q, a }) => (
+              <details key={q} className="group bg-white rounded-xl shadow-sm border-0 px-6 py-4 cursor-pointer">
+                <summary className="flex items-center justify-between font-semibold text-[#1e3a5f] text-base list-none gap-3">
+                  <span>{q}</span>
+                  <span className="text-amber-500 text-xl font-light shrink-0 group-open:rotate-45 transition-transform duration-200">+</span>
+                </summary>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
+          <p className="text-center mt-6 text-sm text-slate-400">
+            More questions? <a href="mailto:hello@college-cuts.com" className="text-[#1e3a5f] hover:underline font-medium">Email us</a> or{" "}
+            <Link href="/submit-tip" className="text-[#1e3a5f] hover:underline font-medium">submit a tip</Link>.
+          </p>
+        </div>
+
       </div>
     </div>
     </>
