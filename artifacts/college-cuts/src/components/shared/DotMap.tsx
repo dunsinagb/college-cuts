@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Link } from "wouter";
 
@@ -73,6 +73,18 @@ function dotColor(control: string): string {
 
 export function DotMap({ data }: Props) {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleHide = useCallback(() => {
+    hideTimerRef.current = setTimeout(() => setTooltip(null), 180);
+  }, []);
+
+  const cancelHide = useCallback(() => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  }, []);
 
   const dots = data
     .filter((d) => STATE_CENTROIDS[d.state])
@@ -116,6 +128,7 @@ export function DotMap({ data }: Props) {
             key={d.id}
             coordinates={d.coords}
             onMouseEnter={(e: any) => {
+              cancelHide();
               const svg = (e.target as SVGElement).closest("svg");
               const rect = svg?.getBoundingClientRect();
               if (!rect) return;
@@ -128,7 +141,7 @@ export function DotMap({ data }: Props) {
                 control: d.control,
               });
             }}
-            onMouseLeave={() => setTooltip(null)}
+            onMouseLeave={() => scheduleHide()}
           >
             <circle
               r={5}
@@ -147,11 +160,10 @@ export function DotMap({ data }: Props) {
 
       {tooltip && (
         <div
-          className="pointer-events-none absolute z-20 rounded-lg bg-[#0d1f33] border border-[#2d4a6b] px-3 py-2 text-white shadow-lg text-xs max-w-[220px]"
-          style={{
-            left: tooltip.x + 12,
-            top: tooltip.y - 10,
-          }}
+          className="absolute z-20 rounded-lg bg-[#0d1f33] border border-[#2d4a6b] px-3 py-2 text-white shadow-lg text-xs max-w-[220px]"
+          style={{ left: tooltip.x + 12, top: tooltip.y - 10, pointerEvents: "auto" }}
+          onMouseEnter={cancelHide}
+          onMouseLeave={() => setTooltip(null)}
         >
           <p className="font-semibold text-sm leading-tight">{tooltip.institution}</p>
           <p className="text-slate-400 mt-0.5">{tooltip.state} · {tooltip.control}</p>
