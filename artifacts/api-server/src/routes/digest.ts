@@ -162,4 +162,148 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
   res.json({ ok: true, sent, total: emails.length, cuts: rows.length, errors: errors.length ? errors : undefined });
 });
 
+router.post("/admin/broadcast-talent-pool", async (req, res): Promise<void> => {
+  if (!requireAdmin(req, res)) return;
+
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) { res.status(500).json({ error: "Resend not configured" }); return; }
+
+  const { data: subs, error: subsErr } = await supabase
+    .from("subscribers")
+    .select("email");
+
+  if (subsErr) { res.status(500).json({ error: subsErr.message }); return; }
+
+  const testTo = req.query.to as string | undefined;
+  const emails = testTo ? [testTo] : (subs ?? []).map((s: any) => s.email);
+
+  if (!emails.length) { res.json({ ok: true, sent: 0, reason: "No subscribers" }); return; }
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f0f4f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1e3a5f,#2a4e7c);padding:28px 32px">
+      <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+        <tr>
+          <td style="vertical-align:middle;width:56px">
+            <img src="${SITE_URL}/favicon-512.png" alt="CollegeCuts" width="44" height="44"
+                 style="display:block;border-radius:8px;border:0" />
+          </td>
+          <td style="vertical-align:middle;padding-left:14px">
+            <div style="color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">New Feature</div>
+            <div style="color:#fff;font-size:20px;font-weight:800">CollegeCuts</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:32px 32px 24px">
+      <h2 style="color:#1e3a5f;margin:0 0 12px;font-size:22px;font-weight:800;line-height:1.3">
+        Were you affected by higher ed cuts?<br/>There's now a talent pool for you.
+      </h2>
+      <p style="color:#374151;line-height:1.75;margin:0 0 20px;font-size:15px">
+        You subscribed to CollegeCuts to track program closures and layoffs across US colleges.
+        We've now built something directly for the people caught in those numbers.
+      </p>
+      <p style="color:#374151;line-height:1.75;margin:0 0 24px;font-size:15px">
+        The <strong style="color:#1e3a5f">CollegeCuts Talent Pool</strong> is a free, searchable directory
+        of displaced academic workers — researchers, administrators, faculty, and staff
+        who've been affected by cuts and are open to new opportunities.
+        Employers are already browsing it.
+      </p>
+
+      <!-- Feature tiles -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;border-collapse:separate;border-spacing:0 10px">
+        <tr>
+          <td style="padding:14px 16px;background:#f0f4f9;border-radius:8px;width:47%;vertical-align:top">
+            <div style="color:#d97706;font-size:18px;margin-bottom:4px">⚡</div>
+            <div style="color:#1e3a5f;font-weight:700;font-size:14px;margin-bottom:3px">30 seconds to register</div>
+            <div style="color:#6b7280;font-size:13px;line-height:1.5">Name, role, institution, and skills — that's it to get listed.</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="padding:14px 16px;background:#f0f4f9;border-radius:8px;width:47%;vertical-align:top">
+            <div style="color:#d97706;font-size:18px;margin-bottom:4px">🔍</div>
+            <div style="color:#1e3a5f;font-weight:700;font-size:14px;margin-bottom:3px">Employers find you</div>
+            <div style="color:#6b7280;font-size:13px;line-height:1.5">Companies actively hiring from academia browse the pool directly.</div>
+          </td>
+        </tr>
+        <tr><td colspan="3" style="height:10px"></td></tr>
+        <tr>
+          <td style="padding:14px 16px;background:#f0f4f9;border-radius:8px;vertical-align:top">
+            <div style="color:#d97706;font-size:18px;margin-bottom:4px">💼</div>
+            <div style="color:#1e3a5f;font-weight:700;font-size:14px;margin-bottom:3px">Always free</div>
+            <div style="color:#6b7280;font-size:13px;line-height:1.5">No fees, no middlemen. This is a civic resource, not a job board.</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="padding:14px 16px;background:#f0f4f9;border-radius:8px;vertical-align:top">
+            <div style="color:#d97706;font-size:18px;margin-bottom:4px">🎓</div>
+            <div style="color:#1e3a5f;font-weight:700;font-size:14px;margin-bottom:3px">For all roles</div>
+            <div style="color:#6b7280;font-size:13px;line-height:1.5">Faculty, staff, administrators, researchers — anyone affected by higher ed cuts.</div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- CTA -->
+      <div style="text-align:center;margin-bottom:28px">
+        <a href="${SITE_URL}/talent"
+           style="display:inline-block;background:#d97706;color:#fff;padding:15px 36px;border-radius:8px;font-weight:800;text-decoration:none;font-size:16px;letter-spacing:.3px">
+          Join the Talent Pool — Free →
+        </a>
+        <p style="color:#9ca3af;font-size:12px;margin:12px 0 0">Takes about 30 seconds. No account required.</p>
+      </div>
+
+      <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0;border-top:1px solid #e5e7eb;padding-top:20px">
+        You can also browse the full higher education cuts database at
+        <a href="${SITE_URL}/cuts" style="color:#1e3a5f;font-weight:600;text-decoration:none">college-cuts.com/cuts</a>
+        — 235+ program cuts, closures, and layoffs tracked across all 50 states.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;text-align:center">
+      <p style="margin:0 0 4px;color:#9ca3af;font-size:12px">
+        You're receiving this because you subscribed at
+        <a href="${SITE_URL}" style="color:#d97706">${SITE_URL.replace("https://","")}</a>.
+      </p>
+      <p style="margin:0;font-size:11px;color:#d1d5db">
+        <a href="${SITE_URL}/subscribe" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a>
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+  const resend = new Resend(resendKey);
+  let sent = 0;
+  const errors: string[] = [];
+
+  for (const email of emails) {
+    try {
+      await resend.emails.send({
+        from: "CollegeCuts <hello@college-cuts.com>",
+        to: [email],
+        subject: "New: Join the CollegeCuts Talent Pool — free, takes 30 seconds",
+        html,
+        headers: {
+          "List-Unsubscribe": `<${SITE_URL}/subscribe>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          "Precedence": "bulk",
+        },
+      });
+      sent++;
+    } catch (err: any) {
+      errors.push(`${email}: ${err.message}`);
+    }
+  }
+
+  res.json({ ok: true, sent, total: emails.length, errors: errors.length ? errors : undefined });
+});
+
 export default router;
