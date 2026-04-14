@@ -154,8 +154,8 @@ export default function Dashboard() {
   return (
     <>
       <Helmet>
-        <title>CollegeCuts | Higher Education Cuts, Program Closures & Layoffs Tracker</title>
-        <meta name="description" content="Track higher education program cuts, department closures, campus shutdowns, and faculty layoffs across US colleges and universities. Free civic data on higher ed budget cuts, updated monthly since 2024." />
+        <title>CollegeCuts | US College Program Cuts & Closures Database</title>
+        <meta name="description" content="The free database of US higher education program cuts, department closures, campus shutdowns, and faculty layoffs. Search 235+ records across all 50 states — civic data on college budget cuts, updated monthly since 2024." />
         <link rel="canonical" href="https://college-cuts.com/" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
@@ -178,7 +178,7 @@ export default function Dashboard() {
           <div className="max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
               <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-amber-300 text-xs font-semibold tracking-wide">Tracking actions since 2024</span>
+              <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database — since 2024</span>
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white leading-tight">
               Tracking the human cost of<br />

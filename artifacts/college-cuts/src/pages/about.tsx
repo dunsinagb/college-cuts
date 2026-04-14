@@ -9,8 +9,8 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>About CollegeCuts | Civic Data Project on Higher Education Cuts</title>
-        <meta name="description" content="CollegeCuts is a civic data project documenting program closures, department suspensions, campus closures, and faculty layoffs at US colleges and universities. Learn about our methodology." />
+        <title>About CollegeCuts | The Free US College Program Cuts & Closures Database</title>
+        <meta name="description" content="CollegeCuts is a free civic database documenting US higher education program closures, department suspensions, campus shutdowns, and faculty layoffs. Learn about our methodology and how we source data." />
         <link rel="canonical" href="https://college-cuts.com/about" />
       </Helmet>
     <div className="container mx-auto max-w-4xl px-4 py-12 space-y-16">

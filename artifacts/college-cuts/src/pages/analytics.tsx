@@ -203,8 +203,8 @@ export default function Analytics() {
   return (
     <>
       <Helmet>
-        <title>Analytics Dashboard | CollegeCuts — Higher Education Trends</title>
-        <meta name="description" content="Explore trends in US higher education cuts: monthly timelines, breakdowns by state, institution type, and cut category. Data-driven analysis of college closures and layoffs." />
+        <title>US College Program Cuts & Closures — Analytics & Trends | CollegeCuts</title>
+        <meta name="description" content="Charts and trends across the CollegeCuts program closures database: monthly timelines, breakdowns by state, institution type, and cut category. Data-driven analysis of college budget cuts and faculty layoffs." />
         <link rel="canonical" href="https://college-cuts.com/analytics" />
       </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">

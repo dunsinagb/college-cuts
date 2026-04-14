@@ -80,8 +80,8 @@ export default function News() {
   return (
     <>
       <Helmet>
-        <title>Higher Education News | CollegeCuts</title>
-        <meta name="description" content="The latest higher education news from Inside Higher Ed, EdScoop, eCampus News, and Higher Ed Dive — aggregated and updated daily." />
+        <title>College Program Closures & Higher Ed Budget Cuts — News | CollegeCuts</title>
+        <meta name="description" content="The latest news on college program closures, university budget cuts, faculty layoffs, and campus shutdowns — aggregated daily from Inside Higher Ed, EdScoop, eCampus News, and Higher Ed Dive." />
         <link rel="canonical" href="https://college-cuts.com/news" />
       </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
