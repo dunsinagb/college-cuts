@@ -32,4 +32,10 @@ declare module "react-simple-maps" {
     };
   }
   export const Geography: React.FC<GeographyProps>;
+
+  export interface MarkerProps extends SVGProps<SVGGElement> {
+    coordinates: [number, number];
+    children?: ReactNode;
+  }
+  export const Marker: React.FC<MarkerProps>;
 }

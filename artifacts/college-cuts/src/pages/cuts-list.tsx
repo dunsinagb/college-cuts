@@ -10,10 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import {
   Search, SlidersHorizontal, ChevronLeft, ChevronRight,
-  ExternalLink, Download, Filter, X, Bell, Check
+  ExternalLink, Download, Filter, X, Bell, Check,
+  AlertTriangle, GraduationCap, Users, MapPin
 } from "lucide-react";
 import { slugify } from "@/lib/slugify";
 import { STATES, CUT_TYPE_LABELS } from "@/lib/constants";
+import { DotMap } from "@/components/shared/DotMap";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -198,6 +200,27 @@ export default function CutsList() {
     }
   }
 
+  const { data: ytd } = useQuery<{
+    year: number; totalActions: number; totalStudentsAffected: number;
+    totalFacultyAffected: number; totalInstitutions: number; mostActiveState: string | null;
+  }>({
+    queryKey: ["stats/ytd"],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/stats/ytd`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
+
+  const { data: dotMapData } = useQuery<{ id: string; state: string; cutType: string; institution: string; date: string }[]>({
+    queryKey: ["stats/dot-map"],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/stats/dot-map`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
+
   const { data, isLoading } = useQuery<CutsResponse>({
     queryKey: ["cuts", { search, state, cutType, status, control, page }],
     queryFn: async () => {
@@ -252,6 +275,57 @@ export default function CutsList() {
               {isExporting ? "Downloading…" : `Export (${total})`}
             </Button>
           </div>
+
+          {/* ── YTD KPI strip ── */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              {
+                label: `Total Actions (${ytd?.year ?? new Date().getFullYear()})`,
+                value: ytd?.totalActions?.toLocaleString() ?? "—",
+                icon: <AlertTriangle className="h-4 w-4" />,
+                color: "bg-red-500/20 text-red-300",
+              },
+              {
+                label: "Students Affected",
+                value: ytd?.totalStudentsAffected?.toLocaleString() ?? "—",
+                icon: <GraduationCap className="h-4 w-4" />,
+                color: "bg-amber-500/20 text-amber-300",
+              },
+              {
+                label: "Faculty / Staff",
+                value: ytd?.totalFacultyAffected?.toLocaleString() ?? "—",
+                icon: <Users className="h-4 w-4" />,
+                color: "bg-teal-500/20 text-teal-300",
+              },
+              {
+                label: "Most Active State",
+                value: ytd?.mostActiveState ?? "—",
+                icon: <MapPin className="h-4 w-4" />,
+                color: "bg-blue-500/20 text-blue-300",
+              },
+            ].map((kpi) => (
+              <div key={kpi.label} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-4 py-3 flex items-center gap-3">
+                <div className={`flex-shrink-0 rounded-lg p-2 ${kpi.color}`}>
+                  {kpi.icon}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-lg font-bold text-white leading-none truncate">{kpi.value}</p>
+                  <p className="text-[11px] text-blue-200 mt-0.5 leading-tight">{kpi.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Dot map ── */}
+          {dotMapData && dotMapData.length > 0 && (
+            <div className="mt-5 bg-white/5 border border-white/15 rounded-xl overflow-hidden">
+              <div className="px-4 pt-3 pb-1 flex items-center justify-between">
+                <p className="text-sm font-semibold text-white">Actions Map — {new Date().getFullYear()}</p>
+                <p className="text-xs text-blue-300">{dotMapData.length} dots · hover for details</p>
+              </div>
+              <DotMap data={dotMapData} />
+            </div>
+          )}
 
           {/* ── filter bar ── */}
           <div className="mt-5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 space-y-3">
