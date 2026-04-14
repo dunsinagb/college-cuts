@@ -299,14 +299,24 @@ router.get("/stats/recent", async (_req, res): Promise<void> => {
 });
 
 /* ── All-time summary (KPIs for All Actions page) ────────────── */
-router.get("/stats/ytd", async (_req, res): Promise<void> => {
+router.get("/stats/ytd", async (req, res): Promise<void> => {
   try {
-    const { data, error } = await supabase
+    const year = req.query.year ? Number(req.query.year) : null;
+
+    let query = supabase
       .from("v_latest_cuts")
-      .select("id,institution,students_affected,faculty_affected,state");
+      .select("id,institution,students_affected,faculty_affected,state,announcement_date");
+
+    if (year) {
+      query = query
+        .gte("announcement_date", `${year}-01-01`)
+        .lte("announcement_date", `${year}-12-31`);
+    }
+
+    const { data, error } = await query;
 
     if (error) { res.status(500).json({ error: error.message }); return; }
-    const rows = (data ?? []) as { id: string; institution: string; students_affected: number | null; faculty_affected: number | null; state: string }[];
+    const rows = (data ?? []) as { id: string; institution: string; students_affected: number | null; faculty_affected: number | null; state: string; announcement_date: string }[];
 
     const students   = rows.reduce((s, r) => s + (r.students_affected ?? 0), 0);
     const faculty    = rows.reduce((s, r) => s + (r.faculty_affected  ?? 0), 0);

@@ -204,9 +204,10 @@ export default function CutsList() {
     totalActions: number; totalStudentsAffected: number;
     totalFacultyAffected: number; totalInstitutions: number; mostActiveState: string | null;
   }>({
-    queryKey: ["stats/ytd"],
+    queryKey: ["stats/ytd", new Date().getFullYear()],
     queryFn: async () => {
-      const r = await fetch(`${BASE_URL}/api/stats/ytd`);
+      const year = new Date().getFullYear();
+      const r = await fetch(`${BASE_URL}/api/stats/ytd?year=${year}`);
       if (!r.ok) throw new Error("Failed");
       return r.json();
     },
@@ -280,25 +281,25 @@ export default function CutsList() {
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               {
-                label: "Total Actions",
+                label: `Actions in ${new Date().getFullYear()}`,
                 value: ytd?.totalActions?.toLocaleString() ?? "—",
                 icon: <AlertTriangle className="h-4 w-4" />,
                 color: "bg-red-500/20 text-red-300",
               },
               {
-                label: "Students Affected",
+                label: `Students Affected (${new Date().getFullYear()})`,
                 value: ytd?.totalStudentsAffected?.toLocaleString() ?? "—",
                 icon: <GraduationCap className="h-4 w-4" />,
                 color: "bg-amber-500/20 text-amber-300",
               },
               {
-                label: "Faculty / Staff",
+                label: `Faculty / Staff (${new Date().getFullYear()})`,
                 value: ytd?.totalFacultyAffected?.toLocaleString() ?? "—",
                 icon: <Users className="h-4 w-4" />,
                 color: "bg-teal-500/20 text-teal-300",
               },
               {
-                label: "Most Active State",
+                label: `Most Active State (${new Date().getFullYear()})`,
                 value: ytd?.mostActiveState ?? "—",
                 icon: <MapPin className="h-4 w-4" />,
                 color: "bg-blue-500/20 text-blue-300",
