@@ -129,7 +129,6 @@ export function DotMap({ data }: Props) {
               });
             }}
             onMouseLeave={() => setTooltip(null)}
-            style={{ cursor: "pointer" }}
           >
             <circle
               r={5}
@@ -137,6 +136,10 @@ export function DotMap({ data }: Props) {
               fillOpacity={0.85}
               stroke="#0d1f33"
               strokeWidth={0.8}
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                window.location.href = `${BASE_URL}/cuts/${d.id}`;
+              }}
             />
           </Marker>
         ))}
