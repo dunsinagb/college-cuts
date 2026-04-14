@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, MouseEvent as ReactMouseEvent } from "react";
+import { useState, useRef, useCallback, MouseEvent as ReactMouseEvent, useEffect } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { scaleLinear } from "d3-scale";
 import { Link } from "wouter";
@@ -42,6 +42,17 @@ interface Props {
 export function USChoroplethMap({ data }: Props) {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(800);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerWidth(el.clientWidth);
+    const ro = new ResizeObserver(() => setContainerWidth(el.clientWidth));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const countByAbbr = Object.fromEntries(data.map((d) => [d.state, d.count]));
   const maxCount = Math.max(...data.map((d) => d.count), 1);
@@ -50,7 +61,9 @@ export function USChoroplethMap({ data }: Props) {
     .domain([0, maxCount])
     .range(["#dce8f5", "#1e3a5f"]);
 
-  const mostAffected = data[0];
+  const mostAffected = data.length > 0
+    ? data.reduce((best, cur) => (cur.count > best.count ? cur : best), data[0])
+    : null;
 
   const legendStops = [0, 0.25, 0.5, 0.75, 1].map((t) => ({
     value: Math.round(t * maxCount),
@@ -83,7 +96,7 @@ export function USChoroplethMap({ data }: Props) {
         </p>
       )}
 
-      <div className="relative w-full">
+      <div className="relative w-full" ref={containerRef}>
         <ComposableMap
           projection="geoAlbersUsa"
           className="w-full"
@@ -138,7 +151,7 @@ export function USChoroplethMap({ data }: Props) {
             style={{
               left: tooltip.x + 12,
               top: tooltip.y - 10,
-              transform: tooltip.x > 700 ? "translateX(-110%)" : undefined,
+              transform: tooltip.x > containerWidth * 0.6 ? "translateX(-110%)" : undefined,
               pointerEvents: "auto",
             }}
             onMouseEnter={cancelHide}
