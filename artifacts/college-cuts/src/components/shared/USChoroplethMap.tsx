@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, MouseEvent as ReactMouseEvent } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { scaleLinear } from "d3-scale";
 import { Link } from "wouter";
@@ -109,10 +109,10 @@ export function USChoroplethMap({ data }: Props) {
                       hover: { outline: "none", opacity: 0.8, cursor: abbr ? "pointer" : "default" },
                       pressed: { outline: "none" },
                     }}
-                    onMouseMove={(e: MouseEvent) => {
+                    onMouseMove={(e: ReactMouseEvent<SVGPathElement>) => {
                       if (!abbr) return;
                       cancelHide();
-                      const rect = (e.currentTarget as SVGPathElement)
+                      const rect = e.currentTarget
                         .closest("svg")
                         ?.getBoundingClientRect();
                       if (!rect) return;
@@ -144,20 +144,21 @@ export function USChoroplethMap({ data }: Props) {
             onMouseEnter={cancelHide}
             onMouseLeave={() => setTooltip(null)}
           >
-            <p className="font-semibold">{tooltip.name}</p>
+            <p className="font-semibold">
+              {tooltip.name}{" "}
+              <span className="font-normal text-slate-300">({tooltip.abbr})</span>
+            </p>
             <p className="text-amber-300 text-xs">
               {tooltip.count > 0
                 ? `${tooltip.count} recorded action${tooltip.count !== 1 ? "s" : ""}`
                 : "No cuts recorded yet"}
             </p>
-            {tooltip.count > 0 && (
-              <Link
-                href={`${BASE_URL}/cuts?state=${tooltip.abbr}`}
-                className="mt-1 block text-xs text-slate-200 underline hover:text-white"
-              >
-                View cuts in {tooltip.abbr} →
-              </Link>
-            )}
+            <Link
+              href={`${BASE_URL}/cuts?state=${tooltip.abbr}`}
+              className="mt-1 block text-xs text-slate-200 underline hover:text-white"
+            >
+              View cuts in {tooltip.abbr} →
+            </Link>
           </div>
         )}
       </div>
