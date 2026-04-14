@@ -164,20 +164,20 @@ export function USChoroplethMap({ data }: Props) {
             <p className="text-amber-300 text-xs">
               {tooltip.count > 0
                 ? `${tooltip.count} recorded action${tooltip.count !== 1 ? "s" : ""}`
-                : "No cuts recorded yet"}
+                : "No actions recorded yet"}
             </p>
             <Link
               href={`${BASE_URL}/cuts?state=${tooltip.abbr}`}
               className="mt-1 block text-xs text-slate-200 underline hover:text-white"
             >
-              View cuts in {tooltip.name} →
+              View actions in {tooltip.name} →
             </Link>
           </div>
         )}
       </div>
 
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Fewer cuts</span>
+        <span>Fewer actions</span>
         <div className="flex h-3 flex-1 max-w-[200px] rounded overflow-hidden">
           {legendStops.map((s, i) => (
             <div
@@ -188,8 +188,8 @@ export function USChoroplethMap({ data }: Props) {
             />
           ))}
         </div>
-        <span>More cuts</span>
-        <span className="ml-2 text-[#9ca3af]">· Gray = no recorded cuts</span>
+        <span>More actions</span>
+        <span className="ml-2 text-[#9ca3af]">· Gray = no actions recorded</span>
       </div>
     </div>
   );

@@ -261,7 +261,7 @@ export default function CutsList() {
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight text-white">All Actions Database</h1>
               <p className="mt-1 text-blue-200">
-                Complete, searchable index of reported program cuts, closures, and layoffs.
+                Complete, searchable index of reported higher education actions — program cuts, closures, and layoffs.
               </p>
             </div>
             <Button

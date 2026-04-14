@@ -519,7 +519,7 @@ export default function Dashboard() {
                 ) : (
                   <Card>
                     <CardContent className="p-6 text-center text-muted-foreground text-sm">
-                      No recent cuts logged.
+                      No recent actions logged.
                     </CardContent>
                   </Card>
                 )}
