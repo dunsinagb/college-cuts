@@ -116,11 +116,11 @@ export default function InstitutionPage() {
   const pageUrl  = `https://college-cuts.com/institution/${slug}`;
   const pageName = data?.institution ?? "Institution";
   const pageTitle = data
-    ? `${data.institution} — Program Cuts & Layoffs | CollegeCuts`
+    ? `${data.institution} — Higher Ed Program Cuts & Layoffs | CollegeCuts`
     : "Institution | CollegeCuts";
   const pageDesc  = data
-    ? `${data.institution} (${data.stats.state}) has ${data.stats.actions} recorded action${data.stats.actions !== 1 ? "s" : ""} — program cuts, closures, and layoffs tracked by CollegeCuts.`
-    : "Higher education cuts tracked by CollegeCuts.";
+    ? `${data.institution} (${data.stats.state}) has recorded ${data.stats.actions} higher education action${data.stats.actions !== 1 ? "s" : ""} — including program suspensions, department closures, and faculty layoffs. Tracked by CollegeCuts.`
+    : "Higher education program cuts, closures, and layoffs tracked by CollegeCuts.";
 
   function handleCopyLink() {
     navigator.clipboard.writeText(pageUrl).then(() => {

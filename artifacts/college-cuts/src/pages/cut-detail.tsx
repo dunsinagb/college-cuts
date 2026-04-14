@@ -75,12 +75,12 @@ export default function CutDetail() {
   const cutTypeLabel = cut?.cutType ? (CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ")) : "";
 
   const pageTitle = cut
-    ? `${cut.institution}${cut.programName ? ` — ${cut.programName}` : ""} (${cutTypeLabel}) | CollegeCuts`
+    ? `${cut.institution}${cut.programName ? ` — ${cut.programName}` : ""} — Higher Ed ${cutTypeLabel} | CollegeCuts`
     : "Higher Education Action | CollegeCuts";
 
   const pageDescription = cut
-    ? `${cutTypeLabel} at ${cut.institution} (${cut.state})${cut.announcementDate ? `, announced ${format(parseISO(cut.announcementDate), "MMMM yyyy")}` : ""}. ${cut.notes ? cut.notes.slice(0, 120) + "…" : "Tracked by CollegeCuts, a civic higher education data project."}`
-    : "Track program closures, department suspensions, and faculty layoffs at US colleges. CollegeCuts civic data project.";
+    ? `Higher education ${cutTypeLabel.toLowerCase()} at ${cut.institution} (${cut.state})${cut.announcementDate ? `, announced ${format(parseISO(cut.announcementDate), "MMMM yyyy")}` : ""}. ${cut.notes ? cut.notes.slice(0, 120) + "…" : "Tracked by CollegeCuts — a civic higher ed data project monitoring program cuts, closures, and faculty layoffs across US universities."}`
+    : "Track higher education program closures, department suspensions, and faculty layoffs at US colleges and universities. CollegeCuts civic data project.";
 
   if (isLoading) {
     return (

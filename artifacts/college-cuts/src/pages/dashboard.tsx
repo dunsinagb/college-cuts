@@ -123,8 +123,8 @@ export default function Dashboard() {
   return (
     <>
       <Helmet>
-        <title>CollegeCuts | US College Program Cuts, Closures & Layoffs Tracker</title>
-        <meta name="description" content="Track program closures, department suspensions, campus closures, and faculty layoffs across US colleges and universities. Civic data updated monthly since 2024." />
+        <title>CollegeCuts | Higher Education Cuts, Program Closures & Layoffs Tracker</title>
+        <meta name="description" content="Track higher education program cuts, department closures, campus shutdowns, and faculty layoffs across US colleges and universities. Free civic data on higher ed budget cuts, updated monthly since 2024." />
         <link rel="canonical" href="https://college-cuts.com/" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
@@ -154,7 +154,7 @@ export default function Dashboard() {
               <span className="text-amber-400">higher education cuts.</span>
             </h1>
             <p className="text-lg text-blue-200 leading-relaxed max-w-2xl">
-              A civic data project monitoring program closures, department suspensions, and faculty layoffs across US colleges and universities.
+              A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated monthly.
             </p>
             {/* ── Yearly insight bar — layoffs.fyi style ── */}
             <div className="pt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -418,11 +418,11 @@ export default function Dashboard() {
                   ))
                 ) : recentCuts && recentCuts.length > 0 ? (
                   recentCuts.slice(0, 5).map((cut, idx) => {
-                    const isLocked = !subscribed && idx >= 2;
+                    const isLocked = !subscribed && idx >= 3;
                     return (
                       <Link
                         key={cut.id}
-                        href={subscribed ? `/cuts/${cut.id}` : `/subscribe?redirect=/cuts/${cut.id}`}
+                        href={`/cuts/${cut.id}`}
                         className="block group"
                       >
                         <Card className={`transition-all hover:border-[#1e3a5f]/40 hover:shadow-md border-0 shadow-sm bg-white ${isLocked ? "relative overflow-hidden" : ""}`}>
