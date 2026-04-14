@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { scaleLinear } from "d3-scale";
 import { Link } from "wouter";
@@ -41,6 +41,7 @@ interface Props {
 
 export function USChoroplethMap({ data }: Props) {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const countByAbbr = Object.fromEntries(data.map((d) => [d.state, d.count]));
   const maxCount = Math.max(...data.map((d) => d.count), 1);
@@ -55,6 +56,17 @@ export function USChoroplethMap({ data }: Props) {
     value: Math.round(t * maxCount),
     color: colorScale(t * maxCount),
   }));
+
+  const scheduleHide = useCallback(() => {
+    hideTimerRef.current = setTimeout(() => setTooltip(null), 180);
+  }, []);
+
+  const cancelHide = useCallback(() => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  }, []);
 
   return (
     <div className="space-y-3">
@@ -99,6 +111,7 @@ export function USChoroplethMap({ data }: Props) {
                     }}
                     onMouseMove={(e: MouseEvent) => {
                       if (!abbr) return;
+                      cancelHide();
                       const rect = (e.currentTarget as SVGPathElement)
                         .closest("svg")
                         ?.getBoundingClientRect();
@@ -111,12 +124,7 @@ export function USChoroplethMap({ data }: Props) {
                         count,
                       });
                     }}
-                    onMouseLeave={() => setTooltip(null)}
-                    onClick={() => {
-                      if (abbr) {
-                        window.location.href = `${BASE_URL}/cuts?state=${abbr}`;
-                      }
-                    }}
+                    onMouseLeave={() => scheduleHide()}
                   />
                 );
               })
@@ -126,23 +134,29 @@ export function USChoroplethMap({ data }: Props) {
 
         {tooltip && (
           <div
-            className="pointer-events-none absolute z-20 rounded-lg bg-[#1e3a5f] px-3 py-2 text-white shadow-lg text-sm"
+            className="absolute z-20 rounded-lg bg-[#1e3a5f] px-3 py-2 text-white shadow-lg text-sm"
             style={{
               left: tooltip.x + 12,
               top: tooltip.y - 10,
               transform: tooltip.x > 700 ? "translateX(-110%)" : undefined,
+              pointerEvents: "auto",
             }}
+            onMouseEnter={cancelHide}
+            onMouseLeave={() => setTooltip(null)}
           >
             <p className="font-semibold">{tooltip.name}</p>
-            <p className="text-amber-300">
+            <p className="text-amber-300 text-xs">
               {tooltip.count > 0
                 ? `${tooltip.count} recorded action${tooltip.count !== 1 ? "s" : ""}`
                 : "No cuts recorded yet"}
             </p>
             {tooltip.count > 0 && (
-              <p className="mt-0.5 text-xs text-slate-300 hover:underline">
+              <Link
+                href={`${BASE_URL}/cuts?state=${tooltip.abbr}`}
+                className="mt-1 block text-xs text-slate-200 underline hover:text-white"
+              >
                 View cuts in {tooltip.abbr} →
-              </p>
+              </Link>
             )}
           </div>
         )}
