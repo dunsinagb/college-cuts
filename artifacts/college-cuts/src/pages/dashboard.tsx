@@ -350,7 +350,7 @@ export default function Dashboard() {
           <Card className="shadow-sm border-0">
             <CardHeader className="pb-2">
               <CardTitle className="text-xl font-bold text-[#1e3a5f]">
-                Higher Education Cuts by State
+                Higher Education Actions by State
               </CardTitle>
               <p className="text-sm text-muted-foreground">
                 Hover a state to see details · Click to filter the database
