@@ -170,7 +170,7 @@ export function USChoroplethMap({ data }: Props) {
               href={`${BASE_URL}/cuts?state=${tooltip.abbr}`}
               className="mt-1 block text-xs text-slate-200 underline hover:text-white"
             >
-              View cuts in {tooltip.abbr} →
+              View cuts in {tooltip.name} →
             </Link>
           </div>
         )}
