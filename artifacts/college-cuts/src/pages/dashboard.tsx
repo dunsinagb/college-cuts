@@ -27,6 +27,7 @@ import {
 } from "recharts";
 import { ArrowRight, AlertTriangle, GraduationCap, MapPin, Lock, BarChart3, Briefcase, RefreshCw, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { USChoroplethMap } from "@/components/shared/USChoroplethMap";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -47,6 +48,14 @@ export default function Dashboard() {
   });
   const { data: statsByType, isLoading: isLoadingType } = useGetStatsByType();
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
+  const { data: byState } = useQuery<{ state: string; count: number; studentsAffected: number }[]>({
+    queryKey: ["stats/by-state"],
+    queryFn: async () => {
+      const r = await fetch(`${BASE_URL}/api/stats/by-state`);
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
   const subscribed = isSubscribed();
 
   // Derive available years from monthlyTrend (earliest → latest)
@@ -334,6 +343,25 @@ export default function Dashboard() {
           />
         </div>
       </div>
+
+      {/* US Choropleth Map */}
+      {byState && byState.length > 0 && (
+        <div className="container mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+          <Card className="shadow-sm border-0">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-bold text-[#1e3a5f]">
+                Higher Education Cuts by State
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Hover a state to see details · Click to filter the database
+              </p>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <USChoroplethMap data={byState} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 space-y-10">
