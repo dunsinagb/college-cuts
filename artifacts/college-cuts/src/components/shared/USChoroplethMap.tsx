@@ -189,7 +189,7 @@ export function USChoroplethMap({ data }: Props) {
           ))}
         </div>
         <span>More cuts</span>
-        <span className="ml-2 text-[#9ca3af]">· Gray = no data</span>
+        <span className="ml-2 text-[#9ca3af]">· Gray = no recorded cuts</span>
       </div>
     </div>
   );
