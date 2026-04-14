@@ -201,7 +201,7 @@ export default function CutsList() {
   }
 
   const { data: ytd } = useQuery<{
-    year: number; totalActions: number; totalStudentsAffected: number;
+    totalActions: number; totalStudentsAffected: number;
     totalFacultyAffected: number; totalInstitutions: number; mostActiveState: string | null;
   }>({
     queryKey: ["stats/ytd"],
@@ -212,7 +212,7 @@ export default function CutsList() {
     },
   });
 
-  const { data: dotMapData } = useQuery<{ id: string; state: string; cutType: string; institution: string; date: string }[]>({
+  const { data: dotMapData } = useQuery<{ id: string; state: string; control: string; institution: string; date: string }[]>({
     queryKey: ["stats/dot-map"],
     queryFn: async () => {
       const r = await fetch(`${BASE_URL}/api/stats/dot-map`);
@@ -280,7 +280,7 @@ export default function CutsList() {
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               {
-                label: `Total Actions (${ytd?.year ?? new Date().getFullYear()})`,
+                label: "Total Actions",
                 value: ytd?.totalActions?.toLocaleString() ?? "—",
                 icon: <AlertTriangle className="h-4 w-4" />,
                 color: "bg-red-500/20 text-red-300",
@@ -320,7 +320,7 @@ export default function CutsList() {
           {dotMapData && dotMapData.length > 0 && (
             <div className="mt-5 bg-white/5 border border-white/15 rounded-xl overflow-hidden">
               <div className="px-4 pt-3 pb-1 flex items-center justify-between">
-                <p className="text-sm font-semibold text-white">Actions Map — {new Date().getFullYear()}</p>
+                <p className="text-sm font-semibold text-white">Actions Map — All Records</p>
                 <p className="text-xs text-blue-300">{dotMapData.length} dots · hover for details</p>
               </div>
               <DotMap data={dotMapData} />

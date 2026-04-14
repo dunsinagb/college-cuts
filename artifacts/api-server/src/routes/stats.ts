@@ -298,16 +298,12 @@ router.get("/stats/recent", async (_req, res): Promise<void> => {
   }
 });
 
-/* ── Year-to-date summary ─────────────────────────────────────── */
+/* ── All-time summary (KPIs for All Actions page) ────────────── */
 router.get("/stats/ytd", async (_req, res): Promise<void> => {
   try {
-    const year = new Date().getFullYear();
-    const since = `${year}-01-01`;
-
     const { data, error } = await supabase
       .from("v_latest_cuts")
-      .select("id,institution,students_affected,faculty_affected,state")
-      .gte("announcement_date", since);
+      .select("id,institution,students_affected,faculty_affected,state");
 
     if (error) { res.status(500).json({ error: error.message }); return; }
     const rows = (data ?? []) as { id: string; institution: string; students_affected: number | null; faculty_affected: number | null; state: string }[];
@@ -319,28 +315,24 @@ router.get("/stats/ytd", async (_req, res): Promise<void> => {
     for (const r of rows) stateCounts[r.state] = (stateCounts[r.state] ?? 0) + 1;
     const mostActiveState = Object.entries(stateCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
-    res.json({ year, totalActions: rows.length, totalStudentsAffected: students, totalFacultyAffected: faculty, totalInstitutions: institutions, mostActiveState });
+    res.json({ totalActions: rows.length, totalStudentsAffected: students, totalFacultyAffected: faculty, totalInstitutions: institutions, mostActiveState });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-/* ── Dot-map data (YTD, lightweight) ─────────────────────────── */
+/* ── Dot-map data (all-time, colored by institution type) ─────── */
 router.get("/stats/dot-map", async (_req, res): Promise<void> => {
   try {
-    const year = new Date().getFullYear();
-    const since = `${year}-01-01`;
-
     const { data, error } = await supabase
       .from("v_latest_cuts")
-      .select("id,institution,state,cut_type,announcement_date")
-      .gte("announcement_date", since)
+      .select("id,institution,state,control,announcement_date")
       .order("announcement_date", { ascending: false });
 
     if (error) { res.status(500).json({ error: error.message }); return; }
-    const rows = (data ?? []) as { id: string; institution: string; state: string; cut_type: string; announcement_date: string }[];
+    const rows = (data ?? []) as { id: string; institution: string; state: string; control: string | null; announcement_date: string }[];
 
-    res.json(rows.map(r => ({ id: r.id, institution: r.institution, state: r.state, cutType: r.cut_type, date: r.announcement_date })));
+    res.json(rows.map(r => ({ id: r.id, institution: r.institution, state: r.state, control: r.control ?? "Unknown", date: r.announcement_date })));
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

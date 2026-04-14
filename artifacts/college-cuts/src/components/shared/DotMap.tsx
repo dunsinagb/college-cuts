@@ -35,7 +35,7 @@ function jitter(id: string | number, idx: 0 | 1): number {
 interface DotPoint {
   id: string | number;
   state: string;
-  cutType: string;
+  control: string;
   institution: string;
   date?: string;
 }
@@ -46,27 +46,29 @@ interface TooltipState {
   id: string | number;
   institution: string;
   state: string;
-  cutType: string;
+  control: string;
 }
 
 interface Props {
   data: DotPoint[];
 }
 
-const CUT_TYPE_COLOR: Record<string, string> = {
-  program_suspension:   "#fbbf24",
-  program_closure:      "#f97316",
-  campus_closure:       "#ef4444",
-  department_closure:   "#a78bfa",
-  faculty_layoff:       "#60a5fa",
-  staff_layoff:         "#34d399",
-  teach_out:            "#f472b6",
-  staff_reduction:      "#34d399",
-  faculty_layoffs:      "#60a5fa",
+const CONTROL_COLOR: Record<string, string> = {
+  "Public":              "#60a5fa",
+  "Private non-profit":  "#fbbf24",
+  "Private for-profit":  "#f97316",
+  "Unknown":             "#94a3b8",
 };
 
-function dotColor(cutType: string): string {
-  return CUT_TYPE_COLOR[cutType] ?? "#fbbf24";
+const CONTROL_LABEL: Record<string, string> = {
+  "Public":              "Public",
+  "Private non-profit":  "Private non-profit",
+  "Private for-profit":  "Private for-profit",
+  "Unknown":             "Unknown",
+};
+
+function dotColor(control: string): string {
+  return CONTROL_COLOR[control] ?? "#94a3b8";
 }
 
 export function DotMap({ data }: Props) {
@@ -79,6 +81,7 @@ export function DotMap({ data }: Props) {
       return {
         ...d,
         coords: [lon + jitter(d.id, 0), lat + jitter(d.id, 1)] as [number, number],
+        color: dotColor(d.control),
       };
     });
 
@@ -122,7 +125,7 @@ export function DotMap({ data }: Props) {
                 id: d.id,
                 institution: d.institution,
                 state: d.state,
-                cutType: d.cutType,
+                control: d.control,
               });
             }}
             onMouseLeave={() => setTooltip(null)}
@@ -130,7 +133,7 @@ export function DotMap({ data }: Props) {
           >
             <circle
               r={5}
-              fill={dotColor(d.cutType)}
+              fill={d.color}
               fillOpacity={0.85}
               stroke="#0d1f33"
               strokeWidth={0.8}
@@ -148,7 +151,7 @@ export function DotMap({ data }: Props) {
           }}
         >
           <p className="font-semibold text-sm leading-tight">{tooltip.institution}</p>
-          <p className="text-slate-400 mt-0.5">{tooltip.state} · {tooltip.cutType.replace(/_/g, " ")}</p>
+          <p className="text-slate-400 mt-0.5">{tooltip.state} · {tooltip.control}</p>
           <Link
             href={`${BASE_URL}/cuts/${tooltip.id}`}
             className="mt-1 block text-amber-400 hover:underline"
@@ -158,11 +161,11 @@ export function DotMap({ data }: Props) {
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-400 px-1">
-        {Object.entries(CUT_TYPE_COLOR).map(([type, color]) => (
-          <span key={type} className="flex items-center gap-1.5">
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-slate-400 px-1">
+        {Object.entries(CONTROL_COLOR).filter(([k]) => k !== "Unknown").map(([control, color]) => (
+          <span key={control} className="flex items-center gap-1.5">
             <span className="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
-            {type.replace(/_/g, " ")}
+            {CONTROL_LABEL[control]}
           </span>
         ))}
       </div>
