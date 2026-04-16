@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { Link } from "wouter";
 import { format, parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
@@ -48,6 +48,27 @@ export default function Dashboard() {
   const { data: statsByType, isLoading: isLoadingType } = useGetStatsByType();
   const { data: recentCuts, isLoading: isLoadingRecent } = useGetRecentCuts();
   const subscribed = isSubscribed();
+
+  const feedScrollRef = useRef<HTMLDivElement>(null);
+  const [feedScrollState, setFeedScrollState] = useState({ atStart: true, atEnd: false });
+
+  const handleFeedScroll = useCallback(() => {
+    const el = feedScrollRef.current;
+    if (!el) return;
+    const atStart = el.scrollLeft <= 0;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+    setFeedScrollState({ atStart, atEnd });
+  }, []);
+
+  useEffect(() => {
+    handleFeedScroll();
+  }, [recentCuts, isLoadingRecent, handleFeedScroll]);
+
+  useEffect(() => {
+    const handleResize = () => handleFeedScroll();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleFeedScroll]);
 
   // Derive available years from monthlyTrend (earliest → latest)
   const availableYears = useMemo(() => {
@@ -284,7 +305,11 @@ export default function Dashboard() {
                 </span>
               </div>
               <div className="relative">
-                <div className="flex overflow-x-auto gap-3 px-4 py-3 scrollbar-none">
+                <div
+                  ref={feedScrollRef}
+                  onScroll={handleFeedScroll}
+                  className="flex overflow-x-auto gap-3 px-4 py-3 scrollbar-none"
+                >
                 {isLoadingRecent ? (
                   [1,2,3].map(i => (
                     <div key={i} className="flex-none w-44 rounded-xl bg-white/5 px-3 py-2.5 space-y-1.5">
@@ -313,8 +338,18 @@ export default function Dashboard() {
                 ))}
                 </div>
                 <div
-                  className="pointer-events-none absolute inset-y-0 right-0 w-12"
-                  style={{ background: "linear-gradient(to right, transparent, rgba(13,31,51,0.85))" }}
+                  className="pointer-events-none absolute inset-y-0 left-0 w-12 transition-opacity duration-200"
+                  style={{
+                    background: "linear-gradient(to left, transparent, rgba(13,31,51,0.85))",
+                    opacity: feedScrollState.atStart ? 0 : 1,
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute inset-y-0 right-0 w-12 transition-opacity duration-200"
+                  style={{
+                    background: "linear-gradient(to right, transparent, rgba(13,31,51,0.85))",
+                    opacity: feedScrollState.atEnd ? 0 : 1,
+                  }}
                 />
               </div>
               <div className="px-4 py-2.5 border-t border-white/10">
