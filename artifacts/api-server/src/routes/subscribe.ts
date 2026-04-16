@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { supabase } from "../lib/supabase";
 import { Resend } from "resend";
+import { isRealEmail } from "../lib/validate-email";
 
 const router: IRouter = Router();
 const SITE_URL = (process.env.SITE_URL || "https://college-cuts.com").replace(/\/$/, "");
@@ -8,8 +9,9 @@ const SITE_URL = (process.env.SITE_URL || "https://college-cuts.com").replace(/\
 router.post("/subscribe", async (req, res): Promise<void> => {
   const { email } = req.body as { email?: string };
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    res.status(400).json({ error: "Invalid email address" });
+  const check = isRealEmail(email ?? "");
+  if (!check.valid) {
+    res.status(400).json({ error: check.reason ?? "Invalid email address" });
     return;
   }
 

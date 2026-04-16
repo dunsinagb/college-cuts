@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+import { isRealEmail } from "../lib/validate-email";
 
 const router: IRouter = Router();
 
@@ -81,8 +82,9 @@ function linkEmailBody(heading: string, intro: string, buttonLabel: string, acti
 router.post("/auth/magic-link", async (req, res): Promise<void> => {
   const { email, redirectTo } = req.body as { email?: string; redirectTo?: string };
 
-  if (!email || !email.includes("@")) {
-    res.status(400).json({ error: "Valid email is required" });
+  const emailCheck = isRealEmail(email ?? "");
+  if (!emailCheck.valid) {
+    res.status(400).json({ error: emailCheck.reason ?? "Valid email is required" });
     return;
   }
 
@@ -162,8 +164,9 @@ router.post("/auth/signup", async (req, res): Promise<void> => {
     redirectTo?: string;
   };
 
-  if (!email || !email.includes("@")) {
-    res.status(400).json({ error: "Valid email is required" });
+  const emailCheck = isRealEmail(email ?? "");
+  if (!emailCheck.valid) {
+    res.status(400).json({ error: emailCheck.reason ?? "Valid email is required" });
     return;
   }
   if (!password || password.length < 8) {
