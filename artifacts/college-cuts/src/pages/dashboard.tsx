@@ -174,74 +174,107 @@ export default function Dashboard() {
             backgroundSize: "60px 60px"
           }}
         />
-        <div className="relative container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-5">
-            <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
-              <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database — since 2024</span>
-            </div>
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white leading-tight">
-              Tracking the human cost of<br />
-              <span className="text-amber-400">higher education cuts.</span>
-            </h1>
-            <p className="text-lg text-blue-200 leading-relaxed max-w-2xl">
-              A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated monthly.
-            </p>
-            {/* ── Yearly insight bar — layoffs.fyi style ── */}
-            <div className="pt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-              {isLoadingYearly ? (
-                <div className="h-8 w-72 bg-white/10 animate-pulse rounded" />
-              ) : (
-                <>
+        <div className="relative container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+            {/* Left: hero text */}
+            <div className="space-y-5">
+              <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database — since 2024</span>
+              </div>
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white leading-tight">
+                Tracking the human cost of<br />
+                <span className="text-amber-400">higher education cuts.</span>
+              </h1>
+              <p className="text-lg text-blue-200 leading-relaxed">
+                A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated monthly.
+              </p>
+
+              {/* Unique stat — institutions tracked (not shown in KPI strip below) */}
+              <div className="pt-2 flex flex-wrap items-center gap-x-5 gap-y-2">
+                {isLoadingSummary ? (
+                  <div className="h-8 w-52 bg-white/10 animate-pulse rounded" />
+                ) : (
                   <span className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-amber-400 tabular-nums">
-                      {yearlySummary?.actions?.toLocaleString() ?? "—"}
+                      {summary?.totalInstitutions?.toLocaleString() ?? "—"}
                     </span>
-                    <span className="text-sm text-blue-200">actions recorded</span>
+                    <span className="text-sm text-blue-200">institutions tracked</span>
                   </span>
-                  <span className="text-blue-400/50 text-lg font-light">·</span>
-                  <span className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-black text-amber-400 tabular-nums">
-                      {yearlySummary?.institutions?.toLocaleString() ?? "—"}
-                    </span>
-                    <span className="text-sm text-blue-200">institutions affected</span>
-                  </span>
-                  <span className="text-blue-400/50 text-lg font-light">·</span>
-                  <span className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-black text-amber-400 tabular-nums">
-                      {yearlySummary?.states ?? "—"}
-                    </span>
-                    <span className="text-sm text-blue-200">states</span>
-                  </span>
-                  <span className="text-blue-400/50 text-lg font-light">·</span>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                    className="bg-white/10 hover:bg-white/15 border border-white/25 rounded-lg text-white text-sm font-semibold px-3 py-1.5 cursor-pointer outline-none transition-colors appearance-none pr-7 relative"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center" }}
-                  >
-                    {availableYears.map(y => (
-                      <option key={y} value={y} className="bg-[#1e3a5f] text-white">In {y}</option>
-                    ))}
-                  </select>
-                </>
+                )}
+                <span className="text-blue-400/40 text-lg font-light">·</span>
+                <span className="inline-flex items-center gap-1.5 text-sm text-blue-200">
+                  <RefreshCw className="h-3.5 w-3.5 text-amber-400/70" />
+                  Updated monthly
+                </span>
+                <span className="text-blue-400/40 text-lg font-light">·</span>
+                <span className="text-sm text-blue-200">Free public data</span>
+              </div>
+
+              {!subscribed && (
+                <Button
+                  asChild
+                  size="lg"
+                  className="mt-2 bg-amber-500 hover:bg-amber-400 text-white border-0 font-bold shadow-lg shadow-amber-900/30"
+                >
+                  <Link href="/subscribe">Unlock Full Database Access →</Link>
+                </Button>
               )}
             </div>
-            <div className="pt-1">
-              <span className="inline-flex items-center gap-1.5 text-xs text-blue-300/70">
-                <RefreshCw className="h-3 w-3 text-amber-400/70" />
-                Updated monthly · prior month&apos;s data published each cycle
-              </span>
+
+            {/* Right: live recent actions feed */}
+            <div className="hidden lg:block">
+              <div className="rounded-2xl overflow-hidden border border-white/10" style={{ background: "rgba(13,31,51,0.65)", backdropFilter: "blur(8px)" }}>
+                <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Recent Actions</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs text-green-400/80">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    Live
+                  </span>
+                </div>
+                <div className="divide-y divide-white/5">
+                  {isLoadingRecent ? (
+                    [1,2,3,4,5].map(i => (
+                      <div key={i} className="px-5 py-3.5">
+                        <div className="h-3.5 bg-white/10 rounded animate-pulse w-3/4 mb-2" />
+                        <div className="h-3 bg-white/5 rounded animate-pulse w-1/2" />
+                      </div>
+                    ))
+                  ) : recentCuts?.slice(0, 5).map((cut) => (
+                    <Link
+                      href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts/${cut.id}`}
+                      key={cut.id}
+                      className="block px-5 py-3.5 hover:bg-white/5 transition-colors group"
+                    >
+                      <p className="text-sm font-semibold text-white leading-snug truncate group-hover:text-amber-300 transition-colors">
+                        {cut.institution}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-blue-300">{cut.state}</span>
+                        {cut.cutType && (
+                          <>
+                            <span className="text-blue-400/30 text-xs">·</span>
+                            <span className="text-xs text-amber-300/70 capitalize">
+                              {String(cut.cutType).replace(/_/g, " ")}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <div className="px-5 py-3.5 border-t border-white/10">
+                  <Link
+                    href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts`}
+                    className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                  >
+                    View all records →
+                  </Link>
+                </div>
+              </div>
             </div>
-            {!subscribed && (
-              <Button
-                asChild
-                size="lg"
-                className="mt-2 bg-amber-500 hover:bg-amber-400 text-white border-0 font-bold shadow-lg shadow-amber-900/30"
-              >
-                <Link href="/subscribe">Unlock Full Database Access →</Link>
-              </Button>
-            )}
+
           </div>
         </div>
       </div>

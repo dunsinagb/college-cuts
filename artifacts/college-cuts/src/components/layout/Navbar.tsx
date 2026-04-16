@@ -16,7 +16,6 @@ export function Navbar() {
     { href: "/news",         label: "News",         highlight: false, comingSoon: false, matchPrefixes: ["/news"] },
     { href: "/job-outlook",  label: "Job Outlook",  highlight: false, comingSoon: false, matchPrefixes: ["/job-outlook"] },
     { href: "/about",        label: "About",         highlight: false, comingSoon: false, matchPrefixes: ["/about"] },
-    { href: "#",             label: "Intelligence",  highlight: false, comingSoon: true,  matchPrefixes: [] },
   ];
 
   function isActive(link: typeof links[0]) {
