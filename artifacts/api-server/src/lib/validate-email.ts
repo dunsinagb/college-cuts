@@ -31,7 +31,7 @@ export function isRealEmail(email: string): { valid: boolean; reason?: string } 
     return { valid: false, reason: "Please use a real email address" };
   }
 
-  if (domain.includes("example") || domain.includes("test.") || domain === "test") {
+  if (domain.includes("example") || /^test\.[a-z]{2,}$/.test(domain)) {
     return { valid: false, reason: "Please use a real email address" };
   }
 
