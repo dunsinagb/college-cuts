@@ -50,14 +50,16 @@ export default function Dashboard() {
   const subscribed = isSubscribed();
 
   const feedScrollRef = useRef<HTMLDivElement>(null);
-  const [feedScrollState, setFeedScrollState] = useState({ atStart: true, atEnd: false });
+  const [feedScrollState, setFeedScrollState] = useState({ atStart: true, atEnd: false, scrollRatio: 0 });
 
   const handleFeedScroll = useCallback(() => {
     const el = feedScrollRef.current;
     if (!el) return;
     const atStart = el.scrollLeft <= 0;
     const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
-    setFeedScrollState({ atStart, atEnd });
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const scrollRatio = maxScroll > 0 ? el.scrollLeft / maxScroll : 0;
+    setFeedScrollState({ atStart, atEnd, scrollRatio });
   }, []);
 
   useEffect(() => {
@@ -352,6 +354,31 @@ export default function Dashboard() {
                   }}
                 />
               </div>
+              {!isLoadingRecent && recentCuts && recentCuts.length > 1 && (() => {
+                const cards = recentCuts.slice(0, 6);
+                const dotCount = cards.length;
+                const activeDot = Math.min(
+                  dotCount - 1,
+                  Math.max(0, Math.round(feedScrollState.scrollRatio * (dotCount - 1)))
+                );
+                return (
+                  <div className="flex justify-center items-center gap-1.5 py-2">
+                    {cards.map((_, i) => (
+                      <span
+                        key={i}
+                        className="block rounded-full transition-all duration-300"
+                        style={{
+                          width: activeDot === i ? "18px" : "6px",
+                          height: "6px",
+                          background: activeDot === i
+                            ? "rgba(251,191,36,0.9)"
+                            : "rgba(255,255,255,0.2)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                );
+              })()}
               <div className="px-4 py-2.5 border-t border-white/10">
                 <Link
                   href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts`}
