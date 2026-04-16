@@ -276,6 +276,57 @@ export default function Dashboard() {
             </div>
 
           </div>
+
+          {/* Mobile: compact horizontally-scrollable recent actions feed */}
+          <div className="block lg:hidden mt-6">
+            <div className="rounded-2xl overflow-hidden border border-white/10" style={{ background: "rgba(13,31,51,0.65)", backdropFilter: "blur(8px)" }}>
+              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Recent Actions</span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-green-400/80">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  Live
+                </span>
+              </div>
+              <div className="flex overflow-x-auto gap-3 px-4 py-3 scrollbar-none">
+                {isLoadingRecent ? (
+                  [1,2,3].map(i => (
+                    <div key={i} className="flex-none w-44 rounded-xl bg-white/5 px-3 py-2.5 space-y-1.5">
+                      <div className="h-3 bg-white/10 rounded animate-pulse w-4/5" />
+                      <div className="h-2.5 bg-white/5 rounded animate-pulse w-3/5" />
+                    </div>
+                  ))
+                ) : recentCuts && recentCuts.length === 0 ? (
+                  <p className="text-xs text-blue-300/60 py-1">No recent actions yet.</p>
+                ) : recentCuts?.slice(0, 6).map((cut) => (
+                  <Link
+                    href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts/${cut.id}`}
+                    key={cut.id}
+                    className="flex-none w-44 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 px-3 py-2.5 transition-colors"
+                  >
+                    <p className="text-xs font-semibold text-white leading-snug line-clamp-2">{cut.institution}</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-[11px] text-blue-300">{cut.state}</span>
+                      {cut.cutType && (
+                        <>
+                          <span className="text-blue-400/30 text-[10px]">·</span>
+                          <span className="text-[11px] text-amber-300/70 capitalize truncate">{String(cut.cutType).replace(/_/g, " ")}</span>
+                        </>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="px-4 py-2.5 border-t border-white/10">
+                <Link
+                  href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts`}
+                  className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+                >
+                  View all records →
+                </Link>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
