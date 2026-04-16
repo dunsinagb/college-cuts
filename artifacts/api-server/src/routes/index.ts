@@ -13,6 +13,7 @@ import alertsRouter from "./alerts";
 import intelligenceRouter from "./intelligence";
 import talentRouter from "./talent";
 import authRouter from "./auth";
+import warnRouter from "./warn";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(alertsRouter);
 router.use(intelligenceRouter);
 router.use(talentRouter);
 router.use(authRouter);
+router.use(warnRouter);
 
 export default router;
