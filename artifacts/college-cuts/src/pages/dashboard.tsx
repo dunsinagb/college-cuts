@@ -283,7 +283,8 @@ export default function Dashboard() {
                   Live
                 </span>
               </div>
-              <div className="flex overflow-x-auto gap-3 px-4 py-3 scrollbar-none">
+              <div className="relative">
+                <div className="flex overflow-x-auto gap-3 px-4 py-3 scrollbar-none">
                 {isLoadingRecent ? (
                   [1,2,3].map(i => (
                     <div key={i} className="flex-none w-44 rounded-xl bg-white/5 px-3 py-2.5 space-y-1.5">
@@ -310,6 +311,11 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ))}
+                </div>
+                <div
+                  className="pointer-events-none absolute inset-y-0 right-0 w-12"
+                  style={{ background: "linear-gradient(to right, transparent, rgba(13,31,51,0.85))" }}
+                />
               </div>
               <div className="px-4 py-2.5 border-t border-white/10">
                 <Link
