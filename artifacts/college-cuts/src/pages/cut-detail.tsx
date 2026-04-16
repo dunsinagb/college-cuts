@@ -229,13 +229,24 @@ export default function CutDetail() {
             </h1>
 
             {institutionSlug && (
-              <Link
-                href={`/institution/${institutionSlug}`}
-                className="inline-flex items-center gap-1 text-sm text-[#1e3a5f] hover:text-amber-600 font-medium transition-colors"
-              >
-                <Building2 className="h-3.5 w-3.5" />
-                View all actions for this institution →
-              </Link>
+              subscribed ? (
+                <Link
+                  href={`/institution/${institutionSlug}`}
+                  className="inline-flex items-center gap-1 text-sm text-[#1e3a5f] hover:text-amber-600 font-medium transition-colors"
+                >
+                  <Building2 className="h-3.5 w-3.5" />
+                  View all actions for this institution →
+                </Link>
+              ) : (
+                <Link
+                  href={`/subscribe?redirect=/institution/${institutionSlug}`}
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-amber-600 font-medium transition-colors"
+                >
+                  <Lock className="h-3.5 w-3.5 text-amber-500" />
+                  View all actions for this institution
+                  <span className="text-xs text-amber-600 font-semibold">— Sign in to unlock</span>
+                </Link>
+              )
             )}
             
             {cut.programName && (
@@ -399,13 +410,13 @@ export default function CutDetail() {
             )}
           </div>
         </div>
-        <RelatedCutsSection state={cut.state} currentId={id} />
+        <RelatedCutsSection state={cut.state} currentId={id} subscribed={subscribed} />
       </div>
     </>
   );
 }
 
-function RelatedCutsSection({ state, currentId }: { state: string; currentId: string }) {
+function RelatedCutsSection({ state, currentId, subscribed }: { state: string; currentId: string; subscribed: boolean }) {
   const { data, isLoading } = useQuery<{ cuts: { id: string; institution: string; programName: string | null; cutType: string; announcementDate: string | null; state: string }[] }>({
     queryKey: ["cuts/by-state", state],
     queryFn: async () => {
@@ -417,7 +428,33 @@ function RelatedCutsSection({ state, currentId }: { state: string; currentId: st
   });
 
   const related = (data?.cuts ?? []).filter(c => c.id !== currentId).slice(0, 4);
-  if (!isLoading && related.length === 0) return null;
+  if (!isLoading && related.length === 0 && subscribed) return null;
+
+  if (!subscribed) {
+    return (
+      <section className="border-t pt-8 mt-4">
+        <h2 className="text-xl font-bold text-[#1e3a5f] mb-5">
+          More higher education cuts in {state}
+        </h2>
+        <div
+          className="rounded-xl p-6 text-center space-y-3 border border-amber-200"
+          style={{ background: "linear-gradient(135deg, #fefce8, #fffbeb)" }}
+        >
+          <Lock className="h-6 w-6 text-amber-500 mx-auto" />
+          <p className="text-sm font-semibold text-[#1e3a5f]">
+            Sign in free to browse all {state} records and the full database
+          </p>
+          <Button
+            asChild
+            size="sm"
+            className="bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold"
+          >
+            <Link href={`/subscribe?redirect=/cuts`}>Get Free Access →</Link>
+          </Button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="border-t pt-8 mt-4">
