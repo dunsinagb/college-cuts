@@ -242,12 +242,8 @@ export default function Dashboard() {
                       </div>
                     ))
                   ) : recentCuts?.slice(0, 5).map((cut) => (
-                    <Link
-                      href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts/${cut.id}`}
-                      key={cut.id}
-                      className="block px-5 py-3.5 hover:bg-white/5 transition-colors group"
-                    >
-                      <p className="text-sm font-semibold text-white leading-snug truncate group-hover:text-amber-300 transition-colors">
+                    <div key={cut.id} className="block px-5 py-3.5">
+                      <p className="text-sm font-semibold text-white leading-snug truncate">
                         {cut.institution}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -261,7 +257,7 @@ export default function Dashboard() {
                           </>
                         )}
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
                 <div className="px-5 py-3.5 border-t border-white/10">
@@ -298,10 +294,9 @@ export default function Dashboard() {
                 ) : recentCuts && recentCuts.length === 0 ? (
                   <p className="text-xs text-blue-300/60 py-1">No recent actions yet.</p>
                 ) : recentCuts?.slice(0, 6).map((cut) => (
-                  <Link
-                    href={`${import.meta.env.BASE_URL?.replace(/\/$/, "")}/cuts/${cut.id}`}
+                  <div
                     key={cut.id}
-                    className="flex-none w-44 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 px-3 py-2.5 transition-colors"
+                    className="flex-none w-44 rounded-xl bg-white/5 border border-white/5 px-3 py-2.5"
                   >
                     <p className="text-xs font-semibold text-white leading-snug line-clamp-2">{cut.institution}</p>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -313,7 +308,7 @@ export default function Dashboard() {
                         </>
                       )}
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
               <div className="px-4 py-2.5 border-t border-white/10">
