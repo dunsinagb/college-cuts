@@ -175,7 +175,7 @@ export default function Dashboard() {
           }}
         />
         <div className="relative container mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
 
             {/* Left: hero text */}
             <div className="space-y-5">
@@ -183,7 +183,7 @@ export default function Dashboard() {
                 <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                 <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database — since 2024</span>
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-white leading-tight">
+              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-4xl text-white leading-tight">
                 Tracking the human cost of<br />
                 <span className="text-amber-400">higher education cuts.</span>
               </h1>
@@ -224,8 +224,8 @@ export default function Dashboard() {
             </div>
 
             {/* Right: live recent actions feed */}
-            <div className="hidden lg:block">
-              <div className="rounded-2xl overflow-hidden border border-white/10" style={{ background: "rgba(13,31,51,0.65)", backdropFilter: "blur(8px)" }}>
+            <div className="hidden lg:flex justify-end">
+              <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-white/10" style={{ background: "rgba(13,31,51,0.65)", backdropFilter: "blur(8px)" }}>
                 <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Recent Actions</span>
                   <span className="inline-flex items-center gap-1.5 text-xs text-green-400/80">
