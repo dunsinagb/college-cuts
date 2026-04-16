@@ -251,8 +251,8 @@ export default function CutsList() {
   return (
     <>
       <Helmet>
-        <title>US College Program Cuts & Closures Database | CollegeCuts — 235+ Records</title>
-        <meta name="description" content="Search and filter the complete database of US college program cuts, department closures, campus closures, teach-outs, and faculty layoffs across all 50 states. Free civic data — 235+ records since 2024." />
+        <title>US College Program Cuts & Closures Database | CollegeCuts</title>
+        <meta name="description" content="Search and filter the complete database of US college program cuts, department closures, campus closures, teach-outs, and faculty layoffs across all 50 states. Free civic data, updated monthly since 2024." />
         <link rel="canonical" href="https://college-cuts.com/cuts" />
       </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
