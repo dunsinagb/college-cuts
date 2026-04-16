@@ -109,6 +109,22 @@ router.post("/auth/magic-link", async (req, res): Promise<void> => {
     }
 
     const actionUrl = data.properties.action_link;
+
+    // Silently ensure they're in the subscribers table (idempotent)
+    try {
+      const { data: existing } = await supabase
+        .from("subscribers")
+        .select("id")
+        .eq("email", cleanEmail)
+        .limit(1)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from("subscribers").insert({ email: cleanEmail });
+      }
+    } catch (subErr) {
+      console.error("[magic-link] subscriber insert error:", subErr);
+    }
+
     const resend = getResend();
 
     const { error: emailError } = await resend.emails.send({
