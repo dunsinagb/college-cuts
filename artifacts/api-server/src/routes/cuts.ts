@@ -121,9 +121,12 @@ router.get("/cuts", async (req, res): Promise<void> => {
       .join(",");
     query = query.or(orClauses);
   } else if (category === "Academic") {
+    /* NULL columns evaluate to NULL (not TRUE) in NOT ILIKE, so rows with
+       null program_name or notes would be silently dropped without the
+       explicit null check here.                                           */
     for (const term of ATHLETICS_KEYWORDS) {
-      query = query.not("program_name", "ilike", `%${term}%`);
-      query = query.not("notes",        "ilike", `%${term}%`);
+      query = query.or(`program_name.is.null,program_name.not.ilike.%${term}%`);
+      query = query.or(`notes.is.null,notes.not.ilike.%${term}%`);
     }
   }
 
