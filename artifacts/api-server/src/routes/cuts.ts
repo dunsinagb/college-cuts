@@ -113,21 +113,15 @@ router.get("/cuts", async (req, res): Promise<void> => {
   }
 
   /* Push category filter to DB so pagination counts are correct.
-     Athletics/Mixed: include records that match athletics keywords.
-     Academic: exclude records that match any athletics keyword.           */
-  const ATHLETICS_DB_TERMS = [
-    "athletic","football","basketball","baseball","softball","wrestling",
-    "volleyball","lacrosse","gymnastics","rowing","ncaa","varsity",
-    "sports program","coaching staff","cross country","crew",
-  ];
-
+     Uses the same ATHLETICS_KEYWORDS list as deriveCategory() so the sets
+     are perfectly complementary: Academic + Athletics + Mixed = total.      */
   if (category === "Athletics" || category === "Mixed") {
-    const orClauses = ATHLETICS_DB_TERMS
+    const orClauses = ATHLETICS_KEYWORDS
       .flatMap(t => [`program_name.ilike.%${t}%`, `notes.ilike.%${t}%`])
       .join(",");
     query = query.or(orClauses);
   } else if (category === "Academic") {
-    for (const term of ATHLETICS_DB_TERMS) {
+    for (const term of ATHLETICS_KEYWORDS) {
       query = query.not("program_name", "ilike", `%${term}%`);
       query = query.not("notes",        "ilike", `%${term}%`);
     }
