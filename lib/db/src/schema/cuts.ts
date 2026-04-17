@@ -17,6 +17,7 @@ export const cutsTable = pgTable("cuts", {
   sourceUrl: text("source_url"),
   sourcePublication: text("source_publication"),
   status: text("status").default("confirmed"),
+  category: text("category").default("Academic"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

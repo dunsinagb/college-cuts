@@ -21,6 +21,7 @@ type SupabaseCut = {
   source_url: string | null;
   source_publication: string | null;
   cip_code: string | null;
+  category: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -55,6 +56,7 @@ function formatCut(cut: SupabaseCut) {
     sourceUrl: cut.source_url,
     sourcePublication: cut.source_publication,
     cipCode: cut.cip_code,
+    category: cut.category ?? "Academic",
     status: cut.status,
     createdAt: cut.created_at,
     updatedAt: cut.updated_at,
@@ -69,6 +71,7 @@ router.get("/cuts", async (req, res): Promise<void> => {
   }
 
   const { state, cutType, status, control, search, page = 1, limit = 25 } = parsed.data;
+  const category = typeof req.query.category === "string" ? req.query.category : undefined;
   const offset = (page - 1) * limit;
 
   let query = supabase
@@ -78,10 +81,11 @@ router.get("/cuts", async (req, res): Promise<void> => {
     .range(offset, offset + limit - 1);
 
   query = query.gte("announcement_date", "2024-01-01");
-  if (state)   query = query.eq("state", state);
-  if (cutType) query = query.eq("cut_type", cutType);
-  if (status)  query = query.eq("status", status);
-  if (control) query = query.eq("control", control);
+  if (state)    query = query.eq("state", state);
+  if (cutType)  query = query.eq("cut_type", cutType);
+  if (status)   query = query.eq("status", status);
+  if (control)  query = query.eq("control", control);
+  if (category) query = query.eq("category", category);
   if (search) {
     query = query.or(
       `institution.ilike.%${search}%,program_name.ilike.%${search}%`

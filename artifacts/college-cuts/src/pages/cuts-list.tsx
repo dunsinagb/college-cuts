@@ -14,7 +14,7 @@ import {
   AlertTriangle, GraduationCap, Users, MapPin
 } from "lucide-react";
 import { slugify } from "@/lib/slugify";
-import { STATES, CUT_TYPE_LABELS } from "@/lib/constants";
+import { STATES, CUT_TYPE_LABELS, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/constants";
 import { DotMap } from "@/components/shared/DotMap";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -82,6 +82,7 @@ interface Cut {
   sourceUrl: string | null;
   sourcePublication: string | null;
   status: string;
+  category: string | null;
 }
 
 interface CutsResponse {
@@ -103,6 +104,7 @@ export default function CutsList() {
   const [status,    setStatus]    = useState(initialParams.get("status") || "");
   const [control,   setControl]   = useState(initialParams.get("control") || "");
   const [reason,    setReason]    = useState(initialParams.get("reason") || "");
+  const [category,  setCategory]  = useState(initialParams.get("category") || "");
   const [page,      setPage]      = useState(1);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -151,13 +153,14 @@ export default function CutsList() {
   const changeCutType = useCallback((v: string) => { setCutType(v); setPage(1); }, []);
   const changeStatus  = useCallback((v: string) => { setStatus(v);  setPage(1); }, []);
   const changeControl = useCallback((v: string) => { setControl(v); setPage(1); }, []);
-  const changeReason  = useCallback((v: string) => { setReason(v);  setPage(1); }, []);
+  const changeReason   = useCallback((v: string) => { setReason(v);   setPage(1); }, []);
+  const changeCategory = useCallback((v: string) => { setCategory(v); setPage(1); }, []);
 
-  const activeFilters = [state, cutType, status, control, reason, search].filter(Boolean).length;
+  const activeFilters = [state, cutType, status, control, reason, category, search].filter(Boolean).length;
 
   function clearAll() {
     setState(""); setCutType(""); setStatus(""); setControl(""); setReason("");
-    setSearch(""); setLiveSearch(""); setPage(1);
+    setCategory(""); setSearch(""); setLiveSearch(""); setPage(1);
   }
 
   async function handleExport() {
@@ -223,7 +226,7 @@ export default function CutsList() {
   });
 
   const { data, isLoading } = useQuery<CutsResponse>({
-    queryKey: ["cuts", { search, state, cutType, status, control, page }],
+    queryKey: ["cuts", { search, state, cutType, status, control, category, page }],
     queryFn: async () => {
       const q = new URLSearchParams();
       q.set("page", String(page));
@@ -233,6 +236,7 @@ export default function CutsList() {
       if (cutType)  q.set("cutType", cutType);
       if (status)   q.set("status",  status);
       if (control)  q.set("control", control);
+      if (category) q.set("category", category);
       const r = await fetch(`${BASE_URL}/api/cuts?${q}`);
       if (!r.ok) throw new Error("Failed");
       return r.json();
@@ -384,6 +388,13 @@ export default function CutsList() {
                 <option value="Accreditation Issues">Accreditation Issues</option>
               </FilterSelect>
 
+              <FilterSelect label="Category" value={category} onChange={changeCategory} className="min-w-[150px]">
+                <option value="">All Categories</option>
+                {Object.entries(CATEGORY_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </FilterSelect>
+
               <FilterSelect label="Status" value={status} onChange={changeStatus} className="min-w-[140px]">
                 <option value="">All Statuses</option>
                 <option value="confirmed">Confirmed</option>
@@ -431,6 +442,7 @@ export default function CutsList() {
                   <th className="px-2 py-3 text-left whitespace-nowrap">Control</th>
                   <th className="px-2 py-3 text-left">St.</th>
                   <th className="px-2 py-3 text-left whitespace-nowrap">Type</th>
+                  <th className="px-2 py-3 text-left whitespace-nowrap">Category</th>
                   <th className="px-2 py-3 text-left whitespace-nowrap">Reason</th>
                   <th className="px-2 py-3 text-left">Status</th>
                   <th className="px-2 py-3 text-right whitespace-nowrap">Students</th>
@@ -442,7 +454,7 @@ export default function CutsList() {
                 {isLoading ? (
                   Array(10).fill(0).map((_, i) => (
                     <tr key={i}>
-                      {Array(11).fill(0).map((_, j) => (
+                      {Array(12).fill(0).map((_, j) => (
                         <td key={j} className="px-2 py-3">
                           <Skeleton className="h-4 w-full" />
                         </td>
@@ -528,6 +540,15 @@ export default function CutsList() {
                       </td>
                       <td className="px-2 py-3">
                         <CutTypeBadge cutType={cut.cutType} />
+                      </td>
+                      <td className="px-2 py-3 whitespace-nowrap">
+                        {cut.category && cut.category !== "Academic" ? (
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[cut.category] ?? ""}`}>
+                            {cut.category}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground/40 text-xs">—</span>
+                        )}
                       </td>
                       <td className="px-2 py-3">
                         <ReasonBadge reason={cut.primaryReason} />
