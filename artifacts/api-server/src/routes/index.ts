@@ -14,6 +14,7 @@ import intelligenceRouter from "./intelligence";
 import talentRouter from "./talent";
 import authRouter from "./auth";
 import warnRouter from "./warn";
+import skillsGapRouter from "./skills-gap";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(intelligenceRouter);
 router.use(talentRouter);
 router.use(authRouter);
 router.use(warnRouter);
+router.use(skillsGapRouter);
 
 export default router;

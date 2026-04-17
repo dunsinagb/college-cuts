@@ -74,7 +74,7 @@ function Router() {
             <Route path="/cuts/:id">{() => <CutDetail />}</Route>
             <Route path="/institution/:slug">{() => <InstitutionPage />}</Route>
             <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
-            <Route path="/job-outlook">{() => <GatedPage path="/job-outlook" component={JobOutlook} />}</Route>
+            <Route path="/job-outlook">{() => <JobOutlook />}</Route>
             <Route path="/news">{() => <News />}</Route>
             <Route path="/subscribe">{() => <Subscribe />}</Route>
             <Route path="/auth/login">{() => <Login />}</Route>

@@ -25,7 +25,7 @@ A civic data tracker that monitors college program cuts, university closures, de
 - `/cuts` — Searchable, filterable full database table with pagination (subscription gated)
 - `/cuts/:id` — Individual cut detail page (subscription gated)
 - `/analytics` — Professional analytics dashboard with 6 charts (subscription gated)
-- `/job-outlook` — Job market outlook by major using BLS + Supabase CIP/SOC data (subscription gated)
+- `/job-outlook` — Skills Gap Intelligence: Skills Gap Scorecard (public), career pathways by major, Talent Impact panel, O*NET at-risk skills
 - `/subscribe` — Email subscription gate (localStorage: cc_subscribed)
 - `/submit-tip` — Form for users to submit new tips about cuts (sends Resend confirmation)
 - `/about` — Mission, methodology, FAQ
@@ -58,7 +58,10 @@ A civic data tracker that monitors college program cuts, university closures, de
 - `GET /api/stats/recent` — 10 most recent cuts
 - `POST /api/tips` — submit a new tip (sends Resend confirmation email)
 - `POST /api/subscribe` — email subscription (saves to local DB, sends Resend welcome email)
-- `GET /api/job-outlook?major=X` — BLS wage/employment data via Supabase CIP/SOC crosswalk
+- `GET /api/job-outlook?major=X` — BLS wage/employment data (live API with 24h cache, falls back to 2024 BLS tables) + O*NET at-risk skills per occupation
+- `GET /api/skills-gap` — Skills Gap Scorecard: cuts by field × BLS growth × employment, ranked by gap score (Critical/High/Moderate/Low), 10min cache
+- `GET /api/skills-gap/:fieldId` — Detail row for one field category
+- `GET /api/skills-gap/by-major/:major` — Maps a major search term to closest field category
 - `GET /api/intelligence/roles` — list all 17 O*NET-mapped role categories
 - `POST /api/intelligence/risks` — compute pipeline risk scores per role from cuts data (body: {roleIds, states})
 - `GET /api/intelligence/recent-disruptions` — last 30 days of cuts mapped to corporate job functions
@@ -70,7 +73,9 @@ A civic data tracker that monitors college program cuts, university closures, de
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon key
 - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (preferred for server-side)
 - `RESEND_API_KEY` — Resend email API key
-- `BLS_API_KEY` — BLS API key (analytics/job data)
+- `BLS_API_KEY` — BLS API key (live OES wage/employment calls with 24h server-side cache)
+- `ONET_USERNAME` — O*NET Web Services username (optional; enables at-risk skills chips per occupation)
+- `ONET_PASSWORD` — O*NET Web Services password (optional; paired with ONET_USERNAME)
 - `SESSION_SECRET` — Express session secret
 
 ## Database Schema
@@ -88,7 +93,8 @@ A civic data tracker that monitors college program cuts, university closures, de
 
 - Gate: `localStorage.getItem("cc_subscribed") === "1"`
 - Set when user successfully POSTs to `/api/subscribe`
-- Gated pages: /cuts, /cuts/:id, /analytics, /job-outlook
+- Gated pages: /cuts, /cuts/:id, /analytics
+- Public pages (no auth): /, /job-outlook, /news, /about, /submit-tip, /intelligence, /talent
 
 ## Data
 

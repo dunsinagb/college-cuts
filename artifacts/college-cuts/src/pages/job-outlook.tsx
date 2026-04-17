@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Search, TrendingUp, DollarSign, Briefcase, Users, GraduationCap,
-  Loader2, AlertCircle, ExternalLink, ChevronUp, ChevronDown, ChevronsUpDown
+  Loader2, AlertCircle, ExternalLink, ChevronUp, ChevronDown, ChevronsUpDown,
+  Share2, Check, AlertTriangle, Zap, Activity, BarChart3
 } from "lucide-react";
 
 /* ─── native select helper ────────────────────────────────────────── */
@@ -40,6 +41,20 @@ interface Job {
   annual_openings: number | null;
   entry_education: string | null;
   unemployment_rate: number | null;
+  at_risk_skills?: string[];
+}
+
+interface ScorecardRow {
+  id: string;
+  label: string;
+  programsCut: number;
+  growthPct: number;
+  employmentBase: number;
+  gapScore: number;
+  gapRisk: "Low" | "Moderate" | "High" | "Critical";
+  estimatedAnnualGradLoss: number;
+  primarySoc: string;
+  shareText: string;
 }
 
 type SortField = keyof Pick<Job, "title" | "median_wage" | "employment_level" | "annual_openings" | "growth_pct">;
@@ -63,6 +78,105 @@ function SortIcon({ field, sortField, sortDir }: { field: SortField; sortField: 
     : <ChevronDown className="inline h-3 w-3 ml-1" />;
 }
 
+const GAP_RISK_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
+  Critical: {
+    label: "Critical",
+    className: "bg-red-100 text-red-800 border-red-200",
+    icon: <Zap className="h-3 w-3" />,
+  },
+  High: {
+    label: "High",
+    className: "bg-orange-100 text-orange-800 border-orange-200",
+    icon: <AlertTriangle className="h-3 w-3" />,
+  },
+  Moderate: {
+    label: "Moderate",
+    className: "bg-amber-100 text-amber-800 border-amber-200",
+    icon: <Activity className="h-3 w-3" />,
+  },
+  Low: {
+    label: "Low",
+    className: "bg-green-100 text-green-800 border-green-200",
+    icon: <BarChart3 className="h-3 w-3" />,
+  },
+};
+
+function GapRiskBadge({ risk }: { risk: string }) {
+  const config = GAP_RISK_CONFIG[risk] ?? GAP_RISK_CONFIG.Low;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${config.className}`}>
+      {config.icon}
+      {config.label}
+    </span>
+  );
+}
+
+function ShareButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleShare() {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <button
+      onClick={handleShare}
+      title="Copy shareable stat"
+      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded hover:bg-muted"
+    >
+      {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Share2 className="h-3.5 w-3.5" />}
+      {copied ? "Copied!" : "Share"}
+    </button>
+  );
+}
+
+/* Talent Impact panel — fetches from server-side /api/skills-gap/by-major/:major */
+function TalentImpactPanel({ major }: { major: string }) {
+  const { data } = useQuery<{ match: ScorecardRow | null }>({
+    queryKey: ["skills-gap-by-major", major],
+    queryFn: async () => {
+      const res = await fetch(`${BASE_URL}/api/skills-gap/by-major/${encodeURIComponent(major)}`);
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    enabled: major.length >= 2,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const match = data?.match;
+  if (!match || match.programsCut === 0) return null;
+
+  const gradLoss = match.estimatedAnnualGradLoss.toLocaleString();
+  const growthSign = match.growthPct >= 0 ? "+" : "";
+
+  return (
+    <Card className="border-l-4 border-l-amber-500 shadow-sm bg-amber-50/50">
+      <CardContent className="p-5">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold text-amber-900 mb-1">Talent Pipeline Impact</p>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              <strong>{match.programsCut} {match.label.toLowerCase()} programs</strong> have been cut or suspended
+              since 2024. At ~{match.estimatedAnnualGradLoss / match.programsCut} graduates per program, that's
+              an estimated <strong>~{gradLoss} fewer graduates entering the pipeline annually</strong> — against{" "}
+              <strong>{growthSign}{match.growthPct}% projected job demand growth</strong>.
+            </p>
+            {(match.gapRisk === "Critical" || match.gapRisk === "High") && (
+              <p className="text-xs text-amber-700 mt-2">
+                Gap Risk rated <strong>{match.gapRisk}</strong>. Employers in this space may face significant recruitment pressure within 2–3 years.
+              </p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function JobOutlookPage() {
   const [majorInput, setMajorInput] = useState("Computer Science");
   const [searchMajor, setSearchMajor] = useState("Computer Science");
@@ -81,6 +195,16 @@ export default function JobOutlookPage() {
     enabled: searchMajor.length >= 2,
   });
 
+  const { data: scorecardData, isLoading: scorecardLoading } = useQuery<{ scorecard: ScorecardRow[] }>({
+    queryKey: ["skills-gap-scorecard"],
+    queryFn: async () => {
+      const res = await fetch(`${BASE_URL}/api/skills-gap`);
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (majorInput.trim().length >= 2) setSearchMajor(majorInput.trim());
@@ -93,6 +217,7 @@ export default function JobOutlookPage() {
   }
 
   const jobs = data?.jobs ?? [];
+  const scorecard = scorecardData?.scorecard ?? [];
 
   const filtered = jobs.filter((j) => {
     if (educationFilter !== "all" && j.entry_education !== educationFilter) return false;
@@ -120,8 +245,8 @@ export default function JobOutlookPage() {
   return (
     <>
       <Helmet>
-        <title>Job Outlook by Major | CollegeCuts — Career Data for Cut Programs</title>
-        <meta name="description" content="Search job outlook, median salaries, and employment data for academic majors affected by college program cuts and closures. Bureau of Labor Statistics data." />
+        <title>Skills Gap Intelligence | CollegeCuts — Career Pipeline Risk Tracker</title>
+        <meta name="description" content="Track which programs are being cut and where job demand is growing. Skills Gap Scorecard powered by BLS data and CollegeCuts program cut tracking." />
         <link rel="canonical" href="https://college-cuts.com/job-outlook" />
       </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
@@ -129,9 +254,13 @@ export default function JobOutlookPage() {
       <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 60%, #1a3352 100%)" }}>
         <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="space-y-2 mb-8">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-semibold uppercase tracking-widest text-amber-400 bg-amber-400/20 px-2 py-0.5 rounded">Skills Gap Intelligence</span>
+            </div>
             <h1 className="text-4xl font-extrabold tracking-tight text-white">Job Outlook</h1>
             <p className="text-lg text-blue-200 max-w-2xl">
-              Search any academic major to see what career paths open up — and what happens to job prospects when those programs get cut.
+              CollegeCuts tracks which programs are being eliminated. BLS tracks where job demand is growing.
+              We cross these datasets to show where the talent pipeline is about to break.
             </p>
           </div>
 
@@ -170,6 +299,91 @@ export default function JobOutlookPage() {
       </div>
 
       <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+
+        {/* ── Skills Gap Scorecard ── */}
+        <Card className="shadow-md">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between flex-wrap gap-2">
+              <div>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  Skills Gap Scorecard
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Fields ranked by shortage severity — programs cut × BLS demand growth × employment base. Click "Share" to copy a pre-formatted stat.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {scorecardLoading ? (
+              <div className="p-6 space-y-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full" />
+                ))}
+              </div>
+            ) : scorecard.length === 0 ? (
+              <div className="p-6 text-center text-muted-foreground text-sm">
+                Scorecard data unavailable — configure Supabase to enable this feature.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30">
+                      <TableHead className="pl-6 w-8 text-center">#</TableHead>
+                      <TableHead>Field</TableHead>
+                      <TableHead className="text-center">Programs Cut</TableHead>
+                      <TableHead className="text-center">Job Growth</TableHead>
+                      <TableHead className="text-center">Gap Risk</TableHead>
+                      <TableHead className="text-center">Est. Grad Loss/yr</TableHead>
+                      <TableHead className="pr-6 text-center">Share</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {scorecard.map((row, idx) => (
+                      <TableRow
+                        key={row.id}
+                        className={`hover:bg-muted/20 ${row.gapRisk === "Critical" ? "bg-red-50/40" : row.gapRisk === "High" ? "bg-orange-50/30" : ""}`}
+                      >
+                        <TableCell className="pl-6 text-center text-sm text-muted-foreground font-mono">{idx + 1}</TableCell>
+                        <TableCell className="font-medium">
+                          <button
+                            onClick={() => { setMajorInput(row.label); setSearchMajor(row.label); }}
+                            className="hover:text-primary hover:underline transition-colors text-left"
+                          >
+                            {row.label}
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {row.programsCut > 0 ? (
+                            <span className="font-bold text-red-700">{row.programsCut}</span>
+                          ) : (
+                            <span className="text-muted-foreground">0</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`font-medium ${row.growthPct >= 15 ? "text-green-700" : row.growthPct >= 5 ? "text-blue-700" : "text-muted-foreground"}`}>
+                            +{row.growthPct}%
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <GapRiskBadge risk={row.gapRisk} />
+                        </TableCell>
+                        <TableCell className="text-center text-sm text-muted-foreground">
+                          {row.estimatedAnnualGradLoss > 0 ? `~${row.estimatedAnnualGradLoss.toLocaleString()}` : "—"}
+                        </TableCell>
+                        <TableCell className="pr-6 text-center">
+                          <ShareButton text={row.shareText} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
       {isError && (
         <div className="flex items-center gap-2 text-destructive bg-red-50 rounded-lg px-4 py-3">
@@ -227,6 +441,9 @@ export default function JobOutlookPage() {
             </Card>
           </div>
 
+          {/* Talent Impact Panel — server-resolved via /api/skills-gap/by-major */}
+          <TalentImpactPanel major={searchMajor} />
+
           <Card className="shadow-md">
             <CardHeader className="pb-4 flex flex-row items-center justify-between">
               <div>
@@ -266,6 +483,7 @@ export default function JobOutlookPage() {
                     </TableHead>
                     <TableHead>Education</TableHead>
                     <TableHead>Growth</TableHead>
+                    <TableHead>At-Risk Skills</TableHead>
                     <TableHead className="pr-6">Career Profile</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -304,6 +522,23 @@ export default function JobOutlookPage() {
                             {job.growth_pct > 0 ? "+" : ""}{job.growth_pct}%
                           </span>
                         ) : "N/A"}
+                      </TableCell>
+                      <TableCell className="max-w-[220px]">
+                        {job.at_risk_skills && job.at_risk_skills.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {job.at_risk_skills.map((skill) => (
+                              <span
+                                key={skill}
+                                title="At-risk skill if this program disappears"
+                                className="inline-block text-xs bg-rose-50 text-rose-700 border border-rose-200 rounded px-1.5 py-0.5 whitespace-nowrap"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="pr-6">
                         {job.soc && job.soc !== "99-9999" ? (
