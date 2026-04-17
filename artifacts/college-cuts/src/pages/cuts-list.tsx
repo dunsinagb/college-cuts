@@ -229,7 +229,7 @@ export default function CutsList() {
      Reason filter remains client-side only.                                */
   const serverCategory = category || undefined;
 
-  const { data, isLoading } = useQuery<CutsResponse>({
+  const { data, isLoading, isFetching } = useQuery<CutsResponse>({
     queryKey: ["cuts", { search, state, cutType, status, control, page, serverCategory }],
     queryFn: async () => {
       const q = new URLSearchParams();
@@ -245,7 +245,6 @@ export default function CutsList() {
       if (!r.ok) throw new Error("Failed");
       return r.json();
     },
-    placeholderData: (prev) => prev,
   });
 
   /* client-side: exact Mixed/Athletics distinction + reason filter */
@@ -425,7 +424,7 @@ export default function CutsList() {
 
             {/* result count */}
             <div className="text-sm text-blue-200 pt-1 border-t border-white/20">
-              {isLoading ? (
+              {isLoading || isFetching ? (
                 <Skeleton className="h-4 w-40 bg-white/20" />
               ) : (
                 <span>
@@ -462,7 +461,7 @@ export default function CutsList() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {isLoading ? (
+                {isLoading || isFetching ? (
                   Array(10).fill(0).map((_, i) => (
                     <tr key={i}>
                       {Array(12).fill(0).map((_, j) => (
