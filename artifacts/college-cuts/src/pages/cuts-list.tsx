@@ -225,12 +225,21 @@ export default function CutsList() {
     },
   });
 
+  /* When filtering by a derived field (reason/category), fetch all records so
+     the client-side filter operates on the full dataset, not just 1 page.     */
+  const needsFullLoad = !!(reason || category);
+
   const { data, isLoading } = useQuery<CutsResponse>({
-    queryKey: ["cuts", { search, state, cutType, status, control, page }],
+    queryKey: ["cuts", { search, state, cutType, status, control, page, reason, category }],
     queryFn: async () => {
       const q = new URLSearchParams();
-      q.set("page", String(page));
-      q.set("limit", "25");
+      if (needsFullLoad) {
+        q.set("page", "1");
+        q.set("limit", "500");
+      } else {
+        q.set("page", String(page));
+        q.set("limit", "25");
+      }
       if (search)   q.set("search",  search);
       if (state)    q.set("state",   state);
       if (cutType)  q.set("cutType", cutType);
@@ -251,7 +260,7 @@ export default function CutsList() {
   });
 
   const shown = filtered.length;
-  const total = (reason || category) ? shown : (data?.total ?? 0);
+  const total = needsFullLoad ? shown : (data?.total ?? 0);
 
   return (
     <>
@@ -593,7 +602,7 @@ export default function CutsList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={11} className="py-20 text-center text-muted-foreground">
+                    <td colSpan={12} className="py-20 text-center text-muted-foreground">
                       <Filter className="h-10 w-10 mx-auto mb-3 opacity-20" />
                       <p className="font-medium">No records found matching your filters.</p>
                       {activeFilters > 0 && (
@@ -608,8 +617,8 @@ export default function CutsList() {
             </table>
           </div>
 
-          {/* pagination */}
-          {data && data.totalPages > 1 && !reason && (
+          {/* pagination — hidden when all records are loaded for client-side filtering */}
+          {data && data.totalPages > 1 && !needsFullLoad && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-[#f8f9fc]">
               <div className="text-sm text-muted-foreground">
                 Page <span className="font-medium">{page}</span> of <span className="font-medium">{data.totalPages}</span>
