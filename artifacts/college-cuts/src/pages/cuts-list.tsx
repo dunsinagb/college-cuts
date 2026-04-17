@@ -226,7 +226,7 @@ export default function CutsList() {
   });
 
   const { data, isLoading } = useQuery<CutsResponse>({
-    queryKey: ["cuts", { search, state, cutType, status, control, category, page }],
+    queryKey: ["cuts", { search, state, cutType, status, control, page }],
     queryFn: async () => {
       const q = new URLSearchParams();
       q.set("page", String(page));
@@ -236,7 +236,6 @@ export default function CutsList() {
       if (cutType)  q.set("cutType", cutType);
       if (status)   q.set("status",  status);
       if (control)  q.set("control", control);
-      if (category) q.set("category", category);
       const r = await fetch(`${BASE_URL}/api/cuts?${q}`);
       if (!r.ok) throw new Error("Failed");
       return r.json();
@@ -244,13 +243,15 @@ export default function CutsList() {
     placeholderData: (prev) => prev,
   });
 
-  /* client-side reason filter (no API support yet) */
-  const filtered = reason
-    ? (data?.data ?? []).filter((c) => c.primaryReason === reason)
-    : (data?.data ?? []);
+  /* client-side filters (reason + category — derived fields, not stored in DB) */
+  const filtered = (data?.data ?? []).filter((c) => {
+    if (reason   && c.primaryReason !== reason)   return false;
+    if (category && c.category      !== category) return false;
+    return true;
+  });
 
   const shown = filtered.length;
-  const total = reason ? shown : (data?.total ?? 0);
+  const total = (reason || category) ? shown : (data?.total ?? 0);
 
   return (
     <>

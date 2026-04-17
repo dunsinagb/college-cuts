@@ -21,10 +21,23 @@ type SupabaseCut = {
   source_url: string | null;
   source_publication: string | null;
   cip_code: string | null;
-  category: string | null;
   created_at: string;
   updated_at: string;
 };
+
+const ATHLETICS_KEYWORDS = [
+  "athletic", "varsity", "football", "basketball", "baseball", "softball",
+  "wrestling", "swimming", "diving", "track and field", "track & field",
+  "volleyball", "soccer", "lacrosse", "tennis", "golf", "gymnastics",
+  "cross country", "rowing", "crew", "athletic department", "ncaa",
+  "sports program", "coaching staff",
+];
+
+function deriveCategory(programName: string | null, notes: string | null): string {
+  const text = ((programName ?? "") + " " + (notes ?? "")).toLowerCase();
+  if (ATHLETICS_KEYWORDS.some((kw) => text.includes(kw))) return "Athletics";
+  return "Academic";
+}
 
 function extractPrimaryReason(notes: string | null): string | null {
   if (!notes) return null;
@@ -56,7 +69,7 @@ function formatCut(cut: SupabaseCut) {
     sourceUrl: cut.source_url,
     sourcePublication: cut.source_publication,
     cipCode: cut.cip_code,
-    category: cut.category ?? "Academic",
+    category: deriveCategory(cut.program_name, cut.notes),
     status: cut.status,
     createdAt: cut.created_at,
     updatedAt: cut.updated_at,
@@ -71,7 +84,6 @@ router.get("/cuts", async (req, res): Promise<void> => {
   }
 
   const { state, cutType, status, control, search, page = 1, limit = 25 } = parsed.data;
-  const category = typeof req.query.category === "string" ? req.query.category : undefined;
   const offset = (page - 1) * limit;
 
   let query = supabase
@@ -85,7 +97,6 @@ router.get("/cuts", async (req, res): Promise<void> => {
   if (cutType)  query = query.eq("cut_type", cutType);
   if (status)   query = query.eq("status", status);
   if (control)  query = query.eq("control", control);
-  if (category) query = query.eq("category", category);
   if (search) {
     query = query.or(
       `institution.ilike.%${search}%,program_name.ilike.%${search}%`
