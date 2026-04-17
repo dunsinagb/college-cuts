@@ -256,7 +256,12 @@ export default function CutsList() {
   });
 
   const shown = filtered.length;
-  const total = reason ? shown : (data?.total ?? 0);
+  /* Athletics/Mixed share a server-side pre-filter, so the exact count comes
+     from the client-side distinction. Academic and unfiltered use server total. */
+  const total =
+    reason || category === "Athletics" || category === "Mixed"
+      ? shown
+      : (data?.total ?? 0);
 
   return (
     <>
@@ -613,8 +618,8 @@ export default function CutsList() {
             </table>
           </div>
 
-          {/* pagination — hide only for reason (client-side filter) */}
-          {data && data.totalPages > 1 && !reason && (
+          {/* hide pagination when total is derived client-side */}
+          {data && data.totalPages > 1 && !reason && category !== "Athletics" && category !== "Mixed" && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-[#f8f9fc]">
               <div className="text-sm text-muted-foreground">
                 Page <span className="font-medium">{page}</span> of <span className="font-medium">{data.totalPages}</span>
