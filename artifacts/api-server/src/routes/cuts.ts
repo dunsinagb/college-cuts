@@ -112,18 +112,25 @@ router.get("/cuts", async (req, res): Promise<void> => {
     );
   }
 
-  /* For Athletics/Mixed we push the keyword filter to the DB so pagination
-     counts correctly — otherwise it only filters the current page of 25.    */
+  /* Push category filter to DB so pagination counts are correct.
+     Athletics/Mixed: include records that match athletics keywords.
+     Academic: exclude records that match any athletics keyword.           */
+  const ATHLETICS_DB_TERMS = [
+    "athletic","football","basketball","baseball","softball","wrestling",
+    "volleyball","lacrosse","gymnastics","rowing","ncaa","varsity",
+    "sports program","coaching staff","cross country","crew",
+  ];
+
   if (category === "Athletics" || category === "Mixed") {
-    const terms = [
-      "athletic","football","basketball","baseball","softball","wrestling",
-      "swimming","diving","tennis","track","volleyball","soccer","lacrosse",
-      "golf","gymnastics","rowing","ncaa","varsity","sports program",
-    ];
-    const orClauses = terms
+    const orClauses = ATHLETICS_DB_TERMS
       .flatMap(t => [`program_name.ilike.%${t}%`, `notes.ilike.%${t}%`])
       .join(",");
     query = query.or(orClauses);
+  } else if (category === "Academic") {
+    for (const term of ATHLETICS_DB_TERMS) {
+      query = query.not("program_name", "ilike", `%${term}%`);
+      query = query.not("notes",        "ilike", `%${term}%`);
+    }
   }
 
   const { data, error, count } = await query;

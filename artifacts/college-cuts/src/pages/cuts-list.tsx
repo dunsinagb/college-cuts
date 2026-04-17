@@ -225,9 +225,9 @@ export default function CutsList() {
     },
   });
 
-  /* Athletics/Mixed: server-side keyword filter → correct pagination counts.
-     Academic/Reason: client-side only (most records are academic anyway).   */
-  const serverCategory = category === "Athletics" || category === "Mixed" ? category : undefined;
+  /* All category values are now handled server-side for accurate pagination.
+     Reason filter remains client-side only.                                */
+  const serverCategory = category || undefined;
 
   const { data, isLoading } = useQuery<CutsResponse>({
     queryKey: ["cuts", { search, state, cutType, status, control, page, serverCategory }],
@@ -248,7 +248,7 @@ export default function CutsList() {
     placeholderData: (prev) => prev,
   });
 
-  /* client-side filters (reason + Academic category — derived fields) */
+  /* client-side: exact Mixed/Athletics distinction + reason filter */
   const filtered = (data?.data ?? []).filter((c) => {
     if (reason   && c.primaryReason !== reason)   return false;
     if (category && c.category      !== category) return false;
@@ -256,7 +256,7 @@ export default function CutsList() {
   });
 
   const shown = filtered.length;
-  const total = (reason || (category && !serverCategory)) ? shown : (data?.total ?? 0);
+  const total = reason ? shown : (data?.total ?? 0);
 
   return (
     <>
@@ -548,7 +548,7 @@ export default function CutsList() {
                         <CutTypeBadge cutType={cut.cutType} />
                       </td>
                       <td className="px-2 py-3 whitespace-nowrap">
-                        {cut.category && cut.category !== "Academic" ? (
+                        {cut.category ? (
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[cut.category] ?? ""}`}>
                             {cut.category}
                           </span>
@@ -613,8 +613,8 @@ export default function CutsList() {
             </table>
           </div>
 
-          {/* pagination — hide for client-side-only filters (reason / Academic) */}
-          {data && data.totalPages > 1 && !reason && !(category && !serverCategory) && (
+          {/* pagination — hide only for reason (client-side filter) */}
+          {data && data.totalPages > 1 && !reason && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-[#f8f9fc]">
               <div className="text-sm text-muted-foreground">
                 Page <span className="font-medium">{page}</span> of <span className="font-medium">{data.totalPages}</span>
