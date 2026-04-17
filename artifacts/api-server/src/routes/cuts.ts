@@ -92,6 +92,7 @@ router.get("/cuts", async (req, res): Promise<void> => {
   }
 
   const { state, cutType, status, control, search, page = 1, limit = 25 } = parsed.data;
+  const category = typeof req.query.category === "string" ? req.query.category : undefined;
   const offset = (page - 1) * limit;
 
   let query = supabase
@@ -109,6 +110,20 @@ router.get("/cuts", async (req, res): Promise<void> => {
     query = query.or(
       `institution.ilike.%${search}%,program_name.ilike.%${search}%`
     );
+  }
+
+  /* For Athletics/Mixed we push the keyword filter to the DB so pagination
+     counts correctly — otherwise it only filters the current page of 25.    */
+  if (category === "Athletics" || category === "Mixed") {
+    const terms = [
+      "athletic","football","basketball","baseball","softball","wrestling",
+      "swimming","diving","tennis","track","volleyball","soccer","lacrosse",
+      "golf","gymnastics","rowing","ncaa","varsity","sports program",
+    ];
+    const orClauses = terms
+      .flatMap(t => [`program_name.ilike.%${t}%`, `notes.ilike.%${t}%`])
+      .join(",");
+    query = query.or(orClauses);
   }
 
   const { data, error, count } = await query;

@@ -225,17 +225,22 @@ export default function CutsList() {
     },
   });
 
+  /* Athletics/Mixed: server-side keyword filter → correct pagination counts.
+     Academic/Reason: client-side only (most records are academic anyway).   */
+  const serverCategory = category === "Athletics" || category === "Mixed" ? category : undefined;
+
   const { data, isLoading } = useQuery<CutsResponse>({
-    queryKey: ["cuts", { search, state, cutType, status, control, page }],
+    queryKey: ["cuts", { search, state, cutType, status, control, page, serverCategory }],
     queryFn: async () => {
       const q = new URLSearchParams();
       q.set("page", String(page));
       q.set("limit", "25");
-      if (search)   q.set("search",  search);
-      if (state)    q.set("state",   state);
-      if (cutType)  q.set("cutType", cutType);
-      if (status)   q.set("status",  status);
-      if (control)  q.set("control", control);
+      if (search)          q.set("search",   search);
+      if (state)           q.set("state",    state);
+      if (cutType)         q.set("cutType",  cutType);
+      if (status)          q.set("status",   status);
+      if (control)         q.set("control",  control);
+      if (serverCategory)  q.set("category", serverCategory);
       const r = await fetch(`${BASE_URL}/api/cuts?${q}`);
       if (!r.ok) throw new Error("Failed");
       return r.json();
@@ -243,7 +248,7 @@ export default function CutsList() {
     placeholderData: (prev) => prev,
   });
 
-  /* client-side filters (reason + category — derived fields, not stored in DB) */
+  /* client-side filters (reason + Academic category — derived fields) */
   const filtered = (data?.data ?? []).filter((c) => {
     if (reason   && c.primaryReason !== reason)   return false;
     if (category && c.category      !== category) return false;
@@ -251,7 +256,7 @@ export default function CutsList() {
   });
 
   const shown = filtered.length;
-  const total = (reason || category) ? shown : (data?.total ?? 0);
+  const total = (reason || (category && !serverCategory)) ? shown : (data?.total ?? 0);
 
   return (
     <>
@@ -608,8 +613,8 @@ export default function CutsList() {
             </table>
           </div>
 
-          {/* pagination */}
-          {data && data.totalPages > 1 && !reason && !category && (
+          {/* pagination — hide for client-side-only filters (reason / Academic) */}
+          {data && data.totalPages > 1 && !reason && !(category && !serverCategory) && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-[#f8f9fc]">
               <div className="text-sm text-muted-foreground">
                 Page <span className="font-medium">{page}</span> of <span className="font-medium">{data.totalPages}</span>
