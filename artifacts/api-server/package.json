@@ -23,7 +23,8 @@
     "pino": "^9",
     "pino-http": "^10",
     "resend": "^6.10.0",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",

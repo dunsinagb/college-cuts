@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -31,6 +31,7 @@ function NativeSelect({ value, onChange, className = "", children }: {
 }
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+const SITE_ORIGIN = "https://college-cuts.com";
 
 interface Job {
   soc: string;
@@ -111,11 +112,12 @@ function GapRiskBadge({ risk }: { risk: string }) {
   );
 }
 
-function ShareButton({ text }: { text: string }) {
+function ShareButton({ fieldId }: { fieldId: string }) {
   const [copied, setCopied] = useState(false);
 
   function handleShare() {
-    navigator.clipboard.writeText(text).then(() => {
+    const shareUrl = `${SITE_ORIGIN}/api/og/share?major=${encodeURIComponent(fieldId)}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -124,7 +126,7 @@ function ShareButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleShare}
-      title="Copy shareable stat"
+      title="Copy shareable link (shows card preview on LinkedIn & X/Twitter)"
       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded hover:bg-muted"
     >
       {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Share2 className="h-3.5 w-3.5" />}
@@ -178,12 +180,32 @@ function TalentImpactPanel({ major }: { major: string }) {
 }
 
 export default function JobOutlookPage() {
-  const [majorInput, setMajorInput] = useState("Computer Science");
-  const [searchMajor, setSearchMajor] = useState("Computer Science");
+  /* Read ?major= URL param on first mount so shared URLs pre-populate the search */
+  const urlMajor = (() => {
+    try {
+      return new URLSearchParams(window.location.search).get("major") ?? "";
+    } catch {
+      return "";
+    }
+  })();
+
+  const defaultMajor = urlMajor.trim().length >= 2 ? urlMajor.trim() : "Computer Science";
+
+  const [majorInput, setMajorInput] = useState(defaultMajor);
+  const [searchMajor, setSearchMajor] = useState(defaultMajor);
   const [educationFilter, setEducationFilter] = useState("all");
   const [salaryFilter, setSalaryFilter] = useState("all");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
+
+  /* Sync URL param if it changes externally (e.g. browser back/forward) */
+  useEffect(() => {
+    if (urlMajor.trim().length >= 2 && urlMajor.trim() !== searchMajor) {
+      setMajorInput(urlMajor.trim());
+      setSearchMajor(urlMajor.trim());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlMajor]);
 
   const { data, isLoading, isError } = useQuery<{ jobs: Job[] }>({
     queryKey: ["job-outlook", searchMajor],
@@ -204,6 +226,29 @@ export default function JobOutlookPage() {
     },
     staleTime: 10 * 60 * 1000,
   });
+
+  /* Look up the fieldId for the current major so we can build the OG image URL */
+  const { data: byMajorData } = useQuery<{ match: ScorecardRow | null }>({
+    queryKey: ["skills-gap-by-major-og", searchMajor],
+    queryFn: async () => {
+      const res = await fetch(`${BASE_URL}/api/skills-gap/by-major/${encodeURIComponent(searchMajor)}`);
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    enabled: searchMajor.length >= 2,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const ogFieldId = byMajorData?.match?.id ?? null;
+  const ogImageUrl = ogFieldId
+    ? `${SITE_ORIGIN}/api/og/skills-gap/${ogFieldId}`
+    : `${SITE_ORIGIN}/api/og/skills-gap/nursing`;
+  const ogTitle = byMajorData?.match
+    ? `${byMajorData.match.label} Skills Gap | CollegeCuts`
+    : "Skills Gap Intelligence | CollegeCuts";
+  const ogDescription = byMajorData?.match
+    ? `${byMajorData.match.programsCut} programs cut. Job demand growth: +${byMajorData.match.growthPct}%. See the full talent pipeline breakdown.`
+    : "Track which programs are being cut and where job demand is growing. Skills Gap Scorecard powered by BLS data.";
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -245,9 +290,23 @@ export default function JobOutlookPage() {
   return (
     <>
       <Helmet>
-        <title>Skills Gap Intelligence | CollegeCuts — Career Pipeline Risk Tracker</title>
-        <meta name="description" content="Track which programs are being cut and where job demand is growing. Skills Gap Scorecard powered by BLS data and CollegeCuts program cut tracking." />
-        <link rel="canonical" href="https://college-cuts.com/job-outlook" />
+        <title>{ogTitle} — Career Pipeline Risk Tracker</title>
+        <meta name="description" content={ogDescription} />
+        <link rel="canonical" href={`${SITE_ORIGIN}/job-outlook${searchMajor !== "Computer Science" ? `?major=${encodeURIComponent(searchMajor)}` : ""}`} />
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="CollegeCuts" />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="628" />
+        <meta property="og:url" content={`${SITE_ORIGIN}/job-outlook${searchMajor !== "Computer Science" ? `?major=${encodeURIComponent(searchMajor)}` : ""}`} />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={ogTitle} />
+        <meta name="twitter:description" content={ogDescription} />
+        <meta name="twitter:image" content={ogImageUrl} />
       </Helmet>
     <div className="min-h-screen bg-[#f0f4f9]">
       {/* Navy header */}
@@ -374,7 +433,7 @@ export default function JobOutlookPage() {
                           {row.estimatedAnnualGradLoss > 0 ? `~${row.estimatedAnnualGradLoss.toLocaleString()}` : "—"}
                         </TableCell>
                         <TableCell className="pr-6 text-center">
-                          <ShareButton text={row.shareText} />
+                          <ShareButton fieldId={row.id} />
                         </TableCell>
                       </TableRow>
                     ))}

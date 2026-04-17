@@ -85,7 +85,8 @@ const FIELD_DISPLAY: FieldDisplay[] = [
 ];
 
 /* ── All MAJOR_SOC_MAP keys sorted longest-first for greedy substring matching ── */
-const SORTED_MAJOR_KEYS = Object.keys(MAJOR_SOC_MAP).sort((a, b) => b.length - a.length);
+export const SORTED_MAJOR_KEYS = Object.keys(MAJOR_SOC_MAP).sort((a, b) => b.length - a.length);
+export { MAJOR_TO_FIELD };
 
 /**
  * Given a cut's program_name (and optional notes), return the field category ID
@@ -187,7 +188,7 @@ async function buildScorecard(): Promise<ScorecardRow[]> {
   return rows;
 }
 
-async function getScorecard(): Promise<ScorecardRow[]> {
+export async function getScorecard(): Promise<ScorecardRow[]> {
   const now = Date.now();
   if (scorecardCache && now - scorecardCache.timestamp < CACHE_TTL_MS) {
     return scorecardCache.data;
