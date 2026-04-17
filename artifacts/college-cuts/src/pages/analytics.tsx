@@ -76,9 +76,9 @@ const TYPE_COLORS: Record<string, string> = {
 const CONTROL_COLORS = [NAVY, C_CRIMSON, AMBER, C_VIOLET, SLATE];
 
 const CATEGORY_PIE_COLORS: Record<string, string> = {
-  Academic:  "#1d4ed8",
-  Athletics: "#0f766e",
-  Mixed:     "#6d28d9",
+  Academic:  C_COBALT,   // same blue used for program_suspension
+  Athletics: C_TEAL,     // same teal used for teach_out
+  Mixed:     C_VIOLET,   // same violet used for staff_layoff
 };
 
 const REASON_COLORS: Record<string, string> = {
