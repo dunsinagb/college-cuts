@@ -33,10 +33,18 @@ const ATHLETICS_KEYWORDS = [
   "sports program", "coaching staff",
 ];
 
+/* These terms signal academic program cuts alongside athletics — indicates Mixed */
+const ACADEMIC_PROGRAM_TERMS = [
+  "minor", "major", "concentration", "degree program",
+  "undergraduate program", "graduate program", "curriculum",
+];
+
 function deriveCategory(programName: string | null, notes: string | null): string {
   const text = ((programName ?? "") + " " + (notes ?? "")).toLowerCase();
-  if (ATHLETICS_KEYWORDS.some((kw) => text.includes(kw))) return "Athletics";
-  return "Academic";
+  const hasAthletics = ATHLETICS_KEYWORDS.some((kw) => text.includes(kw));
+  if (!hasAthletics) return "Academic";
+  const hasAcademic = ACADEMIC_PROGRAM_TERMS.some((kw) => text.includes(kw));
+  return hasAcademic ? "Mixed" : "Athletics";
 }
 
 function extractPrimaryReason(notes: string | null): string | null {

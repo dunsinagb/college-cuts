@@ -1,13 +1,13 @@
 export const CATEGORY_LABELS: Record<string, string> = {
   Academic: "Academic",
   Athletics: "Athletics",
-  Administrative: "Administrative",
+  Mixed: "Mixed",
 };
 
 export const CATEGORY_COLORS: Record<string, string> = {
   Academic: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   Athletics: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  Administrative: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  Mixed: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
 };
 
 export const CUT_TYPE_LABELS: Record<string, string> = {
