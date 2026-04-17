@@ -75,6 +75,12 @@ const TYPE_COLORS: Record<string, string> = {
 // Control: navy → crimson → amber → violet → slate
 const CONTROL_COLORS = [NAVY, C_CRIMSON, AMBER, C_VIOLET, SLATE];
 
+const CATEGORY_PIE_COLORS: Record<string, string> = {
+  Academic:  "#1d4ed8",
+  Athletics: "#0f766e",
+  Mixed:     "#6d28d9",
+};
+
 const REASON_COLORS: Record<string, string> = {
   "Budget Deficit": C_CRIMSON,
   "Enrollment Decline":         C_SIENNA,
@@ -171,8 +177,9 @@ function SectionBadge({ label }: { label: string }) {
 export default function Analytics() {
   const [refreshKey, setRefreshKey]     = useState(0);
   const [lastUpdated, setLastUpdated]   = useState<Date>(new Date());
-  const [activePieIdx, setActivePieIdx] = useState(0);
-  const [chartMode, setChartMode]       = useState<"bar" | "line">("bar");
+  const [activePieIdx, setActivePieIdx]             = useState(0);
+  const [activeCategoryPieIdx, setActiveCategoryPieIdx] = useState(0);
+  const [chartMode, setChartMode]                   = useState<"bar" | "line">("bar");
 
   function handleRefresh() {
     setRefreshKey((k) => k + 1);
@@ -186,6 +193,7 @@ export default function Analytics() {
   const { data: byType,      isLoading: loadType     } = useAPI<ByTypeRow[]>   ("stats/by-type",         refreshKey);
   const { data: byControl,   isLoading: loadControl  } = useAPI<ByControlRow[]>("stats/by-control",      refreshKey);
   const { data: byReason,    isLoading: loadReason   } = useAPI<ByReasonRow[]> ("stats/by-reason",       refreshKey);
+  const { data: byCategory,  isLoading: loadCategory } = useAPI<{ category: string; count: number }[]>("stats/by-category", refreshKey);
 
   const years      = (monthly?.years ?? []).filter(y => parseInt(y) >= 2024);
   const stateYears = (byState?.years ?? []).filter(y => parseInt(y) >= 2024);
@@ -574,50 +582,119 @@ export default function Analytics() {
           </Card>
         </div>
 
-        {/* ══ CHART 6 — Primary Reasons ══ */}
-        <Card className="shadow-sm border-border/60">
-          <CardHeader className="pb-2">
-            <SectionBadge label="Root Causes" />
-            <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">Primary Reasons for Actions</CardTitle>
-            <CardDescription>
-              Identified driving factors behind institutional decisions, extracted from verified source reporting
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {loadReason ? <ChartSkeleton height={300} /> : byReason && byReason.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={byReason}
-                  layout="vertical"
-                  margin={{ top: 4, right: 60, left: 8, bottom: 4 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e9ecef" />
-                  <XAxis type="number" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                  <YAxis
-                    type="category"
-                    dataKey="reason"
-                    stroke="#9ca3af"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    width={186}
-                  />
-                  <RechartsTooltip
-                    contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle}
-                    formatter={(v) => [`${v} cases`, "Occurrences"]}
-                  />
-                  <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={22}>
-                    {byReason.map((entry) => (
-                      <Cell key={entry.reason} fill={REASON_COLORS[entry.reason] ?? SLATE} />
+        {/* ══ ROW: Category breakdown + Primary Reasons ══ */}
+        <div className="grid lg:grid-cols-2 gap-8">
+
+          {/* CHART — Actions by Category (Donut) */}
+          <Card className="shadow-sm border-border/60">
+            <CardHeader className="pb-2">
+              <SectionBadge label="Category" />
+              <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">Actions by Category</CardTitle>
+              <CardDescription>Academic program cuts vs. athletics vs. mixed actions</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-2">
+              {loadCategory ? <ChartSkeleton height={300} /> : byCategory && byCategory.length > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <PieChart>
+                      <Pie
+                        activeIndex={activeCategoryPieIdx}
+                        activeShape={(props: any) => {
+                          const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percent } = props;
+                          return (
+                            <g>
+                              <text x={cx} y={cy - 10} textAnchor="middle" fill={NAVY} fontSize={20} fontWeight="700">{value}</text>
+                              <text x={cx} y={cy + 16} textAnchor="middle" fill={SLATE} fontSize={12}>{payload.category}</text>
+                              <text x={cx} y={cy + 34} textAnchor="middle" fill={SLATE} fontSize={11}>{(percent * 100).toFixed(0)}% of total</text>
+                              <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 6} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+                              <Sector cx={cx} cy={cy} innerRadius={outerRadius + 10} outerRadius={outerRadius + 14} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+                            </g>
+                          );
+                        }}
+                        data={byCategory}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={72}
+                        outerRadius={108}
+                        dataKey="count"
+                        nameKey="category"
+                        onMouseEnter={(_, idx) => setActiveCategoryPieIdx(idx)}
+                        stroke="none"
+                      >
+                        {byCategory.map((entry) => (
+                          <Cell key={entry.category} fill={CATEGORY_PIE_COLORS[entry.category] ?? SLATE} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip
+                        contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle}
+                        formatter={(val, _name, props) => [
+                          `${val} actions (${(((props.payload.count as number) / (summary?.totalCuts || 1)) * 100).toFixed(0)}%)`,
+                          props.payload.category,
+                        ]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mt-1">
+                    {byCategory.map((row) => (
+                      <div key={row.category} className="flex items-center gap-1.5 text-sm">
+                        <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: CATEGORY_PIE_COLORS[row.category] ?? SLATE }} />
+                        <span className="font-medium">{row.category}</span>
+                        <span className="text-muted-foreground">({row.count})</span>
+                      </div>
                     ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data</div>
-            )}
-          </CardContent>
-        </Card>
+                  </div>
+                </>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data</div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* CHART 6 — Primary Reasons */}
+          <Card className="shadow-sm border-border/60">
+            <CardHeader className="pb-2">
+              <SectionBadge label="Root Causes" />
+              <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">Primary Reasons for Actions</CardTitle>
+              <CardDescription>
+                Identified driving factors behind institutional decisions, extracted from verified source reporting
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4">
+              {loadReason ? <ChartSkeleton height={300} /> : byReason && byReason.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={byReason}
+                    layout="vertical"
+                    margin={{ top: 4, right: 60, left: 8, bottom: 4 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e9ecef" />
+                    <XAxis type="number" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <YAxis
+                      type="category"
+                      dataKey="reason"
+                      stroke="#9ca3af"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      width={186}
+                    />
+                    <RechartsTooltip
+                      contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle}
+                      formatter={(v) => [`${v} cases`, "Occurrences"]}
+                    />
+                    <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={22}>
+                      {byReason.map((entry) => (
+                        <Cell key={entry.reason} fill={REASON_COLORS[entry.reason] ?? SLATE} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {/* ══ CHART 4 — Actions by State (all) ══ */}
         <Card className="shadow-sm border-border/60">

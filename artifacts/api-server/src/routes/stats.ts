@@ -85,6 +85,42 @@ router.get("/stats/by-state", async (_req, res): Promise<void> => {
   }
 });
 
+/* ── category helpers (mirrors deriveCategory in cuts.ts) ───────── */
+const ATHLETICS_KEYWORDS_STATS = [
+  "athletic", "varsity", "football", "basketball", "baseball", "softball",
+  "wrestling", "swimming", "diving", "track and field", "track & field",
+  "volleyball", "soccer", "lacrosse", "tennis", "golf", "gymnastics",
+  "cross country", "rowing", "crew", "athletic department", "ncaa",
+  "sports program", "coaching staff",
+];
+const ACADEMIC_PROGRAM_TERMS_STATS = [
+  "minor", "major", "concentration", "degree program",
+  "undergraduate program", "graduate program", "curriculum",
+];
+function deriveCategory(programName: string | null, notes: string | null): string {
+  const text = ((programName ?? "") + " " + (notes ?? "")).toLowerCase();
+  const hasAthletics = ATHLETICS_KEYWORDS_STATS.some((kw) => text.includes(kw));
+  if (!hasAthletics) return "Academic";
+  const hasAcademic = ACADEMIC_PROGRAM_TERMS_STATS.some((kw) => text.includes(kw));
+  return hasAcademic ? "Mixed" : "Athletics";
+}
+
+router.get("/stats/by-category", async (_req, res): Promise<void> => {
+  try {
+    const rows = await fetchAllCuts();
+    const map: Record<string, number> = { Academic: 0, Athletics: 0, Mixed: 0 };
+    for (const r of rows) {
+      const cat = deriveCategory(r.program_name, r.notes);
+      map[cat] = (map[cat] ?? 0) + 1;
+    }
+    const result = Object.entries(map)
+      .map(([category, count]) => ({ category, count }));
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/stats/by-type", async (_req, res): Promise<void> => {
   try {
     const rows = await fetchAllCuts();
