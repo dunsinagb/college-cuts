@@ -214,6 +214,10 @@ export default function Dashboard() {
                 A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated monthly.
               </p>
 
+              <p className="text-sm text-blue-300/70 italic">
+                Used by researchers and journalists tracking higher ed financial health.
+              </p>
+
               {/* Unique stat — institutions tracked (not shown in KPI strip below) */}
               <div className="pt-2 flex flex-wrap items-center gap-x-5 gap-y-2">
                 {isLoadingSummary ? (
