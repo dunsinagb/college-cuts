@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/Layout";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import CutsList from "@/pages/cuts-list";
@@ -27,9 +28,35 @@ import Signup from "@/pages/auth/signup";
 import AuthCallback from "@/pages/auth/callback";
 import Profile from "@/pages/profile";
 
+function resolveStatus(error: unknown): number {
+  if (error && typeof error === "object") {
+    if ("status" in error && typeof (error as { status: number }).status === "number") {
+      return (error as { status: number }).status;
+    }
+    if ("message" in error) {
+      const parsed = parseInt((error as Error).message ?? "");
+      if (!isNaN(parsed)) return parsed;
+    }
+  }
+  return 0;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { refetchOnWindowFocus: false, retry: 1 },
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: (failureCount, error) => {
+        const status = resolveStatus(error);
+        if (status === 429) return failureCount < 3;
+        if (status >= 400 && status < 500) return false;
+        return failureCount < 1;
+      },
+      retryDelay: (attemptIndex, error) => {
+        const status = resolveStatus(error);
+        if (status === 429) return Math.min(1000 * 2 ** attemptIndex, 8000);
+        return 1000;
+      },
+    },
   },
 });
 
@@ -101,9 +128,11 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-            </WouterRouter>
+            <ErrorBoundary>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+              </WouterRouter>
+            </ErrorBoundary>
           </AuthProvider>
           <Toaster />
         </TooltipProvider>
