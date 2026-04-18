@@ -207,11 +207,11 @@ export default function Dashboard() {
                 <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database · since 2024</span>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-4xl text-white leading-tight">
-                Tracking the human cost of<br />
-                <span className="text-amber-400">higher education cuts.</span>
+                The definitive record of<br />
+                <span className="text-amber-400">US higher-ed cuts, closures &amp; layoffs.</span>
               </h1>
               <p className="text-lg text-blue-200 leading-relaxed">
-                A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated as seen.
+                A searchable database of every publicly reported program closure, department merger, and faculty layoff at accredited US colleges — verified, sourced, and updated as seen.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -262,10 +262,6 @@ export default function Dashboard() {
               <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-white/10" style={{ background: "rgba(13,31,51,0.65)", backdropFilter: "blur(8px)" }}>
                 <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Recent Actions</span>
-                  <span className="inline-flex items-center gap-1.5 text-xs text-green-400/80">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                    Live
-                  </span>
                 </div>
                 <div className="divide-y divide-white/5">
                   {isLoadingRecent ? (
@@ -312,10 +308,6 @@ export default function Dashboard() {
             <div className="rounded-2xl overflow-hidden border border-white/10" style={{ background: "rgba(13,31,51,0.65)", backdropFilter: "blur(8px)" }}>
               <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
                 <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Recent Actions</span>
-                <span className="inline-flex items-center gap-1.5 text-xs text-green-400/80">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  Live
-                </span>
               </div>
               <div className="relative">
                 <div
@@ -504,8 +496,8 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 space-y-10">
 
-        {/* § 02 ACTIVITY axis */}
-        <div className="flex items-center gap-3 -mb-4">
+        {/* § 02 BREAKDOWN axis */}
+        <div className="flex items-center gap-3 mb-2">
           <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 02 · BREAKDOWN</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
