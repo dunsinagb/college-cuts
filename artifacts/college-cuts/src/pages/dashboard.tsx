@@ -506,7 +506,7 @@ export default function Dashboard() {
 
         {/* § 02 ACTIVITY axis */}
         <div className="flex items-center gap-3 -mb-4">
-          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 02 · THE FEED</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 02 · BREAKDOWN</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
