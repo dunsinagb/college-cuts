@@ -35,7 +35,9 @@ export function Navbar() {
         <div className="flex items-center gap-6 md:gap-8">
           <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
             <GraduationCap className="h-6 w-6 text-amber-400" />
-            <span className="font-bold text-xl tracking-tight text-white">CollegeCuts</span>
+            <span className="font-bold text-xl tracking-tight">
+              <span className="text-white">College</span><span style={{ color: "#f59e0b" }}>Cuts</span>
+            </span>
           </Link>
           <nav className="hidden gap-5 md:flex items-center">
             {links.map((link) => (
@@ -78,7 +80,12 @@ export function Navbar() {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* LIVE indicator — desktop only */}
+          <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium text-green-400/90 select-none">
+            <span className="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
+            LIVE
+          </span>
           {!loading && (
             user ? (
               <>

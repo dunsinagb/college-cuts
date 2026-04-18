@@ -455,8 +455,16 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* § 01 SNAPSHOT axis */}
+      <div className="container mx-auto max-w-7xl px-4 pt-8 pb-0 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 01 · SNAPSHOT</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+      </div>
+
       {/* KPI Strip */}
-      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Actions"
@@ -495,6 +503,13 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 space-y-10">
+
+        {/* § 02 ACTIVITY axis */}
+        <div className="flex items-center gap-3 -mb-4">
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 02 · ACTIVITY</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">
             <section className="space-y-4">
@@ -705,8 +720,14 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* § 03 FAQ axis */}
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 03 · FREQUENTLY ASKED</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+
         {/* FAQ Section */}
-        <div className="mt-16 mb-8 max-w-3xl mx-auto px-4">
+        <div className="mb-8 max-w-3xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6 text-center">
             Frequently asked questions about higher education cuts
           </h2>
