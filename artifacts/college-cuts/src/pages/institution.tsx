@@ -277,9 +277,20 @@ export default function InstitutionPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-blue-200 text-sm mb-6">
-              <MapPin className="h-4 w-4 text-amber-400" />
-              <span>{data.stats.state}</span>
+            <div className="flex flex-wrap items-center gap-4 text-blue-200 text-sm mb-6">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-amber-400" />
+                <span>{data.stats.state}</span>
+              </div>
+              <a
+                href={`https://collegescorecard.ed.gov/search/?search_term=${encodeURIComponent(data.institution)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-blue-300 hover:text-white transition-colors text-xs font-medium"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                More info — College Scorecard
+              </a>
             </div>
 
             {/* Stat bar */}

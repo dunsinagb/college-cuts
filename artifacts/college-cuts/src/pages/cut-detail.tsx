@@ -248,6 +248,18 @@ export default function CutDetail() {
                 </Link>
               )
             )}
+
+            {cut.institution && (
+              <a
+                href={`https://collegescorecard.ed.gov/search/?search_term=${encodeURIComponent(cut.institution)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-[#1e3a5f] transition-colors"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                More info on this institution — College Scorecard (US Dept. of Education)
+              </a>
+            )}
             
             {cut.programName && (
               <h2 className="text-2xl text-muted-foreground font-medium">
