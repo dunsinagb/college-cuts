@@ -13,7 +13,6 @@ export function Navbar() {
     { href: "/",             label: "Dashboard",    highlight: false, comingSoon: false, matchPrefixes: ["/"] },
     { href: "/cuts",         label: "All Actions",  highlight: false, comingSoon: false, matchPrefixes: ["/cuts", "/institution/", "/cut/"] },
     { href: "/analytics",    label: "Analytics",    highlight: false, comingSoon: false, matchPrefixes: ["/analytics"] },
-    { href: "/charts",       label: "Charts",       highlight: false, comingSoon: false, matchPrefixes: ["/charts"] },
     { href: "/news",         label: "News",         highlight: false, comingSoon: false, matchPrefixes: ["/news"] },
     { href: "/job-outlook",  label: "Job Outlook",  highlight: false, comingSoon: false, matchPrefixes: ["/job-outlook"] },
     { href: "/about",        label: "About",         highlight: false, comingSoon: false, matchPrefixes: ["/about"] },

@@ -41,3 +41,27 @@ id = "N-LbJV1caPPHkA5egseL1"
 uri = "file://screenshots/talent.jpg"
 type = "image"
 title = "CollegeCuts Talent Pool — for Facebook Post 2"
+
+[[outputs]]
+id = "5SxwRjDIDV4m7qFWDuYaU"
+uri = "file://screenshots/chart-1-action-type.jpg"
+type = "image"
+title = "Chart 1 — US Higher Ed Actions by Type"
+
+[[outputs]]
+id = "r1AntOg44p-Tgxpy9-y5E"
+uri = "file://screenshots/chart-2-top-states.jpg"
+type = "image"
+title = "Chart 2 — States with Most Reported Higher Ed Cuts"
+
+[[outputs]]
+id = "Z4ir5K1NnntCeMFmaumKM"
+uri = "file://screenshots/chart-3-monthly-trend.jpg"
+type = "image"
+title = "Chart 3 — Higher Ed Cuts Are Accelerating"
+
+[[outputs]]
+id = "7q66wVN7uhJSunUpdG9Vr"
+uri = "file://screenshots/chart-4-public-vs-private.jpg"
+type = "image"
+title = "Chart 4 — Public vs Private Non-profit"
