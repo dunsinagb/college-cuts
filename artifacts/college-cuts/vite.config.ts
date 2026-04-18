@@ -67,6 +67,22 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    proxy: {
+      "/job-outlook": {
+        target: `http://localhost:${process.env.API_PORT ?? 8080}`,
+        changeOrigin: true,
+        bypass(req) {
+          const ua = (req.headers?.["user-agent"] ?? "").toLowerCase();
+          const crawlerPatterns = [
+            "facebookexternalhit", "facebot", "twitterbot", "linkedinbot",
+            "slackbot", "discordbot", "whatsapp", "telegrambot", "pinterest",
+            "googlebot", "bingbot", "applebot", "iframely", "embedly",
+          ];
+          const isCrawler = crawlerPatterns.some((p) => ua.includes(p));
+          return isCrawler ? undefined : req.url ?? "/job-outlook";
+        },
+      },
+    },
   },
   preview: {
     port,

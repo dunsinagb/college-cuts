@@ -220,6 +220,34 @@ function buildShareHtml(row: Awaited<ReturnType<typeof getScorecard>>[number], _
 }
 
 /**
+ * Known social-media crawler User-Agent substrings.
+ * These bots parse raw HTML and do not execute JavaScript.
+ */
+const CRAWLER_UA_PATTERNS = [
+  "facebookexternalhit",
+  "facebot",
+  "twitterbot",
+  "linkedinbot",
+  "slackbot",
+  "discordbot",
+  "whatsapp",
+  "telegrambot",
+  "pinterest",
+  "googlebot",
+  "bingbot",
+  "applebot",
+  "iframely",
+  "embedly",
+];
+
+export function isSocialCrawler(userAgent: string): boolean {
+  const ua = userAgent.toLowerCase();
+  return CRAWLER_UA_PATTERNS.some((p) => ua.includes(p));
+}
+
+export { resolveMajorRow, buildShareHtml };
+
+/**
  * GET /api/og/share?major=nursing
  * Returns a server-rendered HTML page with OG/Twitter meta tags.
  * Social crawlers read the tags; human visitors are instantly redirected to the SPA.
