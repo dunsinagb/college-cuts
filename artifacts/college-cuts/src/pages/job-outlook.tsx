@@ -276,7 +276,7 @@ export default function JobOutlookPage() {
     enabled: searchMajor.length >= 2,
   });
 
-  const { data: scorecardData, isLoading: scorecardLoading } = useQuery<{ scorecard: ScorecardRow[] }>({
+  const { data: scorecardData, isLoading: scorecardLoading } = useQuery<{ scorecard: ScorecardRow[]; cachedAt: number | null }>({
     queryKey: ["skills-gap-scorecard"],
     queryFn: async () => {
       const res = await fetch(`${BASE_URL}/api/skills-gap`);
@@ -432,6 +432,11 @@ export default function JobOutlookPage() {
                   Fields ranked by shortage severity — programs cut × BLS demand growth × employment base. Click "Share" to copy a link, post to LinkedIn or X, or copy a pre-formatted stat.
                 </CardDescription>
               </div>
+              {scorecardData?.cachedAt != null && (
+                <span className="text-xs text-muted-foreground shrink-0 self-start mt-1">
+                  Last updated {new Date(scorecardData.cachedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              )}
             </div>
           </CardHeader>
           <CardContent className="p-0">

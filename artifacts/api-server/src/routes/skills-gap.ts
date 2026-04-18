@@ -208,14 +208,24 @@ export async function getScorecard(): Promise<ScorecardRow[]> {
 }
 
 /**
+ * Rebuild the scorecard cache immediately. Throws on Supabase/build failure.
+ * Returns the new cachedAt timestamp.
+ */
+async function refreshScorecardCache(): Promise<number> {
+  const scorecard = await buildScorecard();
+  const timestamp = Date.now();
+  scorecardCache = { data: scorecard, timestamp };
+  logger.info(`[skills-gap] Cache refreshed — ${scorecard.length} rows`);
+  return timestamp;
+}
+
+/**
  * Pre-warm the scorecard cache. Safe to call at startup and on a background
  * interval — errors are caught and logged so they never crash the server.
  */
 export async function warmScorecardCache(): Promise<void> {
   try {
-    const scorecard = await buildScorecard();
-    scorecardCache = { data: scorecard, timestamp: Date.now() };
-    logger.info(`[skills-gap] Cache warmed — ${scorecard.length} rows`);
+    await refreshScorecardCache();
   } catch (err) {
     logger.error({ err }, "[skills-gap] Background warm failed");
   }
@@ -227,10 +237,43 @@ router.get("/skills-gap", async (_req, res): Promise<void> => {
     const now = Date.now();
     const wasInCache = !!(scorecardCache && now - scorecardCache.timestamp < CACHE_TTL_MS);
     const scorecard = await getScorecard();
-    res.json({ scorecard, cached: wasInCache });
+    const cachedAt = scorecardCache?.timestamp ?? null;
+    res.json({ scorecard, cached: wasInCache, cachedAt });
   } catch (err) {
     console.error("[skills-gap] Error:", err);
     res.status(500).json({ error: "Failed to build skills gap scorecard" });
+  }
+});
+
+/* GET /api/skills-gap/cache-status — cache freshness metadata */
+router.get("/skills-gap/cache-status", (_req, res): void => {
+  if (!scorecardCache) {
+    res.json({ cachedAt: null, ageSeconds: null, rowCount: 0 });
+    return;
+  }
+  const ageSeconds = Math.floor((Date.now() - scorecardCache.timestamp) / 1000);
+  res.json({
+    cachedAt: scorecardCache.timestamp,
+    ageSeconds,
+    rowCount: scorecardCache.data.length,
+  });
+});
+
+/* POST /api/skills-gap/refresh — admin-only immediate cache refresh */
+router.post("/skills-gap/refresh", async (req, res): Promise<void> => {
+  const adminKey = process.env.ADMIN_API_KEY;
+  const rawHeader = req.headers["x-admin-key"];
+  const provided = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
+  if (!adminKey || provided !== adminKey) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  try {
+    const cachedAt = await refreshScorecardCache();
+    res.json({ cachedAt });
+  } catch (err) {
+    logger.error({ err }, "[skills-gap] Manual refresh failed");
+    res.status(500).json({ error: "Refresh failed" });
   }
 });
 
