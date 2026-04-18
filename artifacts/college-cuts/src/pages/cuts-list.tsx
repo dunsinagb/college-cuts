@@ -20,6 +20,21 @@ import { DotMap } from "@/components/shared/DotMap";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
+/* ─── state code → URL slug ───────────────────────────────── */
+const CODE_TO_SLUG: Record<string, string> = {
+  AL:"alabama", AK:"alaska", AZ:"arizona", AR:"arkansas", CA:"california",
+  CO:"colorado", CT:"connecticut", DE:"delaware", FL:"florida", GA:"georgia",
+  HI:"hawaii", ID:"idaho", IL:"illinois", IN:"indiana", IA:"iowa", KS:"kansas",
+  KY:"kentucky", LA:"louisiana", ME:"maine", MD:"maryland", MA:"massachusetts",
+  MI:"michigan", MN:"minnesota", MS:"mississippi", MO:"missouri", MT:"montana",
+  NE:"nebraska", NV:"nevada", NH:"new-hampshire", NJ:"new-jersey",
+  NM:"new-mexico", NY:"new-york", NC:"north-carolina", ND:"north-dakota",
+  OH:"ohio", OK:"oklahoma", OR:"oregon", PA:"pennsylvania", RI:"rhode-island",
+  SC:"south-carolina", SD:"south-dakota", TN:"tennessee", TX:"texas", UT:"utah",
+  VT:"vermont", VA:"virginia", WA:"washington", WV:"west-virginia",
+  WI:"wisconsin", WY:"wyoming",
+};
+
 /* ─── reason badge colours ────────────────────────────────── */
 const REASON_STYLES: Record<string, string> = {
   "Budget Deficit":           "bg-red-50   text-red-700   border-red-200",
@@ -546,9 +561,20 @@ export default function CutsList() {
                         {cut.control ?? ""}
                       </td>
                       <td className="px-2 py-3">
-                        <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-bold bg-[#1e3a5f]/10 text-[#1e3a5f]">
-                          {cut.state}
-                        </span>
+                        {CODE_TO_SLUG[cut.state ?? ""] ? (
+                          <Link
+                            href={`/state/${CODE_TO_SLUG[cut.state!]}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-bold bg-[#1e3a5f]/10 text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white transition-colors"
+                            title={`View all cuts in ${cut.state}`}
+                          >
+                            {cut.state}
+                          </Link>
+                        ) : (
+                          <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-bold bg-[#1e3a5f]/10 text-[#1e3a5f]">
+                            {cut.state}
+                          </span>
+                        )}
                       </td>
                       <td className="px-2 py-3">
                         <CutTypeBadge cutType={cut.cutType} />
