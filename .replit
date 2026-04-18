@@ -62,3 +62,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 WARN_FIREHOSE_API_KEY = "wf_NEKlASryQYuvt6tINlF-A79jeMZfhCSwitFbOVwBLLg"
+COLLEGE_SCORECARD_API_KEY = "JUq5OcsgMYXbwT4awgBbUs4DxVeBvUMNfLI4F3p0"

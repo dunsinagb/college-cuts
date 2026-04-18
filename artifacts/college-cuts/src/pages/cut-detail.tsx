@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
 import { ArrowLeft, ExternalLink, Calendar, Users, GraduationCap, Building2, MapPin, Lock, BarChart3, Briefcase, Link2, Check } from "lucide-react";
+import { InstitutionInfoCard } from "@/components/shared/InstitutionInfoCard";
 import { slugify } from "@/lib/slugify";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -249,17 +250,7 @@ export default function CutDetail() {
               )
             )}
 
-            {cut.institution && (
-              <a
-                href={`https://collegescorecard.ed.gov/search/?search_term=${encodeURIComponent(cut.institution)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-[#1e3a5f] transition-colors"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                More info on this institution — College Scorecard (US Dept. of Education)
-              </a>
-            )}
+            <InstitutionInfoCard institutionName={cut.institution} />
             
             {cut.programName && (
               <h2 className="text-2xl text-muted-foreground font-medium">

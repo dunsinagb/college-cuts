@@ -16,6 +16,7 @@ import authRouter from "./auth";
 import warnRouter from "./warn";
 import skillsGapRouter from "./skills-gap";
 import ogRouter from "./og";
+import collegeScorecardRouter from "./college-scorecard";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(authRouter);
 router.use(warnRouter);
 router.use(skillsGapRouter);
 router.use(ogRouter);
+router.use(collegeScorecardRouter);
 
 export default router;
