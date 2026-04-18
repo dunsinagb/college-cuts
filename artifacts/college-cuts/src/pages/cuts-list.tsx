@@ -439,10 +439,8 @@ export default function CutsList() {
       </div>
 
       {/* ── table ── */}
-      <div className="w-full px-4 pt-2 pb-0 sm:px-6">
-        <SectionAxis label="§ 01 · DATABASE RECORDS" dark />
-      </div>
-      <div className="w-full px-4 py-6 sm:px-6">
+      <div className="w-full px-4 pt-5 pb-6 sm:px-6">
+        <SectionAxis label="§ 01 · DATABASE RECORDS" dark className="mb-3" />
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">

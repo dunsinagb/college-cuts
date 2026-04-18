@@ -6,7 +6,7 @@ interface SectionAxisProps {
 
 export function SectionAxis({ label, dark = false, className = "" }: SectionAxisProps) {
   return (
-    <div className={`flex items-center gap-3 mb-6 ${className}`}>
+    <div className={`flex items-center gap-3 ${className || "mb-6"}`}>
       <span
         className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0"
         style={{ color: "#f59e0b" }}

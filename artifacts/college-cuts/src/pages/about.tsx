@@ -67,10 +67,7 @@ export default function About() {
       <SectionAxis label="§ 02 · DATA SOURCES" />
       {/* Data Sources */}
       <section className="space-y-8" id="data-sources">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Data Sources</h2>
-          <p className="text-muted-foreground">Every number in this database has a documented origin. Here is what powers each section of the site.</p>
-        </div>
+        <p className="text-muted-foreground">Every number in this database has a documented origin. Here is what powers each section of the site.</p>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Card className="border shadow-sm">
@@ -172,10 +169,7 @@ export default function About() {
       <SectionAxis label="§ 03 · METHODOLOGY" />
       {/* Methodology & FAQ */}
       <section className="space-y-8" id="methodology">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Methodology & FAQ</h2>
-          <p className="text-muted-foreground">How we collect and classify our data.</p>
-        </div>
+        <p className="text-muted-foreground">How we collect and classify our data.</p>
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
@@ -261,10 +255,7 @@ export default function About() {
       <SectionAxis label="§ 04 · ABOUT THE CREATOR" />
       {/* Creator */}
       <section className="space-y-6" id="creator">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Creator</h2>
-          <p className="text-muted-foreground">The person behind the data.</p>
-        </div>
+        <p className="text-muted-foreground">The person behind the data.</p>
         <Card className="border-0 shadow-sm">
           <CardContent className="p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row gap-6 items-start">
