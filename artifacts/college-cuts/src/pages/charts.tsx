@@ -216,8 +216,8 @@ function Chart2() {
     },
   });
 
-  const top12 = data.slice(0, 12);
-  const chartData = [...top12].reverse().map((d) => ({
+  const top10 = data.slice(0, 10);
+  const chartData = [...top10].reverse().map((d) => ({
     name: STATE_NAMES[d.state] ?? d.state,
     count: d.count,
   }));
@@ -228,7 +228,7 @@ function Chart2() {
       <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 8 }}>
         <CardTitle
           title="States with Most Reported Higher Ed Cuts"
-          subtitle="Top 12 states by total actions reported · college-cuts.com"
+          subtitle="Top 10 states by total actions reported · college-cuts.com"
         />
         <StatBox value={data.length} label="states affected" />
       </div>
@@ -328,9 +328,9 @@ function Chart3() {
               )}
               <Area
                 type="monotone" dataKey="count"
-                stroke={AMBER} strokeWidth={2.5}
+                stroke={NAVY} strokeWidth={2.5}
                 fill="url(#amberGrad)"
-                dot={{ fill: AMBER, r: 3, strokeWidth: 0 }}
+                dot={{ fill: NAVY, r: 3, strokeWidth: 0 }}
                 activeDot={{ r: 5, fill: AMBER, strokeWidth: 0 }}
               />
             </AreaChart>
@@ -362,12 +362,20 @@ function Chart4() {
     },
   });
 
-  const total = byCtrl.reduce((s, d) => s + d.count, 0);
-  const publicCount = byCtrl.find((d) => d.control === "Public")?.count ?? 0;
-  const publicPct = total > 0 ? Math.round((publicCount / total) * 100) : 0;
+  const KEEP_CONTROLS = ["Public", "Private non-profit"];
+  const filteredData = data.filter((row) => KEEP_CONTROLS.includes(String(row.control)));
+
+  const publicCount = filteredData.find((r) => r.control === "Public")
+    ? filteredData.filter((r) => r.control === "Public")
+        .reduce((s, r) => s + ACTION_TYPES_ORDER.reduce((a, t) => a + Number(r[t] ?? 0), 0), 0)
+    : 0;
+  const totalFiltered = filteredData.reduce(
+    (s, r) => s + ACTION_TYPES_ORDER.reduce((a, t) => a + Number(r[t] ?? 0), 0), 0
+  );
+  const publicPct = totalFiltered > 0 ? Math.round((publicCount / totalFiltered) * 100) : 0;
 
   const presentTypes = ACTION_TYPES_ORDER.filter((t) =>
-    data.some((row) => (row[t] ?? 0) > 0)
+    filteredData.some((row) => (row[t] ?? 0) > 0)
   );
 
   return (
@@ -385,7 +393,7 @@ function Chart4() {
           <div style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", paddingTop: 60 }}>Loading…</div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" margin={{ left: 16, right: 24, top: 4, bottom: 28 }}>
+            <BarChart data={filteredData} layout="vertical" margin={{ left: 16, right: 24, top: 4, bottom: 28 }}>
               <CartesianGrid horizontal={false} stroke="rgba(255,255,255,0.06)" />
               <XAxis type="number" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <YAxis
@@ -453,32 +461,31 @@ export default function ChartsPage() {
           </p>
         </div>
 
-        <div style={{ marginBottom: 8 }}>
-          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>
-            Chart 01 — Action Type Breakdown
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, paddingBottom: 60 }}>
+          <div>
+            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+              Chart 01 — Action Type Breakdown
+            </div>
+            <Chart1 />
           </div>
-          <Chart1 />
-        </div>
-
-        <div style={{ marginTop: 48, marginBottom: 8 }}>
-          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>
-            Chart 02 — Top States
+          <div>
+            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+              Chart 02 — Top 10 States
+            </div>
+            <Chart2 />
           </div>
-          <Chart2 />
-        </div>
-
-        <div style={{ marginTop: 48, marginBottom: 8 }}>
-          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>
-            Chart 03 — Monthly Trend
+          <div>
+            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+              Chart 03 — Monthly Trend
+            </div>
+            <Chart3 />
           </div>
-          <Chart3 />
-        </div>
-
-        <div style={{ marginTop: 48, paddingBottom: 60 }}>
-          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>
-            Chart 04 — Public vs Private
+          <div>
+            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+              Chart 04 — Public vs Private
+            </div>
+            <Chart4 />
           </div>
-          <Chart4 />
         </div>
 
       </div>
