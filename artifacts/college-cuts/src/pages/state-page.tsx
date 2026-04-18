@@ -165,10 +165,12 @@ export default function StatePage() {
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
                     <p className="text-blue-200 text-xs font-medium uppercase tracking-wide">Total Actions</p>
                     <p className="text-3xl font-extrabold text-white mt-1">{data?.total ?? 0}</p>
+                    <p className="text-blue-300 text-xs mt-1">documented actions</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
                     <p className="text-blue-200 text-xs font-medium uppercase tracking-wide">Institutions</p>
                     <p className="text-3xl font-extrabold text-white mt-1">{data?.institutions ?? 0}</p>
+                    <p className="text-blue-300 text-xs mt-1">colleges & universities</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
                     <p className="text-blue-200 text-xs font-medium uppercase tracking-wide">Students Affected</p>
@@ -177,12 +179,18 @@ export default function StatePage() {
                         ? `~${((data?.studentsAffected ?? 0) / 1000).toFixed(1)}k`
                         : "N/A"}
                     </p>
+                    <p className="text-blue-300 text-xs mt-1">estimated students impacted</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                    <p className="text-blue-200 text-xs font-medium uppercase tracking-wide">Most Common Type</p>
-                    <p className="text-base font-bold text-amber-300 mt-1 leading-tight">
-                      {data?.topType ? (CUT_TYPE_LABELS[data.topType] ?? data.topType) : "N/A"}
+                    <p className="text-blue-200 text-xs font-medium uppercase tracking-wide">Faculty / Staff Affected</p>
+                    <p className="text-3xl font-extrabold text-white mt-1">
+                      {(data?.facultyAffected ?? 0) > 0
+                        ? (data!.facultyAffected >= 1000
+                            ? `~${(data!.facultyAffected / 1000).toFixed(1)}k`
+                            : data!.facultyAffected)
+                        : "N/A"}
                     </p>
+                    <p className="text-blue-300 text-xs mt-1">estimated faculty & staff</p>
                   </div>
                 </>
               )}
