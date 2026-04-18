@@ -275,7 +275,7 @@ export default function StatePage() {
                                 )}
                               </td>
                               <td className="px-3 py-3 whitespace-nowrap">
-                                <CutTypeBadge type={cut.cutType} />
+                                <CutTypeBadge cutType={cut.cutType} />
                               </td>
                               <td className="px-3 py-3 max-w-[240px] text-muted-foreground truncate">
                                 {cut.programName ?? cut.notes?.slice(0, 80) ?? "—"}
