@@ -308,8 +308,8 @@ function Chart3() {
             <AreaChart data={chartData} margin={{ left: 0, right: 24, top: 8, bottom: 4 }}>
               <defs>
                 <linearGradient id="amberGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor={AMBER} stopOpacity={0.4} />
-                  <stop offset="95%" stopColor={AMBER} stopOpacity={0.02} />
+                  <stop offset="5%"  stopColor={AMBER} stopOpacity={0.55} />
+                  <stop offset="95%" stopColor={AMBER} stopOpacity={0.04} />
                 </linearGradient>
               </defs>
               <CartesianGrid stroke="rgba(255,255,255,0.06)" />
@@ -317,7 +317,7 @@ function Chart3() {
                 dataKey="label"
                 tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
                 axisLine={false} tickLine={false}
-                interval={1}
+                interval="preserveStartEnd"
               />
               <YAxis
                 tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }}
@@ -338,9 +338,10 @@ function Chart3() {
               )}
               <Area
                 type="monotone" dataKey="count"
-                stroke={NAVY} strokeWidth={2.5}
+                stroke={AMBER} strokeWidth={2.5}
                 fill="url(#amberGrad)"
-                dot={{ fill: NAVY, r: 3, strokeWidth: 0 }}
+                isAnimationActive={false}
+                dot={false}
                 activeDot={{ r: 5, fill: AMBER, strokeWidth: 0 }}
               />
             </AreaChart>
