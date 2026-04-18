@@ -381,37 +381,6 @@ export default function JobOutlookPage() {
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-5">
-          <form onSubmit={handleSearch} className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-              <Input
-                placeholder="Search by major (e.g. Computer Science, Nursing, Art)"
-                value={majorInput}
-                onChange={(e) => setMajorInput(e.target.value)}
-                className="pl-9 h-12 bg-white/20 border-white/30 text-white placeholder:text-white/50 focus:bg-white/30"
-              />
-            </div>
-            <Button type="submit" className="h-12 px-8 bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold" disabled={isLoading}>
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
-            </Button>
-          </form>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {POPULAR_MAJORS.map((m) => (
-              <button
-                key={m}
-                onClick={() => { setMajorInput(m); setSearchMajor(m); }}
-                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                  searchMajor === m
-                    ? "bg-amber-500 text-white border-amber-500"
-                    : "bg-white/10 text-blue-100 border-white/20 hover:bg-white/20 hover:text-white"
-                }`}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-          </div>
         </div>
       </div>
 
@@ -567,8 +536,48 @@ export default function JobOutlookPage() {
           <SectionAxis label="§ 02 · TALENT IMPACT" />
           {/* Talent Impact Panel — server-resolved via /api/skills-gap/by-major */}
           <TalentImpactPanel major={searchMajor} />
+        </>
+      )}
 
-          <SectionAxis label="§ 03 · CAREER PATHWAYS" />
+      <SectionAxis label="§ 03 · CAREER PATHWAYS" />
+
+      {/* Search form — light themed, always visible */}
+      <Card className="shadow-sm border">
+        <CardContent className="p-5">
+          <form onSubmit={handleSearch} className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by major (e.g. Computer Science, Nursing, Art)"
+                value={majorInput}
+                onChange={(e) => setMajorInput(e.target.value)}
+                className="pl-9 h-11"
+              />
+            </div>
+            <Button type="submit" className="h-11 px-7 bg-amber-500 hover:bg-amber-400 text-white border-0 font-semibold" disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+            </Button>
+          </form>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {POPULAR_MAJORS.map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMajorInput(m); setSearchMajor(m); }}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  searchMajor === m
+                    ? "bg-amber-500 text-white border-amber-500"
+                    : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {sorted.length > 0 && (
+        <>
           <Card className="shadow-md">
             <CardHeader className="pb-4 flex flex-row items-center justify-between">
               <div>
