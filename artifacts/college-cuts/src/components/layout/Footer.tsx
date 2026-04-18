@@ -104,7 +104,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-blue-300/40">
           <span>
-            &copy; {new Date().getFullYear()} CollegeCuts. Dataset licensed{" "}
+            &copy; 2025&ndash;{new Date().getFullYear()} CollegeCuts. Dataset licensed{" "}
             <a
               href="https://creativecommons.org/licenses/by-nc/4.0/"
               target="_blank"
