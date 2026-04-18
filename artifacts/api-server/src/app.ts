@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import router from "./routes";
 import sitemapRouter from "./routes/sitemap";
 import { logger } from "./lib/logger";
+import { warmScorecardCache } from "./routes/skills-gap";
 
 const app: Express = express();
 
@@ -55,5 +56,10 @@ app.get("/robots.txt", (_req, res) => {
 
 app.use(sitemapRouter);
 app.use("/api", router);
+
+const SCORECARD_REFRESH_MS = 5 * 60 * 1000;
+
+warmScorecardCache();
+setInterval(warmScorecardCache, SCORECARD_REFRESH_MS).unref();
 
 export default app;

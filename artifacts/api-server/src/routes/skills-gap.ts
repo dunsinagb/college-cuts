@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { supabase } from "../lib/supabase";
 import { MAJOR_SOC_MAP, getGrowthRate, BLS_2024_EMPLOYMENT } from "../lib/bls-crosswalk";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
@@ -103,9 +104,9 @@ function classifyCut(programName: string | null, notes: string | null): string |
   return null;
 }
 
-/* ── In-memory scorecard cache (10-min TTL) ── */
+/* ── In-memory scorecard cache (5-min TTL, pre-warmed at startup) ── */
 let scorecardCache: { data: ScorecardRow[]; timestamp: number } | null = null;
-const CACHE_TTL_MS = 10 * 60 * 1000;
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
 export interface ScorecardRow {
   id: string;
@@ -193,9 +194,31 @@ export async function getScorecard(): Promise<ScorecardRow[]> {
   if (scorecardCache && now - scorecardCache.timestamp < CACHE_TTL_MS) {
     return scorecardCache.data;
   }
-  const scorecard = await buildScorecard();
-  scorecardCache = { data: scorecard, timestamp: now };
-  return scorecard;
+  try {
+    const scorecard = await buildScorecard();
+    scorecardCache = { data: scorecard, timestamp: now };
+    return scorecard;
+  } catch (err) {
+    if (scorecardCache) {
+      logger.warn({ err }, "[skills-gap] Supabase unavailable — returning stale cache");
+      return scorecardCache.data;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Pre-warm the scorecard cache. Safe to call at startup and on a background
+ * interval — errors are caught and logged so they never crash the server.
+ */
+export async function warmScorecardCache(): Promise<void> {
+  try {
+    const scorecard = await buildScorecard();
+    scorecardCache = { data: scorecard, timestamp: Date.now() };
+    logger.info(`[skills-gap] Cache warmed — ${scorecard.length} rows`);
+  } catch (err) {
+    logger.error({ err }, "[skills-gap] Background warm failed");
+  }
 }
 
 /* GET /api/skills-gap — full ranked scorecard */
