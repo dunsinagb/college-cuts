@@ -55,16 +55,23 @@ export default function CutDetail() {
     });
   }
 
+  function buildShareSentence() {
+    const institution = cut?.institution ?? "This institution";
+    const label = cut?.cutType ? (CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ")) : null;
+    const program = cut?.programName ? ` (${cut.programName})` : "";
+    return label
+      ? `${institution} has recorded a ${label}${program} — tracked on CollegeCuts`
+      : `${institution} has recorded a higher education action${program} — tracked on CollegeCuts`;
+  }
+
   function handleShareTwitter() {
-    const text = encodeURIComponent(
-      `${cut?.institution ?? "This institution"} has recorded program cuts, closures, or layoffs — tracked on College Cuts Tracker`
-    );
+    const text = encodeURIComponent(buildShareSentence());
     const url = encodeURIComponent(institutionUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener,noreferrer,width=550,height=450");
   }
 
   function handleShareLinkedIn() {
-    const shareText = `${cut?.institution ?? "This institution"} has recorded program cuts, closures, or layoffs — tracked by College Cuts Tracker.\n\n${institutionUrl}`;
+    const shareText = `${buildShareSentence()}\n\n${institutionUrl}`;
     navigator.clipboard.writeText(shareText).catch(() => {});
     setLinkedInCopied(true);
     setTimeout(() => setLinkedInCopied(false), 3500);
