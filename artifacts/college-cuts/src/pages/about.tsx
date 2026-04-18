@@ -77,7 +77,7 @@ export default function About() {
                   <Database className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-bold text-sm text-foreground">Program Cuts Database</p>
+                  <p className="font-bold text-sm text-foreground">Higher Ed Actions Database</p>
                   <p className="text-xs text-muted-foreground">Cuts, closures, layoffs</p>
                 </div>
               </div>

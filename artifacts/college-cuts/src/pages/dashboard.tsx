@@ -204,7 +204,7 @@ export default function Dashboard() {
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database · Tracking since 2024</span>
+                <span className="text-amber-300 text-xs font-semibold tracking-wide">Higher Ed Actions Database · Tracking since 2024</span>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-4xl text-white leading-tight">
                 The definitive record of<br />
