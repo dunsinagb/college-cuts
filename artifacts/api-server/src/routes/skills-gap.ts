@@ -164,9 +164,7 @@ async function buildScorecard(): Promise<ScorecardRow[]> {
 
     const estimatedAnnualGradLoss = programsCut * field.avgGradsPerProgram;
 
-    const shareText = programsCut > 0
-      ? `${field.label} programs cut: ${programsCut}. Job demand growth: +${growthPct}%. The pipeline math doesn't work. Data via college-cuts.com`
-      : `${field.label} faces +${growthPct}% job demand growth. Track which programs are being cut at college-cuts.com`;
+    const shareText = `${field.label}: +${growthPct}% projected job demand growth. ${employmentBase.toLocaleString()} workers currently employed nationwide. Career data via https://college-cuts.com/job-outlook?major=${encodeURIComponent(field.id)}`;
 
     return {
       id: field.id,
