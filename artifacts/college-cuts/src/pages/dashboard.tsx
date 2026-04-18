@@ -458,7 +458,7 @@ export default function Dashboard() {
       {/* § 01 SNAPSHOT axis */}
       <div className="container mx-auto max-w-7xl px-4 pt-8 pb-0 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-6">
-          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 01 · SNAPSHOT</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 01 · BY THE NUMBERS</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
       </div>
@@ -506,7 +506,7 @@ export default function Dashboard() {
 
         {/* § 02 ACTIVITY axis */}
         <div className="flex items-center gap-3 -mb-4">
-          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 02 · ACTIVITY</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: "#f59e0b" }}>§ 02 · THE FEED</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
