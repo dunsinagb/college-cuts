@@ -132,7 +132,7 @@ export default function InstitutionPage() {
 
   function shareTwitter() {
     const text = encodeURIComponent(
-      `${pageName} has ${data?.stats.actions} recorded higher-ed action${(data?.stats.actions ?? 0) !== 1 ? "s" : ""} (program cuts, closures & layoffs) tracked on College Cuts Tracker`
+      `${pageName} has ${data?.stats.actions} recorded higher-ed action${(data?.stats.actions ?? 0) !== 1 ? "s" : ""} (program cuts, closures & layoffs) tracked on CollegeCuts`
     );
     const url = encodeURIComponent(pageUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener,noreferrer,width=550,height=450");
@@ -166,7 +166,7 @@ export default function InstitutionPage() {
 
   function shareLinkedIn() {
     const n = data?.stats.actions ?? 0;
-    const shareText = `${pageName} has ${n} recorded higher-ed action${n !== 1 ? "s" : ""} (program cuts, closures & layoffs), tracked by College Cuts Tracker.\n\n${pageUrl}`;
+    const shareText = `${pageName} has ${n} recorded higher-ed action${n !== 1 ? "s" : ""} (program cuts, closures & layoffs), tracked by CollegeCuts.\n\n${pageUrl}`;
     navigator.clipboard.writeText(shareText).catch(() => {});
     setLinkedInCopied(true);
     setTimeout(() => setLinkedInCopied(false), 3500);

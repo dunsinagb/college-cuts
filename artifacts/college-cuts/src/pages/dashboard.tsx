@@ -214,9 +214,16 @@ export default function Dashboard() {
                 A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated monthly.
               </p>
 
-              <p className="text-sm text-blue-300/70 italic">
-                Used by researchers and journalists tracking higher ed financial health.
-              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="inline-flex items-center gap-1.5 bg-white/8 border border-white/15 rounded-full px-3 py-1 text-xs font-medium text-blue-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
+                  Referenced by The Hechinger Report
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-white/8 border border-white/15 rounded-full px-3 py-1 text-xs font-medium text-blue-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
+                  Used by researchers &amp; journalists
+                </span>
+              </div>
 
               {/* Unique stat — institutions tracked (not shown in KPI strip below) */}
               <div className="pt-2 flex flex-wrap items-center gap-x-5 gap-y-2">
