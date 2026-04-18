@@ -165,7 +165,7 @@ async function buildScorecard(): Promise<ScorecardRow[]> {
     const estimatedAnnualGradLoss = programsCut * field.avgGradsPerProgram;
 
     const shareText = programsCut > 0
-      ? `${programsCut} ${field.label.toLowerCase()} programs cut or suspended since 2024. At ~${field.avgGradsPerProgram} graduates per program, that's an estimated ~${estimatedAnnualGradLoss.toLocaleString()} fewer graduates entering the pipeline annually, against +${growthPct}% projected job demand growth. ${employmentBase.toLocaleString()} workers currently employed nationwide. college-cuts.com/job-outlook?major=${field.id}`
+      ? `${programsCut} ${field.label.toLowerCase()} programs cut or suspended since 2024. +${growthPct}% projected job demand growth. ${employmentBase.toLocaleString()} workers currently employed nationwide. college-cuts.com/job-outlook?major=${field.id}`
       : `${field.label}: +${growthPct}% projected job demand growth. ${employmentBase.toLocaleString()} workers currently employed nationwide. college-cuts.com/job-outlook?major=${field.id}`;
 
     return {

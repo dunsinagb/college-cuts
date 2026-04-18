@@ -108,7 +108,7 @@ router.get("/cuts", async (req, res): Promise<void> => {
   if (control)  query = query.eq("control", control);
   if (search) {
     query = query.or(
-      `institution.ilike.%${search}%,program_name.ilike.%${search}%`
+      `institution.ilike.%${search}%,program_name.ilike.%${search}%,notes.ilike.%${search}%`
     );
   }
 
