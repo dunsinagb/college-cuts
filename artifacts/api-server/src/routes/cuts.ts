@@ -262,6 +262,60 @@ router.get("/institution/:slug", async (req, res): Promise<void> => {
   });
 });
 
+const STATE_NAMES: Record<string, string> = {
+  AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
+  CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
+  HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
+  KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
+  MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi",
+  MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire",
+  NJ: "New Jersey", NM: "New Mexico", NY: "New York", NC: "North Carolina",
+  ND: "North Dakota", OH: "Ohio", OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania",
+  RI: "Rhode Island", SC: "South Carolina", SD: "South Dakota", TN: "Tennessee",
+  TX: "Texas", UT: "Utah", VT: "Vermont", VA: "Virginia", WA: "Washington",
+  WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
+};
+
+router.get("/state/:stateCode", async (req, res): Promise<void> => {
+  const stateCode = req.params.stateCode.toUpperCase();
+  const stateName = STATE_NAMES[stateCode];
+  if (!stateName) {
+    res.status(404).json({ error: "State not found" });
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("v_latest_cuts")
+    .select("*")
+    .eq("state", stateCode)
+    .order("announcement_date", { ascending: false });
+
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+
+  const cuts = (data ?? []) as SupabaseCut[];
+  const institutions = new Set(cuts.map(c => c.institution));
+  const cutTypeCounts: Record<string, number> = {};
+  for (const c of cuts) {
+    cutTypeCounts[c.cut_type] = (cutTypeCounts[c.cut_type] ?? 0) + 1;
+  }
+  const topType = Object.entries(cutTypeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+  res.json({
+    stateCode,
+    stateName,
+    total: cuts.length,
+    institutions: institutions.size,
+    studentsAffected: cuts.reduce((s, c) => s + (c.students_affected ?? 0), 0),
+    facultyAffected: cuts.reduce((s, c) => s + (c.faculty_affected ?? 0), 0),
+    topType,
+    cutTypeCounts,
+    cuts: cuts.map(formatCut),
+  });
+});
+
 router.get("/cuts/:id", async (req, res): Promise<void> => {
   const params = GetCutParams.safeParse(req.params);
   if (!params.success) {

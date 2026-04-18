@@ -42,15 +42,40 @@ router.get("/sitemap.xml", async (_req, res) => {
   </url>`;
     }).join("\n");
 
-    const staticUrls = ["/", "/news", "/intelligence", "/talent", "/subscribe", "/about", "/submit-tip"].map(p => `  <url>
+    const staticUrls = ["/", "/news", "/intelligence", "/talent", "/subscribe", "/about", "/submit-tip", "/analytics", "/job-outlook"].map(p => `  <url>
     <loc>${SITE_URL}${p}</loc>
     <changefreq>${p === "/news" || p === "/" ? "daily" : "weekly"}</changefreq>
     <priority>${p === "/" ? "1.0" : p === "/news" || p === "/intelligence" || p === "/talent" ? "0.8" : "0.5"}</priority>
   </url>`).join("\n");
 
+    const STATE_SLUGS: Record<string, string> = {
+      AL: "alabama", AK: "alaska", AZ: "arizona", AR: "arkansas", CA: "california",
+      CO: "colorado", CT: "connecticut", DE: "delaware", FL: "florida", GA: "georgia",
+      HI: "hawaii", ID: "idaho", IL: "illinois", IN: "indiana", IA: "iowa",
+      KS: "kansas", KY: "kentucky", LA: "louisiana", ME: "maine", MD: "maryland",
+      MA: "massachusetts", MI: "michigan", MN: "minnesota", MS: "mississippi",
+      MO: "missouri", MT: "montana", NE: "nebraska", NV: "nevada",
+      NH: "new-hampshire", NJ: "new-jersey", NM: "new-mexico", NY: "new-york",
+      NC: "north-carolina", ND: "north-dakota", OH: "ohio", OK: "oklahoma",
+      OR: "oregon", PA: "pennsylvania", RI: "rhode-island", SC: "south-carolina",
+      SD: "south-dakota", TN: "tennessee", TX: "texas", UT: "utah",
+      VT: "vermont", VA: "virginia", WA: "washington", WV: "west-virginia",
+      WI: "wisconsin", WY: "wyoming",
+    };
+    const seenStates = new Set(rows.map((r: any) => r.state as string).filter(Boolean));
+    const stateUrls = [...seenStates]
+      .filter(code => STATE_SLUGS[code])
+      .map(code => `  <url>
+    <loc>${SITE_URL}/state/${STATE_SLUGS[code]}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>`)
+      .join("\n");
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${staticUrls}
+${stateUrls}
 ${institutionUrls.join("\n")}
 ${cutUrls}
 </urlset>`;

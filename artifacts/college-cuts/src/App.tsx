@@ -28,6 +28,7 @@ import Signup from "@/pages/auth/signup";
 import AuthCallback from "@/pages/auth/callback";
 import Profile from "@/pages/profile";
 import ChartsPage from "@/pages/charts";
+import StatePage from "@/pages/state-page";
 
 function resolveStatus(error: unknown): number {
   if (error && typeof error === "object") {
@@ -102,6 +103,7 @@ function Router() {
             <Route path="/cuts">{() => <GatedPage path="/cuts" component={CutsList} />}</Route>
             <Route path="/cuts/:id">{() => <CutDetail />}</Route>
             <Route path="/institution/:slug">{() => <InstitutionPage />}</Route>
+            <Route path="/state/:statename">{() => <StatePage />}</Route>
             <Route path="/analytics">{() => <GatedPage path="/analytics" component={Analytics} />}</Route>
             <Route path="/job-outlook">{() => <JobOutlook />}</Route>
             <Route path="/news">{() => <News />}</Route>
