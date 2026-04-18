@@ -302,10 +302,10 @@ export default function JobOutlookPage() {
     : `${SITE_ORIGIN}/api/og/skills-gap/nursing`;
   const ogTitle = byMajorData?.match
     ? `${byMajorData.match.label} Skills Gap | CollegeCuts`
-    : "Skills Gap Intelligence | CollegeCuts";
+    : "College Program Cuts vs. Job Demand: Where the Talent Gap Is Widest";
   const ogDescription = byMajorData?.match
     ? `${byMajorData.match.programsCut} programs cut. Job demand growth: +${byMajorData.match.growthPct}%. See the full talent pipeline breakdown.`
-    : "Track which programs are being cut and where job demand is growing. Skills Gap Scorecard powered by BLS data.";
+    : "Which college majors are being eliminated while employers are desperate to hire? Explore the widening gap between disappearing programs and growing careers — powered by BLS data.";
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -348,7 +348,7 @@ export default function JobOutlookPage() {
   return (
     <>
       <Helmet>
-        <title>{ogTitle} | Career Pipeline Risk Tracker</title>
+        <title>{ogTitle} | CollegeCuts</title>
         <meta name="description" content={ogDescription} />
         <link rel="canonical" href={`${SITE_ORIGIN}/job-outlook${searchMajor !== "Computer Science" ? `?major=${encodeURIComponent(searchMajor)}` : ""}`} />
         {/* Open Graph */}
