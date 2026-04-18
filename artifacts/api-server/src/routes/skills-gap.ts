@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { supabase } from "../lib/supabase";
 import { MAJOR_SOC_MAP, getGrowthRate, BLS_2024_EMPLOYMENT } from "../lib/bls-crosswalk";
 import { logger } from "../lib/logger";
+import { readScorecardCache, writeScorecardCache } from "../lib/cache-persist";
 
 const router: IRouter = Router();
 
@@ -105,8 +106,10 @@ function classifyCut(programName: string | null, notes: string | null): string |
 }
 
 /* ── In-memory scorecard cache (5-min TTL, pre-warmed at startup) ── */
-let scorecardCache: { data: ScorecardRow[]; timestamp: number } | null = null;
 const CACHE_TTL_MS = 5 * 60 * 1000;
+
+/** Seeded immediately from disk so cold-start requests never hit Supabase first. */
+let scorecardCache: { data: ScorecardRow[]; timestamp: number } | null = readScorecardCache();
 
 export interface ScorecardRow {
   id: string;
@@ -214,7 +217,9 @@ export async function getScorecard(): Promise<ScorecardRow[]> {
 async function refreshScorecardCache(): Promise<number> {
   const scorecard = await buildScorecard();
   const timestamp = Date.now();
-  scorecardCache = { data: scorecard, timestamp };
+  const entry = { data: scorecard, timestamp };
+  scorecardCache = entry;
+  writeScorecardCache(entry);
   logger.info(`[skills-gap] Cache refreshed — ${scorecard.length} rows`);
   return timestamp;
 }
