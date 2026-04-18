@@ -27,6 +27,7 @@ import Login from "@/pages/auth/login";
 import Signup from "@/pages/auth/signup";
 import AuthCallback from "@/pages/auth/callback";
 import Profile from "@/pages/profile";
+import ChartsPage from "@/pages/charts";
 
 function resolveStatus(error: unknown): number {
   if (error && typeof error === "object") {
@@ -93,6 +94,7 @@ function Router() {
       <Route path="/embed/:slug">{() => (
         <div className="p-3"><EmbedWidget /></div>
       )}</Route>
+      <Route path="/charts/solo">{() => <ChartsPage />}</Route>
       <Route>{() => (
         <Layout>
           <Switch>
@@ -114,6 +116,7 @@ function Router() {
             <Route path="/intelligence/onboarding">{() => <IntelligenceOnboarding />}</Route>
             <Route path="/intelligence/dashboard">{() => <IntelligenceDashboard />}</Route>
             <Route path="/talent">{() => <TalentRegister />}</Route>
+            <Route path="/charts">{() => <ChartsPage />}</Route>
             <Route>{() => <NotFound />}</Route>
           </Switch>
         </Layout>

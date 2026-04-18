@@ -224,6 +224,36 @@ router.get("/stats/yearly-by-state", async (_req, res): Promise<void> => {
   }
 });
 
+router.get("/stats/by-control-type", async (_req, res): Promise<void> => {
+  try {
+    const rows = await fetchAllCuts();
+    const TYPE_LABELS: Record<string, string> = {
+      program_suspension: "Program Suspension",
+      staff_layoff:       "Staff Layoff",
+      department_closure: "Department Closure",
+      institution_closure:"Institution Closure",
+      campus_closure:     "Campus Closure",
+      teach_out:          "Teach-Out",
+    };
+    const map: Record<string, Record<string, number>> = {};
+    for (const r of rows) {
+      const ctrl  = r.control ?? "Unknown";
+      const label = TYPE_LABELS[r.cut_type] ?? r.cut_type;
+      if (!map[ctrl]) map[ctrl] = {};
+      map[ctrl][label] = (map[ctrl][label] ?? 0) + 1;
+    }
+    const result = Object.entries(map)
+      .sort((a, b) => {
+        const total = (obj: Record<string,number>) => Object.values(obj).reduce((s,v) => s+v, 0);
+        return total(b[1]) - total(a[1]);
+      })
+      .map(([control, types]) => ({ control, ...types }));
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/stats/by-control", async (_req, res): Promise<void> => {
   try {
     const rows = await fetchAllCuts();
