@@ -23,7 +23,6 @@ const BLUE2  = "#3d70b2";
 const BLUE3  = "#5585c0";
 const BLUE4  = "#7aa4d0";
 const BLUE5  = "#9ec2e0";
-const BLUE6  = "#bfd5ec";
 
 const TYPE_COLORS: Record<string, string> = {
   "Program Suspension":  AMBER,
@@ -217,7 +216,7 @@ function Chart2() {
   });
 
   const top10 = data.slice(0, 10);
-  const chartData = [...top10].reverse().map((d) => ({
+  const chartData = [...top10].map((d) => ({
     name: STATE_NAMES[d.state] ?? d.state,
     count: d.count,
   }));
@@ -250,7 +249,7 @@ function Chart2() {
               <Bar dataKey="count" radius={[0, 6, 6, 0]}
                 label={{ position: "right", fill: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700 }}>
                 {chartData.map((_, i) => (
-                  <Cell key={i} fill={stateBarColor(chartData.length - 1 - i, chartData.length)} />
+                  <Cell key={i} fill={stateBarColor(i, chartData.length)} />
                 ))}
               </Bar>
             </BarChart>
@@ -354,14 +353,6 @@ function Chart4() {
       return r.json();
     },
   });
-  const { data: byCtrl = [] } = useQuery<{ control: string; count: number }[]>({
-    queryKey: ["charts/by-control"],
-    queryFn: async () => {
-      const r = await fetch(`${BASE}/api/stats/by-control`);
-      return r.json();
-    },
-  });
-
   const KEEP_CONTROLS = ["Public", "Private non-profit"];
   const filteredData = data.filter((row) => KEEP_CONTROLS.includes(String(row.control)));
 
