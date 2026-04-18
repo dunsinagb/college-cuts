@@ -92,7 +92,7 @@ export function USChoroplethMap({ data }: Props) {
           >
             {mostAffected.state}
           </Link>{" "}
-          — {mostAffected.count.toLocaleString()} recorded actions
+          with {mostAffected.count.toLocaleString()} recorded actions
         </p>
       )}
 

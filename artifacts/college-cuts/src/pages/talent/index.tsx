@@ -156,13 +156,13 @@ export default function TalentRegister() {
               ) : "a university?"}
             </h1>
             <p className="text-blue-200 text-base max-w-xl leading-relaxed mb-6">
-              Companies are actively looking for talent displaced from academia — especially in healthcare, technology, engineering, and research.
+              Companies are actively looking for talent displaced from academia, especially in healthcare, technology, engineering, and research.
               Create a free profile and get discovered directly by employers who need exactly your background.
             </p>
             <div className="flex flex-wrap gap-4">
               {[
                 { icon: Briefcase, text: "Matched to employers hiring in your field" },
-                { icon: Users, text: "No resume needed — your credentials speak for themselves" },
+                { icon: Users, text: "No resume needed. Your credentials speak for themselves." },
                 { icon: Building2, text: "Visible to Fortune 500 HR teams and workforce planners" },
               ].map((p) => (
                 <div key={p.text} className="flex items-center gap-2 text-sm text-blue-200">
@@ -340,7 +340,7 @@ export default function TalentRegister() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Brief Bio <span className="text-gray-400 font-normal">(optional — 2–3 sentences)</span>
+                    Brief Bio <span className="text-gray-400 font-normal">(optional, 2-3 sentences)</span>
                   </label>
                   <textarea
                     value={form.bio}
@@ -360,7 +360,7 @@ export default function TalentRegister() {
                     className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-[#1e3a5f]"
                   />
                   <label htmlFor="visible" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-                    <span className="font-semibold">Make my profile discoverable</span> — Employers using the Skills Gap Intelligence platform can find and view my profile. I can request removal at any time by emailing <a href="mailto:hello@college-cuts.com" className="text-[#1e3a5f] underline">hello@college-cuts.com</a>.
+                    <span className="font-semibold">Make my profile discoverable.</span> Employers using the Skills Gap Intelligence platform can find and view my profile. I can request removal at any time by emailing <a href="mailto:hello@college-cuts.com" className="text-[#1e3a5f] underline">hello@college-cuts.com</a>.
                   </label>
                 </div>
 
@@ -391,7 +391,7 @@ export default function TalentRegister() {
           {/* How it works */}
           <div className="mt-10 grid sm:grid-cols-3 gap-6 text-center">
             {[
-              { icon: GraduationCap, title: "Your credentials stay with you", body: "We record your background from academia — the depth of expertise that's often invisible on a standard resume." },
+              { icon: GraduationCap, title: "Your credentials stay with you", body: "We record your background from academia: the depth of expertise that's often invisible on a standard resume." },
               { icon: Briefcase, title: "Companies find you", body: "When an employer's pipeline alert fires for your field, your profile is surfaced directly in their talent feed." },
               { icon: Zap, title: "No cold applications", body: "You don't apply to anything. Interested employers reach out to you through the platform." },
             ].map((s) => (

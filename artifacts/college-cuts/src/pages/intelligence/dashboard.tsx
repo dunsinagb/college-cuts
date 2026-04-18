@@ -565,7 +565,7 @@ export default function IntelligenceDashboard() {
                   <BarChart3 className="h-5 w-5 text-amber-400" />
                   <span className="text-blue-300 text-sm font-semibold">Skills Gap Intelligence</span>
                 </div>
-                <h1 className="text-2xl font-extrabold text-white">{profile.company} — Pipeline Risk Dashboard</h1>
+                <h1 className="text-2xl font-extrabold text-white">{profile.company}: Pipeline Risk Dashboard</h1>
                 <p className="text-blue-300 text-sm mt-1">
                   {profile.states.length > 0 ? profile.states.join(", ") : "National"} · Last 12 months ·{" "}
                   {data?.generatedAt ? format(parseISO(data.generatedAt), "MMM d, yyyy h:mm a") : "Generating..."}
@@ -629,12 +629,12 @@ export default function IntelligenceDashboard() {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-bold text-amber-800 text-sm">You're on the free plan — {results.length - FREE_VISIBLE} roles are locked</div>
+                  <div className="font-bold text-amber-800 text-sm">You're on the free plan. {results.length - FREE_VISIBLE} roles are locked.</div>
                   <div className="text-amber-700 text-xs mt-0.5">Upgrade to Professional to see all {results.length} tracked roles, geographic filters, and real-time alerts.</div>
                 </div>
               </div>
               <Button size="sm" onClick={() => setShowUpgradeModal(true)} className="shrink-0 bg-amber-500 hover:bg-amber-400 text-white font-bold">
-                Upgrade — $299/mo
+                Upgrade ($299/mo)
               </Button>
             </div>
           )}
@@ -749,7 +749,7 @@ export default function IntelligenceDashboard() {
                 </Link>
               </div>
               <p className="text-sm text-gray-500 mb-4">
-                Professionals displaced by recent program cuts who are open to industry roles — sourced directly from CollegeCuts.
+                Professionals displaced by recent program cuts who are open to industry roles, sourced directly from CollegeCuts.
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {talentProfiles.slice(0, 6).map((t) => {
@@ -835,7 +835,7 @@ export default function IntelligenceDashboard() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button size="lg" onClick={() => setShowUpgradeModal(true)} className="bg-amber-500 hover:bg-amber-400 text-white font-bold">
-                  Upgrade to Professional — $299/mo
+                  Upgrade to Professional ($299/mo)
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 bg-transparent font-semibold" asChild>

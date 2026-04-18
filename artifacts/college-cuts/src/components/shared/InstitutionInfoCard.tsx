@@ -78,7 +78,7 @@ export function InstitutionInfoCard({ institutionName }: { institutionName: stri
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">
-            Institution Data — College Scorecard
+            Institution Data · College Scorecard
           </p>
           <p className="text-sm font-semibold text-[#1e3a5f] leading-snug">{data.name}</p>
           <p className="text-xs text-muted-foreground">

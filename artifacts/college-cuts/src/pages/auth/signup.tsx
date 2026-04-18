@@ -79,7 +79,7 @@ export default function Signup() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
               <Mail className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="text-xl font-extrabold text-[#1e3a5f]">You're in — account ready!</h2>
+            <h2 className="text-xl font-extrabold text-[#1e3a5f]">You're in. Account ready!</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
               Your account has been created and is ready to use. We sent a welcome email to{" "}
               <strong className="text-[#1e3a5f]">{email}</strong> with a one-click sign-in button.

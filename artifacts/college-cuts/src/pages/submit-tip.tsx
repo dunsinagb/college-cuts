@@ -100,7 +100,7 @@ export default function SubmitTip() {
   return (
     <>
       <Helmet>
-        <title>Submit a Tip | CollegeCuts — Report a College Cut or Closure</title>
+        <title>Submit a Tip | CollegeCuts | Report a College Cut or Closure</title>
         <meta name="description" content="Know about a college program closure, department suspension, campus closure, or faculty layoff? Submit a tip to CollegeCuts and help keep the public record accurate." />
         <link rel="canonical" href="https://college-cuts.com/submit-tip" />
       </Helmet>

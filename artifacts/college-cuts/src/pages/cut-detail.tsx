@@ -75,7 +75,7 @@ export default function CutDetail() {
   function buildXText() {
     const { institution, label, program, state, date, reason, students, faculty } = getShareParts();
     const parts: string[] = [];
-    parts.push(`${institution}${state ? ` (${state})` : ""} — ${label}${program ? `: ${program}` : ""}.`);
+    parts.push(`${institution}${state ? ` (${state})` : ""}: ${label}${program ? ` / ${program}` : ""}.`);
     const impact: string[] = [];
     if (faculty != null)  impact.push(`${faculty} staff affected`);
     if (students != null) impact.push(`${students.toLocaleString()} students affected`);
@@ -99,7 +99,7 @@ export default function CutDetail() {
     if (students != null) impact.push(`${students.toLocaleString()} students affected`);
     if (impact.length)    lines.push(impact.join("  |  "));
     if (firstSentence)    lines.push(`\n"${firstSentence}"`);
-    lines.push(`\nTracked on CollegeCuts — the civic database monitoring US higher education cuts.\n${institutionUrl}`);
+    lines.push(`\nTracked on CollegeCuts, the civic database monitoring US higher education cuts.\n${institutionUrl}`);
     return lines.join("\n");
   }
 
@@ -124,11 +124,11 @@ export default function CutDetail() {
   const cutTypeLabel = cut?.cutType ? (CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ")) : "";
 
   const pageTitle = cut
-    ? `${cut.institution}${cut.programName ? ` — ${cut.programName}` : ""} — Higher Ed ${cutTypeLabel} | CollegeCuts`
+    ? `${cut.institution}${cut.programName ? `: ${cut.programName}` : ""} | Higher Ed ${cutTypeLabel} | CollegeCuts`
     : "Higher Education Action | CollegeCuts";
 
   const pageDescription = cut
-    ? `Higher education ${cutTypeLabel.toLowerCase()} at ${cut.institution} (${cut.state})${cut.announcementDate ? `, announced ${format(parseISO(cut.announcementDate), "MMMM yyyy")}` : ""}. ${cut.notes ? cut.notes.slice(0, 120) + "…" : "Tracked by CollegeCuts — a civic higher ed data project monitoring program cuts, closures, and faculty layoffs across US universities."}`
+    ? `Higher education ${cutTypeLabel.toLowerCase()} at ${cut.institution} (${cut.state})${cut.announcementDate ? `, announced ${format(parseISO(cut.announcementDate), "MMMM yyyy")}` : ""}. ${cut.notes ? cut.notes.slice(0, 120) + "…" : "Tracked by CollegeCuts, a civic higher ed data project monitoring program cuts, closures, and faculty layoffs across US universities."}`
     : "Track higher education program closures, department suspensions, and faculty layoffs at US colleges and universities. CollegeCuts civic data project.";
 
   if (isLoading) {
@@ -290,7 +290,7 @@ export default function CutDetail() {
                 >
                   <Lock className="h-3.5 w-3.5 text-amber-500" />
                   View all actions for this institution
-                  <span className="text-xs text-amber-600 font-semibold">— Sign in to unlock</span>
+                  <span className="text-xs text-amber-600 font-semibold">Sign in to unlock</span>
                 </Link>
               )
             )}
@@ -318,7 +318,7 @@ export default function CutDetail() {
                       <Calendar className="h-4 w-4" /> Announcement Date
                     </dt>
                     <dd className="text-base font-semibold">
-                      {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMMM d, yyyy") : "—"}
+                      {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMMM d, yyyy") : "Not recorded"}
                     </dd>
                   </div>
                   
@@ -530,7 +530,7 @@ function RelatedCutsSection({ state, currentId, subscribed }: { state: string; c
                   <div className="flex items-center justify-between mt-2">
                     <CutTypeBadge cutType={cut.cutType} className="text-[10px] px-1.5 py-0 h-5" />
                     <span className="text-xs text-muted-foreground">
-                      {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : "—"}
+                      {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : ""}
                     </span>
                   </div>
                 </CardContent>

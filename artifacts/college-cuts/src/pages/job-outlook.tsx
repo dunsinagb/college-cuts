@@ -223,7 +223,7 @@ function TalentImpactPanel({ major }: { major: string }) {
             <p className="text-sm text-amber-800 leading-relaxed">
               <strong>{match.programsCut} {match.label.toLowerCase()} programs</strong> have been cut or suspended
               since 2024. At ~{match.estimatedAnnualGradLoss / match.programsCut} graduates per program, that's
-              an estimated <strong>~{gradLoss} fewer graduates entering the pipeline annually</strong> — against{" "}
+              an estimated <strong>~{gradLoss} fewer graduates entering the pipeline annually</strong>, against{" "}
               <strong>{growthSign}{match.growthPct}% projected job demand growth</strong>.
             </p>
             {(match.gapRisk === "Critical" || match.gapRisk === "High") && (
@@ -350,7 +350,7 @@ export default function JobOutlookPage() {
   return (
     <>
       <Helmet>
-        <title>{ogTitle} — Career Pipeline Risk Tracker</title>
+        <title>{ogTitle} | Career Pipeline Risk Tracker</title>
         <meta name="description" content={ogDescription} />
         <link rel="canonical" href={`${SITE_ORIGIN}/job-outlook${searchMajor !== "Computer Science" ? `?major=${encodeURIComponent(searchMajor)}` : ""}`} />
         {/* Open Graph */}
@@ -429,7 +429,7 @@ export default function JobOutlookPage() {
                   Skills Gap Scorecard
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  Fields ranked by shortage severity — programs cut × BLS demand growth × employment base. Click "Share" to copy a link, post to LinkedIn or X, or copy a pre-formatted stat.
+                  Fields ranked by shortage severity (programs cut × BLS demand growth × employment base). Click "Share" to copy a link, post to LinkedIn or X, or copy a pre-formatted stat.
                 </CardDescription>
               </div>
               {scorecardData?.cachedAt != null && (
@@ -448,7 +448,7 @@ export default function JobOutlookPage() {
               </div>
             ) : scorecard.length === 0 ? (
               <div className="p-6 text-center text-muted-foreground text-sm">
-                Scorecard data unavailable — configure Supabase to enable this feature.
+                Scorecard data unavailable. Configure Supabase to enable this feature.
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -495,7 +495,7 @@ export default function JobOutlookPage() {
                           <GapRiskBadge risk={row.gapRisk} />
                         </TableCell>
                         <TableCell className="text-center text-sm text-muted-foreground">
-                          {row.estimatedAnnualGradLoss > 0 ? `~${row.estimatedAnnualGradLoss.toLocaleString()}` : "—"}
+                          {row.estimatedAnnualGradLoss > 0 ? `~${row.estimatedAnnualGradLoss.toLocaleString()}` : ""}
                         </TableCell>
                         <TableCell className="pr-6 text-center">
                           <ShareButton fieldId={row.id} label={row.label} shareText={row.shareText} />
@@ -662,13 +662,13 @@ export default function JobOutlookPage() {
                           </div>
                         ) : onetStatus === "pending_approval" ? (
                           <span
-                            title="O*NET account is pending approval — skills will appear once the account is activated"
+                            title="O*NET account is pending approval. Skills will appear once the account is activated."
                             className="inline-block text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded px-1.5 py-0.5 whitespace-nowrap cursor-help"
                           >
                             Skills loading soon
                           </span>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground"></span>
                         )}
                       </TableCell>
                       <TableCell className="pr-6">
@@ -682,7 +682,7 @@ export default function JobOutlookPage() {
                             O*NET <ExternalLink className="h-3 w-3" />
                           </a>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground"></span>
                         )}
                       </TableCell>
                     </TableRow>

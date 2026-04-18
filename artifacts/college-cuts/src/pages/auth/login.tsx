@@ -224,7 +224,7 @@ export default function Login() {
                 </div>
                 <p className="font-bold text-[#1e3a5f]">Check your inbox</p>
                 <p className="text-sm text-gray-500">
-                  We sent a sign-in link to <strong>{email}</strong>. Click it and you'll be signed in automatically — no password needed.
+                  We sent a sign-in link to <strong>{email}</strong>. Click it and you'll be signed in automatically, no password needed.
                 </p>
                 <button
                   type="button"
@@ -237,7 +237,7 @@ export default function Login() {
             ) : (
               <form onSubmit={handleMagicLink} className="space-y-4">
                 <p className="text-sm text-gray-600 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">
-                  <strong>Already subscribed?</strong> Enter your email and we'll send you a one-click sign-in link. No password needed — works for existing subscribers too.
+                  <strong>Already subscribed?</strong> Enter your email and we'll send you a one-click sign-in link. No password needed. Works for existing subscribers too.
                 </p>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>

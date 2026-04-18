@@ -31,7 +31,7 @@ const REASON_STYLES: Record<string, string> = {
 };
 
 function ReasonBadge({ reason }: { reason: string | null }) {
-  if (!reason) return <span className="text-muted-foreground text-xs">—</span>;
+  if (!reason) return <span className="text-muted-foreground text-xs"></span>;
   const style = REASON_STYLES[reason] ?? "bg-gray-50 text-gray-700 border-gray-200";
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${style}`}>
@@ -276,7 +276,7 @@ export default function CutsList() {
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight text-white">All Actions Database</h1>
               <p className="mt-1 text-blue-200">
-                Complete, searchable index of reported higher education actions — program cuts, closures, and layoffs.
+                Complete, searchable index of reported higher education actions: program cuts, closures, and layoffs.
               </p>
             </div>
             <Button
@@ -296,25 +296,25 @@ export default function CutsList() {
             {[
               {
                 label: `Actions in ${new Date().getFullYear()}`,
-                value: ytd?.totalActions?.toLocaleString() ?? "—",
+                value: ytd?.totalActions?.toLocaleString() ?? "N/A",
                 icon: <AlertTriangle className="h-4 w-4" />,
                 color: "bg-red-500/20 text-red-300",
               },
               {
                 label: `Students Affected (${new Date().getFullYear()})`,
-                value: ytd?.totalStudentsAffected?.toLocaleString() ?? "—",
+                value: ytd?.totalStudentsAffected?.toLocaleString() ?? "N/A",
                 icon: <GraduationCap className="h-4 w-4" />,
                 color: "bg-amber-500/20 text-amber-300",
               },
               {
                 label: `Faculty / Staff (${new Date().getFullYear()})`,
-                value: ytd?.totalFacultyAffected?.toLocaleString() ?? "—",
+                value: ytd?.totalFacultyAffected?.toLocaleString() ?? "N/A",
                 icon: <Users className="h-4 w-4" />,
                 color: "bg-teal-500/20 text-teal-300",
               },
               {
                 label: `Most Active State (${new Date().getFullYear()})`,
-                value: ytd?.mostActiveState ?? "—",
+                value: ytd?.mostActiveState ?? "N/A",
                 icon: <MapPin className="h-4 w-4" />,
                 color: "bg-blue-500/20 text-blue-300",
               },
@@ -335,7 +335,7 @@ export default function CutsList() {
           {dotMapData && dotMapData.length > 0 && (
             <div className="mt-5 bg-white/5 border border-white/15 rounded-xl overflow-hidden">
               <div className="px-4 pt-3 pb-1 flex items-center justify-between">
-                <p className="text-sm font-semibold text-white">Actions Map — All Records</p>
+                <p className="text-sm font-semibold text-white">Actions Map: All Records</p>
                 <p className="text-xs text-blue-300">{dotMapData.length} dots · hover for details</p>
               </div>
               <DotMap data={dotMapData} />
@@ -530,7 +530,7 @@ export default function CutsList() {
                       </td>
 
                       <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">
-                        {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : "—"}
+                        {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM yyyy") : ""}
                       </td>
                       <td className="px-2 py-3 font-medium max-w-[180px]">
                         <Link
@@ -541,7 +541,7 @@ export default function CutsList() {
                         </Link>
                       </td>
                       <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">
-                        {cut.control ?? "—"}
+                        {cut.control ?? ""}
                       </td>
                       <td className="px-2 py-3">
                         <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-bold bg-[#1e3a5f]/10 text-[#1e3a5f]">
@@ -557,7 +557,7 @@ export default function CutsList() {
                             {cut.category}
                           </span>
                         ) : (
-                          <span className="text-muted-foreground/40 text-xs">—</span>
+                          <span className="text-muted-foreground/40 text-xs"></span>
                         )}
                       </td>
                       <td className="px-2 py-3">
@@ -570,14 +570,14 @@ export default function CutsList() {
                         {cut.studentsAffected != null ? (
                           <span className="font-medium">{cut.studentsAffected.toLocaleString()}</span>
                         ) : (
-                          <span className="text-muted-foreground">—</span>
+                          <span className="text-muted-foreground"></span>
                         )}
                       </td>
                       <td className="px-2 py-3 text-right tabular-nums">
                         {cut.facultyAffected != null ? (
                           <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
                         ) : (
-                          <span className="text-muted-foreground">—</span>
+                          <span className="text-muted-foreground"></span>
                         )}
                       </td>
                       <td className="px-2 py-3 max-w-[120px]">
@@ -595,7 +595,7 @@ export default function CutsList() {
                             <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
                           </a>
                         ) : (
-                          <span className="text-muted-foreground/40">—</span>
+                          <span className="text-muted-foreground/40"></span>
                         )}
                       </td>
                     </tr>

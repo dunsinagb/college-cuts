@@ -154,12 +154,12 @@ export default function About() {
                   <BookOpen className="h-5 w-5 text-rose-600" />
                 </div>
                 <div>
-                  <p className="font-bold text-sm text-foreground">Skills Gap Intelligence — Scoring Methodology</p>
+                  <p className="font-bold text-sm text-foreground">Skills Gap Intelligence: Scoring Methodology</p>
                   <p className="text-xs text-muted-foreground">Skills Gap dashboard</p>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                The Skills Gap Scorecard ranks 15 academic fields by a composite Gap Score derived from three inputs: (1) the number of programs in that field cut or suspended since 2024, drawn from the CollegeCuts database; (2) the projected 10-year employment growth rate from BLS; and (3) the current national employment base from BLS OEWS. A higher score indicates a field where supply of trained graduates is contracting against growing employer demand. No estimates or modeled figures are used — every data point is sourced directly from the BLS or the verified cuts database.
+                The Skills Gap Scorecard ranks 15 academic fields by a composite Gap Score derived from three inputs: (1) the number of programs in that field cut or suspended since 2024, drawn from the CollegeCuts database; (2) the projected 10-year employment growth rate from BLS; and (3) the current national employment base from BLS OEWS. A higher score indicates a field where supply of trained graduates is contracting against growing employer demand. No estimates or modeled figures are used. Every data point is sourced directly from the BLS or the verified cuts database.
               </p>
             </CardContent>
           </Card>
@@ -190,11 +190,11 @@ export default function About() {
           <AccordionItem value="item-1b">
             <AccordionTrigger className="text-lg font-semibold">Where do the job growth and employment figures come from?</AccordionTrigger>
             <AccordionContent className="text-muted-foreground space-y-2 text-base">
-              <p>All occupational employment, wage, and growth figures displayed in the Job Outlook and Skills Gap sections come from the US Bureau of Labor Statistics (BLS) — specifically:</p>
+              <p>All occupational employment, wage, and growth figures displayed in the Job Outlook and Skills Gap sections come from the US Bureau of Labor Statistics (BLS), specifically:</p>
               <ul className="list-disc pl-6 space-y-1">
-                <li><strong className="text-foreground">Employment counts</strong> — BLS Occupational Employment and Wage Statistics (OEWS), latest annual release</li>
-                <li><strong className="text-foreground">10-year growth projections</strong> — BLS Employment Projections program</li>
-                <li><strong className="text-foreground">Median wages</strong> — BLS OEWS</li>
+                <li><strong className="text-foreground">Employment counts:</strong> BLS Occupational Employment and Wage Statistics (OEWS), latest annual release</li>
+                <li><strong className="text-foreground">10-year growth projections:</strong> BLS Employment Projections program</li>
+                <li><strong className="text-foreground">Median wages:</strong> BLS OEWS</li>
               </ul>
               <p>We do not model, interpolate, or adjust these figures. They are published government statistics.</p>
             </AccordionContent>
@@ -210,7 +210,7 @@ export default function About() {
                 <li>Median earnings 6 years after enrollment</li>
                 <li>Average annual net price</li>
               </ul>
-              <p>Figures reflect the latest available academic year in the Scorecard dataset. They are not estimates — they are the federal government's own published figures for each school.</p>
+              <p>Figures reflect the latest available academic year in the Scorecard dataset. They are not estimates. They are the federal government's own published figures for each school.</p>
             </AccordionContent>
           </AccordionItem>
           
@@ -247,7 +247,7 @@ export default function About() {
           <AccordionItem value="item-4">
             <AccordionTrigger className="text-lg font-semibold">Can I use this data in my research or reporting?</AccordionTrigger>
             <AccordionContent className="text-muted-foreground space-y-2 text-base">
-              <p>Yes. CollegeCuts data is free to use for journalism, academic research, and policy work. The public API is available at <strong className="text-foreground">college-cuts.com/api/cuts</strong> — no key required. Please credit CollegeCuts and link back to the relevant record or institution page when citing specific figures.</p>
+              <p>Yes. CollegeCuts data is free to use for journalism, academic research, and policy work. The public API is available at <strong className="text-foreground">college-cuts.com/api/cuts</strong> (no key required). Please credit CollegeCuts and link back to the relevant record or institution page when citing specific figures.</p>
               <p>For bulk data exports, methodology questions, or collaboration inquiries, email us directly.</p>
             </AccordionContent>
           </AccordionItem>

@@ -211,7 +211,7 @@ export default function Analytics() {
   return (
     <>
       <Helmet>
-        <title>US College Program Cuts & Closures — Analytics & Trends | CollegeCuts</title>
+        <title>US College Program Cuts & Closures | Analytics & Trends | CollegeCuts</title>
         <meta name="description" content="Charts and trends across the CollegeCuts program closures database: monthly timelines, breakdowns by state, institution type, and cut category. Data-driven analysis of college budget cuts and faculty layoffs." />
         <link rel="canonical" href="https://college-cuts.com/analytics" />
       </Helmet>
@@ -226,7 +226,7 @@ export default function Analytics() {
                 Analytics Overview
               </h1>
               <p className="mt-2 text-blue-200 max-w-xl">
-                Comprehensive intelligence on higher education cuts, closures, and workforce impacts across US institutions — updated in real time.
+                Comprehensive intelligence on higher education cuts, closures, and workforce impacts across US institutions, updated in real time.
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
@@ -249,7 +249,7 @@ export default function Analytics() {
                   <Skeleton className="h-7 w-16 mb-1 bg-white/20" />
                 ) : (
                   <div className="text-2xl font-bold text-white">
-                    {k.value !== undefined ? Number(k.value).toLocaleString() : "—"}
+                    {k.value !== undefined ? Number(k.value).toLocaleString() : "N/A"}
                   </div>
                 )}
                 <div className="text-xs text-blue-200 font-medium mt-0.5">{k.label}</div>
@@ -268,7 +268,7 @@ export default function Analytics() {
               <div>
                 <SectionBadge label="Trend" />
                 <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">
-                  Actions Over Time — {years.join(" vs ")}
+                  Actions Over Time: {years.join(" vs ")}
                 </CardTitle>
                 <CardDescription>Monthly volume of institutional actions, year-over-year comparison</CardDescription>
               </div>
@@ -383,7 +383,7 @@ export default function Analytics() {
             <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">
               Top 10 States by Program Actions
             </CardTitle>
-            <CardDescription>Year-over-year breakdown of institutional actions — states ranked by total volume</CardDescription>
+            <CardDescription>Year-over-year breakdown of institutional actions, ranked by total volume</CardDescription>
           </CardHeader>
           <CardContent className="pt-2">
             {loadState ? <ChartSkeleton height={380} /> : byState && byState.data.length > 0 ? (() => {
@@ -701,7 +701,7 @@ export default function Analytics() {
           <CardHeader className="pb-2">
             <SectionBadge label="All States" />
             <CardTitle className="mt-2 text-xl font-bold text-[#1e3a5f]">Actions by State</CardTitle>
-            <CardDescription>Full state-level ranking — total recorded institutional actions per state</CardDescription>
+            <CardDescription>Full state-level ranking of total recorded institutional actions per state</CardDescription>
           </CardHeader>
           <CardContent className="pt-2">
             {loadAllState ? <ChartSkeleton height={420} /> : allStates && allStates.length > 0 ? (() => {
@@ -746,7 +746,7 @@ export default function Analytics() {
                           <span className="w-10 sm:w-16 text-right text-sm font-bold text-[#1e3a5f] tabular-nums">{row.count}</span>
                           {/* Students — desktop only */}
                           <span className="hidden sm:block w-28 text-right text-xs text-muted-foreground tabular-nums">
-                            {row.studentsAffected > 0 ? row.studentsAffected.toLocaleString() : "—"}
+                            {row.studentsAffected > 0 ? row.studentsAffected.toLocaleString() : ""}
                           </span>
                         </div>
                       );

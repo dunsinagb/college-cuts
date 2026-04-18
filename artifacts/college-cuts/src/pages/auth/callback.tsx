@@ -67,7 +67,7 @@ export default function AuthCallback() {
       // Safety timeout — if nothing fires within 12s, show error
       setTimeout(() => {
         if (!handled.current) {
-          setError("Sign-in could not be completed. The link may have expired — please try again.");
+          setError("Sign-in could not be completed. The link may have expired. Please try again.");
         }
       }, 12000);
     }

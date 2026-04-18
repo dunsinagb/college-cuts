@@ -108,7 +108,7 @@ export default function Dashboard() {
     },
     {
       q: "How can I find higher education program closures by state?",
-      a: "CollegeCuts lets you filter all recorded actions by US state. Each state view shows every institution affected, the type of cut, and the date announced — making it easy to track higher ed budget cuts in your region."
+      a: "CollegeCuts lets you filter all recorded actions by US state. Each state view shows every institution affected, the type of cut, and the date announced, making it easy to track higher ed budget cuts in your region."
     },
     {
       q: "Are these college and university cuts publicly documented?",
@@ -178,7 +178,7 @@ export default function Dashboard() {
     <>
       <Helmet>
         <title>CollegeCuts | US College Program Cuts & Closures Database</title>
-        <meta name="description" content="The free database of US higher education program cuts, department closures, campus shutdowns, and faculty layoffs. Search records across all 50 states — civic data on college budget cuts, updated monthly since 2024." />
+        <meta name="description" content="The free database of US higher education program cuts, department closures, campus shutdowns, and faculty layoffs. Search records across all 50 states. Civic data on college budget cuts, updated monthly since 2024." />
         <link rel="canonical" href="https://college-cuts.com/" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
@@ -204,7 +204,7 @@ export default function Dashboard() {
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database — since 2024</span>
+                <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database · since 2024</span>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-4xl text-white leading-tight">
                 Tracking the human cost of<br />
@@ -225,7 +225,7 @@ export default function Dashboard() {
                 ) : (
                   <span className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-amber-400 tabular-nums">
-                      {summary?.totalInstitutions?.toLocaleString() ?? "—"}
+                      {summary?.totalInstitutions?.toLocaleString() ?? "..."}
                     </span>
                     <span className="text-sm text-blue-200">institutions tracked</span>
                   </span>
@@ -406,11 +406,11 @@ export default function Dashboard() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h2 className="text-lg font-extrabold text-[#1e3a5f]">Displaced Academic Workers — Talent Pool</h2>
+                <h2 className="text-lg font-extrabold text-[#1e3a5f]">Displaced Academic Workers: Talent Pool</h2>
                 <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full uppercase tracking-wide">Free</span>
               </div>
               <p className="text-gray-500 text-sm leading-relaxed max-w-2xl">
-                Affected by higher education cuts? Add yourself to our talent pool and get discovered by employers actively recruiting from academia — researchers, faculty, administrators, and staff.
+                Affected by higher education cuts? Add yourself to our talent pool and get discovered by employers actively recruiting from academia: researchers, faculty, administrators, and staff.
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 <Link
@@ -418,7 +418,7 @@ export default function Dashboard() {
                   className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors shadow-sm"
                 >
                   <Users className="h-4 w-4" />
-                  I was affected — join the pool
+                  I was affected. Join the pool.
                 </Link>
                 <Link
                   href="/cuts"
@@ -631,7 +631,7 @@ export default function Dashboard() {
                             <div className="flex items-center justify-between mt-2">
                               <CutTypeBadge cutType={cut.cutType} className="text-[10px] px-1.5 py-0 h-5" />
                               <span className="text-xs text-muted-foreground">
-                                {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM d, yyyy") : "—"}
+                                {cut.announcementDate ? format(parseISO(cut.announcementDate), "MMM d, yyyy") : ""}
                               </span>
                             </div>
                           </CardContent>
@@ -741,7 +741,7 @@ function StatCard({
     ? rawValue
     : value !== undefined
       ? value.toLocaleString()
-      : "—";
+      : "N/A";
 
   return (
     <Card className="border-0 shadow-md bg-white">

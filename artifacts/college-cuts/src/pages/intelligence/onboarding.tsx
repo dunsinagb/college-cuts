@@ -181,7 +181,7 @@ export default function IntelligenceOnboarding() {
         <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2a4e7c 100%)" }} className="py-10 px-4">
           <div className="container mx-auto max-w-3xl">
             <h1 className="text-2xl font-extrabold text-white mb-1">Build Your Pipeline Risk Dashboard</h1>
-            <p className="text-blue-200 text-sm">Takes about 2 minutes. See your risk profile immediately — free.</p>
+            <p className="text-blue-200 text-sm">Takes about 2 minutes. See your risk profile immediately, free.</p>
           </div>
         </div>
 

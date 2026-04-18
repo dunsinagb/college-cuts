@@ -117,10 +117,10 @@ export default function InstitutionPage() {
   const pageUrl  = `https://college-cuts.com/institution/${slug}`;
   const pageName = data?.institution ?? "Institution";
   const pageTitle = data
-    ? `${data.institution} — Higher Ed Program Cuts & Layoffs | CollegeCuts`
+    ? `${data.institution} | Higher Ed Program Cuts & Layoffs | CollegeCuts`
     : "Institution | CollegeCuts";
   const pageDesc  = data
-    ? `${data.institution} (${data.stats.state}) has recorded ${data.stats.actions} higher education action${data.stats.actions !== 1 ? "s" : ""} — including program suspensions, department closures, and faculty layoffs. Tracked by CollegeCuts.`
+    ? `${data.institution} (${data.stats.state}) has recorded ${data.stats.actions} higher education action${data.stats.actions !== 1 ? "s" : ""}, including program suspensions, department closures, and faculty layoffs. Tracked by CollegeCuts.`
     : "Higher education program cuts, closures, and layoffs tracked by CollegeCuts.";
 
   function handleCopyLink() {
@@ -166,7 +166,7 @@ export default function InstitutionPage() {
 
   function shareLinkedIn() {
     const n = data?.stats.actions ?? 0;
-    const shareText = `${pageName} has ${n} recorded higher-ed action${n !== 1 ? "s" : ""} (program cuts, closures & layoffs) — tracked by College Cuts Tracker.\n\n${pageUrl}`;
+    const shareText = `${pageName} has ${n} recorded higher-ed action${n !== 1 ? "s" : ""} (program cuts, closures & layoffs), tracked by College Cuts Tracker.\n\n${pageUrl}`;
     navigator.clipboard.writeText(shareText).catch(() => {});
     setLinkedInCopied(true);
     setTimeout(() => setLinkedInCopied(false), 3500);
@@ -231,7 +231,7 @@ export default function InstitutionPage() {
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Dataset",
-          "name": `${data.institution} — Higher Education Cuts & Closures`,
+          "name": `${data.institution}: Higher Education Cuts & Closures`,
           "description": pageDesc,
           "url": pageUrl,
           "publisher": {
@@ -419,7 +419,7 @@ export default function InstitutionPage() {
                   Were you or a colleague affected by cuts at {data.institution}?
                 </h2>
                 <p className="text-amber-100 text-xs mt-0.5">
-                  Add your name to our displaced talent pool — companies actively recruiting from this list will reach out to you directly.
+                  Add your name to our displaced talent pool. Companies actively recruiting from this list will reach out to you directly.
                 </p>
               </div>
             </div>
@@ -446,7 +446,7 @@ export default function InstitutionPage() {
               ) : (
                 <form onSubmit={handleAffectedSubmit} className="space-y-4">
                   <p className="text-sm text-gray-600">
-                    Takes 30 seconds. No account needed — just your name, email, and role. We'll never spam you.
+                    Takes 30 seconds. No account needed. Just your name, email, and role. We'll never spam you.
                   </p>
                   <div className="grid sm:grid-cols-3 gap-3">
                     <div>

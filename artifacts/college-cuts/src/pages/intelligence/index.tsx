@@ -58,12 +58,12 @@ const HOW_IT_WORKS = [
   {
     icon: TrendingDown,
     title: "We track every program cut",
-    body: "Our database logs every academic program suspension, department closure, and faculty layoff at U.S. universities — updated continuously.",
+    body: "Our database logs every academic program suspension, department closure, and faculty layoff at U.S. universities, updated continuously.",
   },
   {
     icon: BarChart3,
     title: "We map it to your talent pipelines",
-    body: "Using O*NET occupational codes, we translate higher education events into corporate workforce terms — roles, skills, and hiring timelines.",
+    body: "Using O*NET occupational codes, we translate higher education events into corporate workforce terms: roles, skills, and hiring timelines.",
   },
   {
     icon: Bell,
@@ -107,7 +107,7 @@ export default function IntelligenceLanding() {
               </h1>
               <p className="text-lg sm:text-xl text-blue-200 max-w-2xl leading-relaxed mb-10">
                 CollegeCuts tracks every academic program cut, department closure, and faculty layoff at U.S. universities.
-                The Skills Gap Intelligence Tool maps that data to your specific talent pipelines — giving HR and talent teams
+                The Skills Gap Intelligence Tool maps that data to your specific talent pipelines, giving HR and talent teams
                 an early warning system that doesn't exist anywhere else.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -189,7 +189,7 @@ export default function IntelligenceLanding() {
                 <p className="text-blue-200 text-base leading-relaxed mb-6">
                   When a university cuts a nursing program, the pipeline of RN graduates shrinks by roughly 45 per year.
                   If 7 programs are cut in your target metro over 6 months, that's 315 fewer candidates available by 2027.
-                  That's a board-level talent risk — and you can see it now, not in 2027.
+                  That's a board-level talent risk. And you can see it now, not in 2027.
                 </p>
                 <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-400 text-white font-bold">
                   <Link href="/intelligence/onboarding">
@@ -217,7 +217,7 @@ export default function IntelligenceLanding() {
                   </div>
                 ))}
                 <div className="text-center text-blue-400 text-xs pt-2">
-                  <Lock className="h-3 w-3 inline mr-1" />Sample dashboard — build yours free
+                  <Lock className="h-3 w-3 inline mr-1" />Sample dashboard · build yours free
                 </div>
               </div>
             </div>
