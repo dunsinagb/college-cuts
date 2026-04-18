@@ -55,24 +55,62 @@ export default function CutDetail() {
     });
   }
 
-  function buildShareSentence() {
+  function getShareParts() {
     const institution = cut?.institution ?? "This institution";
-    const label = cut?.cutType ? (CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ")) : null;
-    const program = cut?.programName ? ` (${cut.programName})` : "";
-    return label
-      ? `${institution} has recorded a ${label}${program} — tracked on CollegeCuts`
-      : `${institution} has recorded a higher education action${program} — tracked on CollegeCuts`;
+    const label       = cut?.cutType ? (CUT_TYPE_LABELS[cut.cutType] ?? cut.cutType.replace(/_/g, " ")) : "Higher Ed Action";
+    // Only show programName if it differs from the institution name
+    const program     = cut?.programName && cut.programName !== cut.institution ? cut.programName : null;
+    const state       = cut?.state ?? null;
+    const date        = cut?.announcementDate ? format(parseISO(cut.announcementDate), "MMMM yyyy") : null;
+    const reason      = cut?.primaryReason ?? null;
+    const students    = cut?.studentsAffected ?? null;
+    const faculty     = cut?.facultyAffected ?? null;
+    // First complete sentence of notes, capped at 200 chars
+    const firstSentence = cut?.notes
+      ? (cut.notes.match(/^.+?[.!?](?:\s|$)/)?.[0]?.trim() ?? cut.notes.slice(0, 200))
+      : null;
+    return { institution, label, program, state, date, reason, students, faculty, firstSentence };
+  }
+
+  function buildXText() {
+    const { institution, label, program, state, date, reason, students, faculty } = getShareParts();
+    const parts: string[] = [];
+    parts.push(`${institution}${state ? ` (${state})` : ""} — ${label}${program ? `: ${program}` : ""}.`);
+    const impact: string[] = [];
+    if (faculty != null)  impact.push(`${faculty} staff affected`);
+    if (students != null) impact.push(`${students.toLocaleString()} students affected`);
+    if (impact.length)    parts.push(impact.join(", ") + ".");
+    if (reason)           parts.push(`Reason: ${reason}.`);
+    if (date)             parts.push(`Announced ${date}.`);
+    return parts.join(" ");
+  }
+
+  function buildLinkedInText() {
+    const { institution, label, program, state, date, reason, students, faculty, firstSentence } = getShareParts();
+    const lines: string[] = [];
+    lines.push(`${institution}${state ? ` (${state})` : ""} has recorded a ${label}.`);
+    if (program) lines.push(`Program: ${program}`);
+    const meta: string[] = [];
+    if (date)   meta.push(`Announced: ${date}`);
+    if (reason) meta.push(`Reason: ${reason}`);
+    if (meta.length) lines.push(meta.join("  |  "));
+    const impact: string[] = [];
+    if (faculty != null)  impact.push(`${faculty} faculty/staff affected`);
+    if (students != null) impact.push(`${students.toLocaleString()} students affected`);
+    if (impact.length)    lines.push(impact.join("  |  "));
+    if (firstSentence)    lines.push(`\n"${firstSentence}"`);
+    lines.push(`\nTracked on CollegeCuts — the civic database monitoring US higher education cuts.\n${institutionUrl}`);
+    return lines.join("\n");
   }
 
   function handleShareTwitter() {
-    const text = encodeURIComponent(buildShareSentence());
-    const url = encodeURIComponent(institutionUrl);
+    const text = encodeURIComponent(buildXText());
+    const url  = encodeURIComponent(institutionUrl);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank", "noopener,noreferrer,width=550,height=450");
   }
 
   function handleShareLinkedIn() {
-    const shareText = `${buildShareSentence()}\n\n${institutionUrl}`;
-    navigator.clipboard.writeText(shareText).catch(() => {});
+    navigator.clipboard.writeText(buildLinkedInText()).catch(() => {});
     setLinkedInCopied(true);
     setTimeout(() => setLinkedInCopied(false), 3500);
     const url = encodeURIComponent(institutionUrl);
