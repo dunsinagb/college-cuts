@@ -47,16 +47,82 @@ function deriveCategory(programName: string | null, notes: string | null): strin
   return hasAcademic ? "Mixed" : "Athletics";
 }
 
-function extractPrimaryReason(notes: string | null): string | null {
-  if (!notes) return null;
+function extractPrimaryReason(notes: string | null, cutType?: string): string | null {
+  if (!notes) {
+    // Fallback by cut type when no notes available
+    if (cutType === "institution_closure" || cutType === "campus_closure") return "Budget Deficit";
+    if (cutType === "staff_layoff") return "Budget Deficit";
+    if (cutType === "program_suspension" || cutType === "department_closure") return "Strategic Restructuring";
+    return null;
+  }
   const n = notes.toLowerCase();
-  if (n.includes("budget") || n.includes("financial") || n.includes("deficit") || n.includes("fiscal") || n.includes("shortfall") || n.includes("underfund") || n.includes("cost saving") || n.includes("cost reduction") || n.includes("revenue")) return "Budget Deficit";
-  if (n.includes("enrollment") || n.includes("low enroll") || n.includes("declining enroll") || n.includes("student demand") || n.includes("declining student")) return "Enrollment Decline";
-  if (n.includes("merger") || n.includes("merge") || n.includes("acqui") || n.includes("consolidat")) return "Merger / Consolidation";
+
+  // Budget Deficit — financial pressure signals
+  if (
+    n.includes("budget") || n.includes("financial") || n.includes("deficit") ||
+    n.includes("fiscal") || n.includes("shortfall") || n.includes("underfund") ||
+    n.includes("cost saving") || n.includes("cost-saving") || n.includes("cost reduction") ||
+    n.includes("revenue") || n.includes("warn act") || n.includes("layoff notice") ||
+    n.includes("salary cut") || n.includes("pay cut") || n.includes("furlough") ||
+    n.includes("retrenchment") || n.includes("positions eliminated") ||
+    n.includes("campus closing") || n.includes("campus clos")
+  ) return "Budget Deficit";
+
+  // Enrollment Decline — student numbers
+  if (
+    n.includes("enrollment") || n.includes("low enroll") || n.includes("declining enroll") ||
+    n.includes("student demand") || n.includes("declining student") || n.includes("low demand") ||
+    n.includes("underenroll") || n.includes("fewer student")
+  ) return "Enrollment Decline";
+
+  // Merger / Consolidation — absorbed, acquired, sold
+  if (
+    n.includes("merger") || n.includes("merge") || n.includes("acqui") ||
+    n.includes("consolidat") || n.includes("absorbed") || n.includes("sold to") ||
+    n.includes("being sold") || n.includes("takeover") || n.includes("absorbed by")
+  ) return "Merger / Consolidation";
+
+  // Accreditation Issues
   if (n.includes("accredit")) return "Accreditation Issues";
-  if (n.includes("compliance") || n.includes("sb1") || n.includes("mandate") || n.includes("regulation") || n.includes("executive order") || n.includes("dei") || n.includes("diversity")) return "Compliance / Policy";
-  if (n.includes("restructur") || n.includes("reorganiz") || n.includes("strategic") || n.includes("priorit")) return "Strategic Restructuring";
-  if (n.includes("state") && (n.includes("fund") || n.includes("cut") || n.includes("alloc") || n.includes("appropriat"))) return "State Funding Cuts";
+
+  // Compliance / Policy — federal cuts, legislation, mandates
+  const hasLegislative =
+    n.includes("compliance") || n.includes("sb1") || n.includes("mandate") ||
+    n.includes("regulation") || n.includes("executive order") || n.includes("dei") ||
+    n.includes("diversity") || n.includes("federal grant") ||
+    n.includes("usaid") || n.includes("revocation") || n.includes("congress") ||
+    n.includes("trump") || n.includes(" hb ") || n.includes("hb ") ||
+    n.includes(" sb ") || n.includes("senate bill") ||
+    n.includes("title ix") || n.includes("title vi") ||
+    n.includes("federal eliminat") || n.includes("appropriations") || n.includes("doge") ||
+    n.includes("nih grant") || n.includes("nsf grant") || n.includes("snap-ed") ||
+    n.includes("higher education act") || n.includes("low-productivity") ||
+    (n.includes("federal") && (n.includes("fund") || n.includes("cut") || n.includes("eliminat") || n.includes("grant")));
+  if (hasLegislative) return "Compliance / Policy";
+
+  // Strategic Restructuring — internal realignment
+  if (
+    n.includes("restructur") || n.includes("reorganiz") || n.includes("strategic") ||
+    n.includes("priorit") || n.includes("sunset") || n.includes("program review") ||
+    n.includes("under review") || n.includes("retirement incentive") || n.includes("vrip") ||
+    n.includes("ratio") || n.includes("portfolio") || n.includes("academic review") ||
+    n.includes("curriculum review") || n.includes("rightsiz") || n.includes("rebrand") ||
+    n.includes("operational effici") || n.includes("discontinued") ||
+    n.includes("non-renewal") || n.includes("teach-out") || n.includes("dissolving") ||
+    n.includes("sunsetting") || n.includes("program discontinu")
+  ) return "Strategic Restructuring";
+
+  // State Funding Cuts — state appropriations
+  if (
+    (n.includes("state") || n.includes("legislature") || n.includes("governor")) &&
+    (n.includes("fund") || n.includes("cut") || n.includes("alloc") || n.includes("appropriat") || n.includes("reduc"))
+  ) return "State Funding Cuts";
+
+  // Last-resort fallback by cut type so no record shows blank
+  if (cutType === "staff_layoff") return "Budget Deficit";
+  if (cutType === "institution_closure" || cutType === "campus_closure") return "Budget Deficit";
+  if (cutType === "program_suspension" || cutType === "department_closure") return "Strategic Restructuring";
+
   return null;
 }
 
@@ -73,7 +139,7 @@ function formatCut(cut: SupabaseCut) {
     studentsAffected: cut.students_affected,
     facultyAffected: cut.faculty_affected,
     notes: cut.notes,
-    primaryReason: extractPrimaryReason(cut.notes),
+    primaryReason: extractPrimaryReason(cut.notes, cut.cut_type),
     sourceUrl: cut.source_url,
     sourcePublication: cut.source_publication,
     cipCode: cut.cip_code,
