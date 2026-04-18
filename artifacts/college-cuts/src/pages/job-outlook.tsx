@@ -210,7 +210,6 @@ function TalentImpactPanel({ major }: { major: string }) {
   const match = data?.match;
   if (!match || match.programsCut === 0) return null;
 
-  const gradLoss = match.estimatedAnnualGradLoss.toLocaleString();
   const growthSign = match.growthPct >= 0 ? "+" : "";
 
   return (
@@ -222,13 +221,11 @@ function TalentImpactPanel({ major }: { major: string }) {
             <p className="font-semibold text-amber-900 mb-1">Talent Pipeline Impact</p>
             <p className="text-sm text-amber-800 leading-relaxed">
               <strong>{match.programsCut} {match.label.toLowerCase()} programs</strong> have been cut or suspended
-              since 2024. At ~{match.estimatedAnnualGradLoss / match.programsCut} graduates per program, that's
-              an estimated <strong>~{gradLoss} fewer graduates entering the pipeline annually</strong>, against{" "}
-              <strong>{growthSign}{match.growthPct}% projected job demand growth</strong>.
+              since 2024, against a <strong>{growthSign}{match.growthPct}% projected job demand growth</strong> per BLS data.
             </p>
             {(match.gapRisk === "Critical" || match.gapRisk === "High") && (
               <p className="text-xs text-amber-700 mt-2">
-                Gap Risk rated <strong>{match.gapRisk}</strong>. Employers in this space may face significant recruitment pressure within 2–3 years.
+                Gap Risk rated <strong>{match.gapRisk}</strong> based on program cuts versus BLS job demand projections.
               </p>
             )}
           </div>
