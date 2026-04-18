@@ -95,8 +95,8 @@ export default function Dashboard() {
 
   const faqItems = [
     {
-      q: "Which colleges are cutting programs in 2025?",
-      a: "Dozens of US colleges and universities have cut or suspended academic programs in 2025. CollegeCuts tracks program suspensions, department closures, and campus-wide cuts across all 50 states. Browse the full database to filter by state, institution type, or action type."
+      q: "Which colleges are cutting programs in 2025 and 2026?",
+      a: "Hundreds of US colleges and universities have cut or suspended academic programs since 2024. CollegeCuts tracks program suspensions, department closures, and campus-wide cuts across all 50 states. Browse the full database to filter by state, institution type, or action type."
     },
     {
       q: "Which universities have had faculty layoffs recently?",

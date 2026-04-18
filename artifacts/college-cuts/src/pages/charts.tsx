@@ -276,8 +276,15 @@ function Chart3() {
   };
 
   const chartData = data.map((d) => ({ ...d, label: fmt(d.month) }));
-  const refLabel = chartData.find((d) => d.month === "2025-01")?.label;
-  const count2025 = data.filter((d) => d.month >= "2025-01").reduce((s, d) => s + d.count, 0);
+  const currentYear = new Date().getFullYear();
+  const prevYear = currentYear - 1;
+  const refLabel = chartData.find((d) => d.month === `${currentYear}-01`)?.label;
+  const countThisYear = data
+    .filter((d) => d.month >= `${currentYear}-01`)
+    .reduce((s, d) => s + d.count, 0);
+  const countPrevYear = data
+    .filter((d) => d.month >= `${prevYear}-01` && d.month < `${currentYear}-01`)
+    .reduce((s, d) => s + d.count, 0);
 
   return (
     <ChartCard id="chart-3">
@@ -287,7 +294,11 @@ function Chart3() {
           title="Higher Ed Cuts Are Accelerating"
           subtitle="Monthly actions reported in the CollegeCuts database · college-cuts.com"
         />
-        {data.length > 0 && <StatBox value={count2025} label="actions in 2025" />}
+        {data.length > 0 && (
+          countThisYear > 0
+            ? <StatBox value={countThisYear} label={`actions in ${currentYear} YTD`} />
+            : <StatBox value={countPrevYear} label={`actions in ${prevYear}`} />
+        )}
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
         {isLoading ? (
@@ -322,7 +333,7 @@ function Chart3() {
                   x={refLabel}
                   stroke="rgba(255,255,255,0.25)"
                   strokeDasharray="4 3"
-                  label={{ value: "2025", position: "insideTopRight", fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+                  label={{ value: String(currentYear), position: "insideTopRight", fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
                 />
               )}
               <Area
