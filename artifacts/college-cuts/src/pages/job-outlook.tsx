@@ -10,8 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import {
   Search, TrendingUp, DollarSign, Briefcase, Users, GraduationCap,
   Loader2, AlertCircle, ExternalLink, ChevronUp, ChevronDown, ChevronsUpDown,
-  Share2, Check, AlertTriangle, Zap, Activity, BarChart3
+  Share2, Check, AlertTriangle, Zap, Activity, BarChart3, Link2, FileText
 } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 /* ─── native select helper ────────────────────────────────────────── */
 function NativeSelect({ value, onChange, className = "", children }: {
@@ -112,26 +113,84 @@ function GapRiskBadge({ risk }: { risk: string }) {
   );
 }
 
-function ShareButton({ fieldId }: { fieldId: string }) {
-  const [copied, setCopied] = useState(false);
+function ShareButton({ fieldId, label, shareText }: { fieldId: string; label: string; shareText: string }) {
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedStat, setCopiedStat] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  function handleShare() {
-    const shareUrl = `${SITE_ORIGIN}/api/og/share?major=${encodeURIComponent(fieldId)}`;
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const pageUrl = `${SITE_ORIGIN}/job-outlook?major=${encodeURIComponent(label)}`;
+  const socialShareUrl = `${SITE_ORIGIN}/api/og/share?major=${encodeURIComponent(fieldId)}`;
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(socialShareUrl)}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(socialShareUrl)}&text=${encodeURIComponent(shareText)}`;
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      setCopiedLink(true);
+      setTimeout(() => { setCopiedLink(false); setOpen(false); }, 1800);
+    });
+  }
+
+  function handleCopyStat() {
+    navigator.clipboard.writeText(shareText).then(() => {
+      setCopiedStat(true);
+      setTimeout(() => { setCopiedStat(false); setOpen(false); }, 1800);
     });
   }
 
   return (
-    <button
-      onClick={handleShare}
-      title="Copy shareable link (shows card preview on LinkedIn & X/Twitter)"
-      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded hover:bg-muted"
-    >
-      {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Share2 className="h-3.5 w-3.5" />}
-      {copied ? "Copied!" : "Share"}
-    </button>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          title="Share this skills gap card"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded hover:bg-muted"
+        >
+          <Share2 className="h-3.5 w-3.5" />
+          Share
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-56 p-2">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-2 pb-1.5">Share</p>
+        <button
+          onClick={handleCopyLink}
+          className="flex w-full items-center gap-2.5 rounded px-2 py-1.5 text-sm hover:bg-muted transition-colors"
+        >
+          {copiedLink ? <Check className="h-4 w-4 text-green-600 shrink-0" /> : <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />}
+          {copiedLink ? "Link copied!" : "Copy link"}
+        </button>
+        <a
+          href={linkedInUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setOpen(false)}
+          className="flex w-full items-center gap-2.5 rounded px-2 py-1.5 text-sm hover:bg-muted transition-colors"
+        >
+          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          Share on LinkedIn
+        </a>
+        <a
+          href={twitterUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setOpen(false)}
+          className="flex w-full items-center gap-2.5 rounded px-2 py-1.5 text-sm hover:bg-muted transition-colors"
+        >
+          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          Share on X / Twitter
+        </a>
+        <div className="border-t my-1" />
+        <button
+          onClick={handleCopyStat}
+          className="flex w-full items-center gap-2.5 rounded px-2 py-1.5 text-sm hover:bg-muted transition-colors"
+        >
+          {copiedStat ? <Check className="h-4 w-4 text-green-600 shrink-0" /> : <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />}
+          {copiedStat ? "Copied!" : "Copy stat as text"}
+        </button>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -369,7 +428,7 @@ export default function JobOutlookPage() {
                   Skills Gap Scorecard
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  Fields ranked by shortage severity — programs cut × BLS demand growth × employment base. Click "Share" to copy a pre-formatted stat.
+                  Fields ranked by shortage severity — programs cut × BLS demand growth × employment base. Click "Share" to copy a link, post to LinkedIn or X, or copy a pre-formatted stat.
                 </CardDescription>
               </div>
             </div>
@@ -433,7 +492,7 @@ export default function JobOutlookPage() {
                           {row.estimatedAnnualGradLoss > 0 ? `~${row.estimatedAnnualGradLoss.toLocaleString()}` : "—"}
                         </TableCell>
                         <TableCell className="pr-6 text-center">
-                          <ShareButton fieldId={row.id} />
+                          <ShareButton fieldId={row.id} label={row.label} shareText={row.shareText} />
                         </TableCell>
                       </TableRow>
                     ))}
