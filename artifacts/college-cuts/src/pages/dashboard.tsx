@@ -217,7 +217,7 @@ export default function Dashboard() {
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className="inline-flex items-center gap-1.5 bg-white/8 border border-white/15 rounded-full px-3 py-1 text-xs font-medium text-blue-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
-                  Referenced by The Hechinger Report
+                  Referenced by journalists &amp; newsrooms
                 </span>
                 <span className="inline-flex items-center gap-1.5 bg-white/8 border border-white/15 rounded-full px-3 py-1 text-xs font-medium text-blue-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
