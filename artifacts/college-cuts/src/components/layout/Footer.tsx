@@ -15,7 +15,7 @@ export function Footer() {
               <GraduationCap className="h-5 w-5 text-amber-400 shrink-0" />
               <span className="font-bold text-lg tracking-tight">
                 <span className="text-white">College</span>
-                <span style={{ color: "#f59e0b" }}>Cuts</span>
+                <span style={{ color: "#fbbf24" }}>Cuts</span>
               </span>
             </Link>
             <p className="text-sm text-blue-200/60 leading-relaxed max-w-[220px]">

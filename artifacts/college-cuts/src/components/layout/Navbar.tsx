@@ -36,7 +36,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
             <GraduationCap className="h-6 w-6 text-amber-400" />
             <span className="font-bold text-xl tracking-tight">
-              <span className="text-white">College</span><span style={{ color: "#f59e0b" }}>Cuts</span>
+              <span className="text-white">College</span><span style={{ color: "#fbbf24" }}>Cuts</span>
             </span>
           </Link>
           <nav className="hidden gap-5 md:flex items-center">

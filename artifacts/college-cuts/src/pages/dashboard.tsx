@@ -211,7 +211,7 @@ export default function Dashboard() {
                 <span className="text-amber-400">higher education cuts.</span>
               </h1>
               <p className="text-lg text-blue-200 leading-relaxed">
-                A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated monthly.
+                A civic data project tracking higher education program cuts, department closures, faculty layoffs, and campus shutdowns across US colleges and universities. Free higher ed data, updated as seen.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -240,7 +240,7 @@ export default function Dashboard() {
                 <span className="text-blue-400/40 text-lg font-light">·</span>
                 <span className="inline-flex items-center gap-1.5 text-sm text-blue-200">
                   <RefreshCw className="h-3.5 w-3.5 text-amber-400/70" />
-                  Updated monthly
+                  Updated as seen
                 </span>
                 <span className="text-blue-400/40 text-lg font-light">·</span>
                 <span className="text-sm text-blue-200">Free public data</span>
