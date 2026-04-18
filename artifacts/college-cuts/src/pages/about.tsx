@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Database, ShieldAlert, GraduationCap, ArrowRight, Mail } from "lucide-react";
+import { Database, ShieldAlert, GraduationCap, ArrowRight, Mail, ExternalLink, BookOpen, TrendingUp, Building2, Briefcase } from "lucide-react";
 
 export default function About() {
   return (
@@ -62,6 +62,110 @@ export default function About() {
         </Card>
       </section>
 
+      {/* Data Sources */}
+      <section className="space-y-8" id="data-sources">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">Data Sources</h2>
+          <p className="text-muted-foreground">Every number in this database has a documented origin. Here is what powers each section of the site.</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Card className="border shadow-sm">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Database className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-foreground">Program Cuts Database</p>
+                  <p className="text-xs text-muted-foreground">Cuts, closures, layoffs</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Compiled manually from local and national news reporting, official university press releases, board meeting minutes, accreditor filings, and crowdsourced tips. Every record is verified against a public source before being marked Confirmed.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border shadow-sm">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                  <TrendingUp className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-foreground">Bureau of Labor Statistics (BLS)</p>
+                  <p className="text-xs text-muted-foreground">Job Outlook &amp; Skills Gap</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Occupational employment counts, 10-year projected growth rates, and median wages come from the BLS Occupational Employment and Wage Statistics (OEWS) program and the Occupational Outlook Handbook. Data is updated with each BLS release cycle.
+              </p>
+              <a href="https://www.bls.gov/ooh/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                bls.gov/ooh <ExternalLink className="h-3 w-3" />
+              </a>
+            </CardContent>
+          </Card>
+
+          <Card className="border shadow-sm">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-foreground">College Scorecard</p>
+                  <p className="text-xs text-muted-foreground">Institution profiles</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Enrollment size, graduation rates, median earnings 6 years after enrollment, and average net price on each institution page come directly from the US Department of Education's College Scorecard API. Figures reflect the latest published academic year.
+              </p>
+              <a href="https://collegescorecard.ed.gov/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                collegescorecard.ed.gov <ExternalLink className="h-3 w-3" />
+              </a>
+            </CardContent>
+          </Card>
+
+          <Card className="border shadow-sm">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                  <Briefcase className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-foreground">O*NET OnLine</p>
+                  <p className="text-xs text-muted-foreground">Occupational skills data</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Detailed skill requirements, work activities, and knowledge areas by occupation come from O*NET, the US Department of Labor's primary occupational information database. Integration is live and populates the Skills section of each Job Outlook entry.
+              </p>
+              <a href="https://www.onetonline.org/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                onetonline.org <ExternalLink className="h-3 w-3" />
+              </a>
+            </CardContent>
+          </Card>
+
+          <Card className="border shadow-sm sm:col-span-2">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-rose-100 flex items-center justify-center shrink-0">
+                  <BookOpen className="h-5 w-5 text-rose-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-foreground">Skills Gap Intelligence — Scoring Methodology</p>
+                  <p className="text-xs text-muted-foreground">Skills Gap dashboard</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                The Skills Gap Scorecard ranks 15 academic fields by a composite Gap Score derived from three inputs: (1) the number of programs in that field cut or suspended since 2024, drawn from the CollegeCuts database; (2) the projected 10-year employment growth rate from BLS; and (3) the current national employment base from BLS OEWS. A higher score indicates a field where supply of trained graduates is contracting against growing employer demand. No estimates or modeled figures are used — every data point is sourced directly from the BLS or the verified cuts database.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Methodology & FAQ */}
       <section className="space-y-8" id="methodology">
         <div className="space-y-2">
@@ -71,15 +175,42 @@ export default function About() {
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
-            <AccordionTrigger className="text-lg font-semibold">Where does this data come from?</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">Where does the cuts data come from?</AccordionTrigger>
             <AccordionContent className="text-muted-foreground space-y-2 text-base">
-              <p>Our data is compiled from three primary sources:</p>
+              <p>Our cuts database is compiled from three primary sources:</p>
               <ul className="list-disc pl-6 space-y-1">
                 <li>Local and national news reporting</li>
                 <li>Official university press releases, board minutes, and regulatory filings</li>
                 <li>Crowdsourced tips submitted by students, faculty, and community members</li>
               </ul>
               <p>Every submission is reviewed and verified against public records or reporting before being marked as "Confirmed".</p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="item-1b">
+            <AccordionTrigger className="text-lg font-semibold">Where do the job growth and employment figures come from?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground space-y-2 text-base">
+              <p>All occupational employment, wage, and growth figures displayed in the Job Outlook and Skills Gap sections come from the US Bureau of Labor Statistics (BLS) — specifically:</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li><strong className="text-foreground">Employment counts</strong> — BLS Occupational Employment and Wage Statistics (OEWS), latest annual release</li>
+                <li><strong className="text-foreground">10-year growth projections</strong> — BLS Employment Projections program</li>
+                <li><strong className="text-foreground">Median wages</strong> — BLS OEWS</li>
+              </ul>
+              <p>We do not model, interpolate, or adjust these figures. They are published government statistics.</p>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="item-1c">
+            <AccordionTrigger className="text-lg font-semibold">Where does the institution data (grad rate, net price, earnings) come from?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground space-y-2 text-base">
+              <p>Institution-level data shown on each cut record and institution profile page is pulled live from the <strong className="text-foreground">US Department of Education College Scorecard API</strong>. This includes:</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Total enrollment</li>
+                <li>Graduation rate (overall, completion rate suppressed)</li>
+                <li>Median earnings 6 years after enrollment</li>
+                <li>Average annual net price</li>
+              </ul>
+              <p>Figures reflect the latest available academic year in the Scorecard dataset. They are not estimates — they are the federal government's own published figures for each school.</p>
             </AccordionContent>
           </AccordionItem>
           
@@ -110,6 +241,14 @@ export default function About() {
             <AccordionTrigger className="text-lg font-semibold">Are the "affected" numbers exact?</AccordionTrigger>
             <AccordionContent className="text-muted-foreground text-base">
               No. Numbers for affected students and faculty are estimates based on available reporting at the time of the announcement. Universities often obscure these figures or report them inconsistently. We treat our numbers as conservative baselines.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="item-4">
+            <AccordionTrigger className="text-lg font-semibold">Can I use this data in my research or reporting?</AccordionTrigger>
+            <AccordionContent className="text-muted-foreground space-y-2 text-base">
+              <p>Yes. CollegeCuts data is free to use for journalism, academic research, and policy work. The public API is available at <strong className="text-foreground">college-cuts.com/api/cuts</strong> — no key required. Please credit CollegeCuts and link back to the relevant record or institution page when citing specific figures.</p>
+              <p>For bulk data exports, methodology questions, or collaboration inquiries, email us directly.</p>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
