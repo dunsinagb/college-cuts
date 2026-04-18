@@ -266,7 +266,7 @@ export default function JobOutlookPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlMajor]);
 
-  const { data, isLoading, isError } = useQuery<{ jobs: Job[] }>({
+  const { data, isLoading, isError } = useQuery<{ jobs: Job[]; onet_status?: string }>({
     queryKey: ["job-outlook", searchMajor],
     queryFn: async () => {
       const res = await fetch(`${BASE_URL}/api/job-outlook?major=${encodeURIComponent(searchMajor)}`);
@@ -321,6 +321,7 @@ export default function JobOutlookPage() {
   }
 
   const jobs = data?.jobs ?? [];
+  const onetStatus = data?.onet_status ?? null;
   const scorecard = scorecardData?.scorecard ?? [];
 
   const filtered = jobs.filter((j) => {
@@ -654,6 +655,13 @@ export default function JobOutlookPage() {
                               </span>
                             ))}
                           </div>
+                        ) : onetStatus === "pending_approval" ? (
+                          <span
+                            title="O*NET account is pending approval — skills will appear once the account is activated"
+                            className="inline-block text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded px-1.5 py-0.5 whitespace-nowrap cursor-help"
+                          >
+                            Skills loading soon
+                          </span>
                         ) : (
                           <span className="text-xs text-muted-foreground">—</span>
                         )}
