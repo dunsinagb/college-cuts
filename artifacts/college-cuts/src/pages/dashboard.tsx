@@ -204,14 +204,14 @@ export default function Dashboard() {
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database · since 2024</span>
+                <span className="text-amber-300 text-xs font-semibold tracking-wide">Program Cuts Database · Tracking since 2024</span>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-4xl text-white leading-tight">
                 The definitive record of<br />
                 <span className="text-amber-400">US higher-ed cuts, closures &amp; layoffs.</span>
               </h1>
               <p className="text-lg text-blue-200 leading-relaxed">
-                A searchable database of every publicly reported program closure, department merger, and faculty layoff at accredited US colleges — verified, sourced, and updated as seen.
+                A searchable database of every publicly reported program closure, department merger, and faculty layoff at accredited US colleges — verified, sourced, and updated as reported.
               </p>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -240,7 +240,7 @@ export default function Dashboard() {
                 <span className="text-blue-400/40 text-lg font-light">·</span>
                 <span className="inline-flex items-center gap-1.5 text-sm text-blue-200">
                   <RefreshCw className="h-3.5 w-3.5 text-amber-400/70" />
-                  Updated as seen
+                  Updated as reported
                 </span>
                 <span className="text-blue-400/40 text-lg font-light">·</span>
                 <span className="text-sm text-blue-200">Free public data</span>
