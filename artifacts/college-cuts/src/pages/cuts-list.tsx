@@ -458,7 +458,7 @@ export default function CutsList() {
                   <th className="px-2 py-3 text-left whitespace-nowrap">Reason</th>
                   <th className="px-2 py-3 text-left">Status</th>
                   <th className="px-2 py-3 text-right whitespace-nowrap">Students</th>
-                  <th className="px-2 py-3 text-right whitespace-nowrap">Faculty</th>
+                  <th className="px-2 py-3 text-right whitespace-nowrap">Faculty / Staff</th>
                   <th className="px-2 py-3 text-left whitespace-nowrap">Source</th>
                 </tr>
               </thead>
@@ -577,7 +577,12 @@ export default function CutsList() {
                       </td>
                       <td className="px-2 py-3 text-right tabular-nums">
                         {cut.facultyAffected != null ? (
-                          <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
+                          <div className="inline-flex flex-col items-end">
+                            <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
+                            <span className="text-[10px] text-muted-foreground leading-none mt-0.5">
+                              {cut.cutType === "staff_layoff" ? "staff" : "faculty"}
+                            </span>
+                          </div>
                         ) : (
                           <span className="text-muted-foreground"></span>
                         )}
