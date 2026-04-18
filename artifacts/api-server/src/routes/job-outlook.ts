@@ -103,9 +103,26 @@ async function fetchLiveBls(soc: string, blsKey: string): Promise<{ wage: number
    O*NET Web Services — in-memory cache
    Endpoint: GET /ws/occupations/{soc}.00/skills
    Auth: HTTP Basic (ONET_USERNAME / ONET_PASSWORD)
+   Status values:
+     "not_configured"   – env vars absent
+     "pending_approval" – credentials present but API returns 401 (account under review)
+     "active"           – credentials valid and skills returned successfully
    ────────────────────────────────────────────── */
-const ONET_SKILLS_CACHE: Map<string, { skills: string[]; fetchedAt: number }> = new Map();
-const ONET_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+type OnetStatus = "not_configured" | "pending_approval" | "active";
+
+const ONET_SKILLS_CACHE: Map<string, { skills: string[]; fetchedAt: number; pending?: boolean }> = new Map();
+const ONET_CACHE_TTL_MS         = 6 * 60 * 60 * 1000;
+const ONET_PENDING_CACHE_TTL_MS = 5 * 60 * 1000;
+let onetStatus: OnetStatus = process.env.ONET_USERNAME && process.env.ONET_PASSWORD
+  ? "pending_approval"
+  : "not_configured";
+
+// Log credential presence at startup so it is visible in server logs
+if (onetStatus !== "not_configured") {
+  console.info("[O*NET] Credentials configured. Awaiting first successful API call to confirm account approval.");
+} else {
+  console.warn("[O*NET] ONET_USERNAME / ONET_PASSWORD not set — at-risk skills disabled.");
+}
 
 async function fetchOnetSkills(soc: string): Promise<string[]> {
   const username = process.env.ONET_USERNAME;
@@ -113,8 +130,9 @@ async function fetchOnetSkills(soc: string): Promise<string[]> {
   if (!username || !password) return [];
 
   const cached = ONET_SKILLS_CACHE.get(soc);
-  if (cached && Date.now() - cached.fetchedAt < ONET_CACHE_TTL_MS) {
-    return cached.skills;
+  if (cached) {
+    const ttl = cached.pending ? ONET_PENDING_CACHE_TTL_MS : ONET_CACHE_TTL_MS;
+    if (Date.now() - cached.fetchedAt < ttl) return cached.skills;
   }
 
   try {
@@ -128,6 +146,13 @@ async function fetchOnetSkills(soc: string): Promise<string[]> {
         "Accept": "application/json",
       },
     });
+
+    if (resp.status === 401) {
+      console.warn(`[O*NET] 401 Unauthorized for SOC ${soc} — account may still be pending O*NET staff approval.`);
+      onetStatus = "pending_approval";
+      ONET_SKILLS_CACHE.set(soc, { skills: [], fetchedAt: Date.now(), pending: true });
+      return [];
+    }
 
     if (!resp.ok) throw new Error(`O*NET API ${resp.status}`);
 
@@ -144,6 +169,7 @@ async function fetchOnetSkills(soc: string): Promise<string[]> {
       .slice(0, 5)
       .map((e) => e.name);
 
+    onetStatus = "active";
     ONET_SKILLS_CACHE.set(soc, { skills: elements, fetchedAt: Date.now() });
     return elements;
   } catch (err) {
@@ -221,7 +247,7 @@ router.get("/job-outlook", async (req, res): Promise<void> => {
   }
 
   if (!socList.length) {
-    res.json({ jobs: [], source: "local" });
+    res.json({ jobs: [], source: "local", onet_status: onetStatus });
     return;
   }
 
@@ -253,7 +279,7 @@ router.get("/job-outlook", async (req, res): Promise<void> => {
     })
   );
 
-  res.json({ jobs, source: supabaseUrl ? "supabase" : "local" });
+  res.json({ jobs, source: supabaseUrl ? "supabase" : "local", onet_status: onetStatus });
 });
 
 export default router;
