@@ -24,6 +24,7 @@ import {
   Sector,
 } from "recharts";
 import { RefreshCw, TrendingUp, GraduationCap, Users, MapPin, AlertTriangle, BookOpen } from "lucide-react";
+import { SectionAxis } from "@/components/ui/section-axis";
 import { format } from "date-fns";
 
 /* ─── colours ─────────────────────────────────────────────────── */
@@ -261,6 +262,7 @@ export default function Analytics() {
 
       <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
 
+        <SectionAxis label="§ 01 · TRENDS OVER TIME" />
         {/* ══ CHART 1 — Actions Over Time ══ */}
         <Card className="shadow-sm border-border/60">
           <CardHeader className="pb-2">
@@ -376,6 +378,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
+        <SectionAxis label="§ 02 · GEOGRAPHIC BREAKDOWN" />
         {/* ══ CHART 2 — Top 10 States (YoY) ══ */}
         <Card className="shadow-sm border-border/60">
           <CardHeader className="pb-2">
@@ -468,6 +471,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
+        <SectionAxis label="§ 03 · BY INSTITUTION TYPE" />
         {/* ══ ROW: Control Type + Action Type ══ */}
         <div className="grid lg:grid-cols-2 gap-8">
 
@@ -582,6 +586,7 @@ export default function Analytics() {
           </Card>
         </div>
 
+        <SectionAxis label="§ 04 · CATEGORY & ROOT CAUSES" />
         {/* ══ ROW: Category breakdown + Primary Reasons ══ */}
         <div className="grid lg:grid-cols-2 gap-8">
 

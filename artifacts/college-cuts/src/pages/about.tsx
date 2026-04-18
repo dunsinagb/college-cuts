@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Database, ShieldAlert, GraduationCap, ArrowRight, Mail, ExternalLink, BookOpen, TrendingUp, Building2, Briefcase } from "lucide-react";
+import { SectionAxis } from "@/components/ui/section-axis";
 
 export default function About() {
   return (
@@ -25,6 +26,7 @@ export default function About() {
         </p>
       </section>
 
+      <SectionAxis label="§ 01 · PRINCIPLES" />
       {/* Core Values */}
       <section className="grid gap-6 md:grid-cols-3">
         <Card className="border-t-4 border-t-primary shadow-sm bg-muted/10">
@@ -62,6 +64,7 @@ export default function About() {
         </Card>
       </section>
 
+      <SectionAxis label="§ 02 · DATA SOURCES" />
       {/* Data Sources */}
       <section className="space-y-8" id="data-sources">
         <div className="space-y-2">
@@ -166,6 +169,7 @@ export default function About() {
         </div>
       </section>
 
+      <SectionAxis label="§ 03 · METHODOLOGY" />
       {/* Methodology & FAQ */}
       <section className="space-y-8" id="methodology">
         <div className="space-y-2">
@@ -254,6 +258,7 @@ export default function About() {
         </Accordion>
       </section>
 
+      <SectionAxis label="§ 04 · ABOUT THE CREATOR" />
       {/* Creator */}
       <section className="space-y-6" id="creator">
         <div className="space-y-2">

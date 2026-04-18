@@ -12,6 +12,7 @@ import {
   Loader2, AlertCircle, ExternalLink, ChevronUp, ChevronDown, ChevronsUpDown,
   Share2, Check, AlertTriangle, Zap, Activity, BarChart3, Link2, FileText
 } from "lucide-react";
+import { SectionAxis } from "@/components/ui/section-axis";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 /* ─── native select helper ────────────────────────────────────────── */
@@ -515,6 +516,7 @@ export default function JobOutlookPage() {
 
       {sorted.length > 0 && (
         <>
+          <SectionAxis label="§ 01 · CAREER OVERVIEW" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="shadow-sm">
               <CardContent className="p-4 flex items-center gap-3">
@@ -562,9 +564,11 @@ export default function JobOutlookPage() {
             </Card>
           </div>
 
+          <SectionAxis label="§ 02 · TALENT IMPACT" />
           {/* Talent Impact Panel — server-resolved via /api/skills-gap/by-major */}
           <TalentImpactPanel major={searchMajor} />
 
+          <SectionAxis label="§ 03 · CAREER PATHWAYS" />
           <Card className="shadow-md">
             <CardHeader className="pb-4 flex flex-row items-center justify-between">
               <div>

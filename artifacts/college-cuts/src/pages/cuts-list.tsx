@@ -13,6 +13,7 @@ import {
   ExternalLink, Download, Filter, X, Bell, Check,
   AlertTriangle, GraduationCap, Users, MapPin
 } from "lucide-react";
+import { SectionAxis } from "@/components/ui/section-axis";
 import { slugify } from "@/lib/slugify";
 import { STATES, CUT_TYPE_LABELS, CATEGORY_LABELS, CATEGORY_COLORS } from "@/lib/constants";
 import { DotMap } from "@/components/shared/DotMap";
@@ -438,6 +439,9 @@ export default function CutsList() {
       </div>
 
       {/* ── table ── */}
+      <div className="w-full px-4 pt-2 pb-0 sm:px-6">
+        <SectionAxis label="§ 01 · DATABASE RECORDS" dark />
+      </div>
       <div className="w-full px-4 py-6 sm:px-6">
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
