@@ -101,33 +101,31 @@ async function fetchLiveBls(soc: string, blsKey: string): Promise<{ wage: number
 
 /* ──────────────────────────────────────────────
    O*NET Web Services — in-memory cache
-   Endpoint: GET /ws/occupations/{soc}.00/skills
-   Auth: HTTP Basic (ONET_USERNAME / ONET_PASSWORD)
+   Endpoint: GET /occupations/{soc}.00/skills (api-v2.onetcenter.org)
+   Auth: X-API-Key header (ONET_API_KEY)
    Status values:
-     "not_configured"   – env vars absent
-     "pending_approval" – credentials present but API returns 401 (account under review)
-     "active"           – credentials valid and skills returned successfully
+     "not_configured"   – env var absent
+     "pending_approval" – key present but API returns 401
+     "active"           – key valid and skills returned successfully
    ────────────────────────────────────────────── */
 type OnetStatus = "not_configured" | "pending_approval" | "active";
 
 const ONET_SKILLS_CACHE: Map<string, { skills: string[]; fetchedAt: number; pending?: boolean }> = new Map();
 const ONET_CACHE_TTL_MS         = 6 * 60 * 60 * 1000;
 const ONET_PENDING_CACHE_TTL_MS = 5 * 60 * 1000;
-let onetStatus: OnetStatus = process.env.ONET_USERNAME && process.env.ONET_PASSWORD
+let onetStatus: OnetStatus = process.env.ONET_API_KEY
   ? "pending_approval"
   : "not_configured";
 
-// Log credential presence at startup so it is visible in server logs
 if (onetStatus !== "not_configured") {
-  console.info("[O*NET] Credentials configured. Awaiting first successful API call to confirm account approval.");
+  console.info("[O*NET] API key configured. Awaiting first successful call to confirm activation.");
 } else {
-  console.warn("[O*NET] ONET_USERNAME / ONET_PASSWORD not set — at-risk skills disabled.");
+  console.warn("[O*NET] ONET_API_KEY not set — at-risk skills disabled.");
 }
 
 async function fetchOnetSkills(soc: string): Promise<string[]> {
-  const username = process.env.ONET_USERNAME;
-  const password = process.env.ONET_PASSWORD;
-  if (!username || !password) return [];
+  const apiKey = process.env.ONET_API_KEY;
+  if (!apiKey) return [];
 
   const cached = ONET_SKILLS_CACHE.get(soc);
   if (cached) {
@@ -137,18 +135,17 @@ async function fetchOnetSkills(soc: string): Promise<string[]> {
 
   try {
     const socFormatted = `${soc}.00`;
-    const url = `https://services.onetcenter.org/ws/occupations/${socFormatted}/skills`;
-    const authHeader = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
+    const url = `https://api-v2.onetcenter.org/online/occupations/${socFormatted}/summary/skills`;
 
     const resp = await fetch(url, {
       headers: {
-        "Authorization": authHeader,
+        "X-API-Key": apiKey,
         "Accept": "application/json",
       },
     });
 
     if (resp.status === 401) {
-      console.warn(`[O*NET] 401 Unauthorized for SOC ${soc} — account may still be pending O*NET staff approval.`);
+      console.warn(`[O*NET] 401 Unauthorized for SOC ${soc} — API key may be inactive.`);
       onetStatus = "pending_approval";
       ONET_SKILLS_CACHE.set(soc, { skills: [], fetchedAt: Date.now(), pending: true });
       return [];
@@ -164,13 +161,13 @@ async function fetchOnetSkills(soc: string): Promise<string[]> {
     };
 
     const elements = (json.element ?? [])
-      .filter((e) => e.score?.scale?.id === "IM" || e.score != null)
-      .sort((a, b) => (b.score?.value ?? 0) - (a.score?.value ?? 0))
       .slice(0, 5)
-      .map((e) => e.name);
+      .map((e) => e.name)
+      .filter(Boolean);
 
     onetStatus = "active";
     ONET_SKILLS_CACHE.set(soc, { skills: elements, fetchedAt: Date.now() });
+    console.info(`[O*NET] Skills fetched for SOC ${soc}: ${elements.join(", ")}`);
     return elements;
   } catch (err) {
     console.warn(`[O*NET] Failed for SOC ${soc}:`, err);
