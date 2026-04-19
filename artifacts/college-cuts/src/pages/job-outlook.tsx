@@ -712,6 +712,32 @@ export default function JobOutlookPage() {
         </div>
       )}
       </div>
+
+      {/* O*NET attribution — required by O*NET Web Services Terms of Service */}
+      <div className="border-t border-border/40 mt-12 pt-8 pb-10 text-center px-4">
+        <a
+          href="https://services.onetcenter.org/"
+          title="This site incorporates information from O*NET Web Services. Click to learn more."
+          className="inline-block mb-3"
+        >
+          <img
+            src="https://www.onetcenter.org/image/link/onet-in-it.svg"
+            alt="O*NET in-it"
+            style={{ width: 130, height: 60, border: "none" }}
+          />
+        </a>
+        <p className="text-xs text-muted-foreground max-w-lg mx-auto">
+          This site incorporates information from{" "}
+          <a
+            href="https://services.onetcenter.org/"
+            className="underline underline-offset-2 hover:text-foreground transition-colors"
+          >
+            O*NET Web Services
+          </a>{" "}
+          by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA).
+          O*NET&reg; is a trademark of USDOL/ETA.
+        </p>
+      </div>
     </div>
     </>
   );
