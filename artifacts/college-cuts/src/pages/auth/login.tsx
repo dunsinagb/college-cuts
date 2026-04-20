@@ -103,6 +103,7 @@ export default function Login() {
     <>
       <Helmet>
         <title>Sign In | CollegeCuts</title>
+        <meta name="robots" content="noindex" />
       </Helmet>
       <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4">
         <div className="w-full max-w-md">

@@ -42,10 +42,10 @@ router.get("/sitemap.xml", async (_req, res) => {
   </url>`;
     }).join("\n");
 
-    const staticUrls = ["/", "/news", "/intelligence", "/talent", "/subscribe", "/about", "/submit-tip", "/analytics", "/job-outlook"].map(p => `  <url>
+    const staticUrls = ["/", "/news", "/intelligence", "/talent", "/subscribe", "/about", "/submit-tip", "/job-outlook"].map(p => `  <url>
     <loc>${SITE_URL}${p}</loc>
     <changefreq>${p === "/news" || p === "/" ? "daily" : "weekly"}</changefreq>
-    <priority>${p === "/" ? "1.0" : p === "/news" || p === "/intelligence" || p === "/talent" ? "0.8" : "0.5"}</priority>
+    <priority>${p === "/" ? "1.0" : p === "/news" || p === "/intelligence" || p === "/talent" || p === "/job-outlook" ? "0.8" : "0.5"}</priority>
   </url>`).join("\n");
 
     const STATE_SLUGS: Record<string, string> = {

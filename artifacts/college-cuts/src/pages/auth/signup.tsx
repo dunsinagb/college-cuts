@@ -113,6 +113,7 @@ export default function Signup() {
     <>
       <Helmet>
         <title>Create Account | CollegeCuts</title>
+        <meta name="robots" content="noindex" />
         <meta name="description" content="Create a free account to access the full CollegeCuts higher education database." />
       </Helmet>
       <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4 py-10">

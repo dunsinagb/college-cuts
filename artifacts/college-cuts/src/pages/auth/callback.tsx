@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
+import { Helmet } from "react-helmet-async";
 import { GraduationCap, Loader2 } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase-client";
@@ -79,38 +80,44 @@ export default function AuthCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4">
-        <div className="text-center space-y-4 max-w-sm">
-          <div className="flex justify-center items-center gap-2">
-            <GraduationCap className="h-7 w-7 text-[#1e3a5f]" />
-            <span className="font-extrabold text-xl text-[#1e3a5f]">CollegeCuts</span>
+      <>
+        <Helmet><meta name="robots" content="noindex" /></Helmet>
+        <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4">
+          <div className="text-center space-y-4 max-w-sm">
+            <div className="flex justify-center items-center gap-2">
+              <GraduationCap className="h-7 w-7 text-[#1e3a5f]" />
+              <span className="font-extrabold text-xl text-[#1e3a5f]">CollegeCuts</span>
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4">
+              <p className="text-red-700 text-sm font-medium">{error}</p>
+            </div>
+            <a
+              href="/auth/login"
+              className="inline-block text-sm font-semibold text-[#1e3a5f] hover:underline"
+            >
+              ← Back to sign-in
+            </a>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4">
-            <p className="text-red-700 text-sm font-medium">{error}</p>
-          </div>
-          <a
-            href="/auth/login"
-            className="inline-block text-sm font-semibold text-[#1e3a5f] hover:underline"
-          >
-            ← Back to sign-in
-          </a>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4">
-      <div className="text-center space-y-4">
-        <div className="flex justify-center items-center gap-2">
-          <GraduationCap className="h-7 w-7 text-[#1e3a5f]" />
-          <span className="font-extrabold text-xl text-[#1e3a5f]">CollegeCuts</span>
-        </div>
-        <div className="flex items-center justify-center gap-2 text-gray-500">
-          <Loader2 className="h-5 w-5 animate-spin text-[#1e3a5f]" />
-          <span className="text-sm font-medium">Signing you in…</span>
+    <>
+      <Helmet><meta name="robots" content="noindex" /></Helmet>
+      <div className="min-h-screen bg-[#f0f4f9] flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center items-center gap-2">
+            <GraduationCap className="h-7 w-7 text-[#1e3a5f]" />
+            <span className="font-extrabold text-xl text-[#1e3a5f]">CollegeCuts</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-gray-500">
+            <Loader2 className="h-5 w-5 animate-spin text-[#1e3a5f]" />
+            <span className="text-sm font-medium">Signing you in…</span>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

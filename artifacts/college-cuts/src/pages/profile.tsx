@@ -45,6 +45,7 @@ export default function Profile() {
     <>
       <Helmet>
         <title>My Account | CollegeCuts</title>
+        <meta name="robots" content="noindex" />
       </Helmet>
       <div className="min-h-screen bg-[#f0f4f9] py-12 px-4">
         <div className="max-w-lg mx-auto space-y-5">

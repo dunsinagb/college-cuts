@@ -387,6 +387,7 @@ export default function IntelligenceDashboard() {
     <>
       <Helmet>
         <title>Pipeline Risk Dashboard | CollegeCuts Intelligence</title>
+        <meta name="robots" content="noindex" />
       </Helmet>
 
       {showSettingsModal && (

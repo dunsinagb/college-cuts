@@ -175,6 +175,7 @@ export default function IntelligenceOnboarding() {
     <>
       <Helmet>
         <title>Set Up Your Risk Dashboard | CollegeCuts Intelligence</title>
+        <meta name="robots" content="noindex" />
       </Helmet>
       <div className="min-h-screen bg-[#f0f4f9]">
         {/* Header */}
