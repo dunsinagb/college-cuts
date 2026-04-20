@@ -47,6 +47,8 @@ export default function CutDetail() {
   const institutionUrl  = institutionSlug
     ? `https://college-cuts.com/institution/${institutionSlug}`
     : `https://college-cuts.com/cuts/${id}`;
+  // Each cut detail page is its own canonical URL
+  const cutUrl = `https://college-cuts.com/cuts/${id}`;
 
   function handleCopyLink() {
     navigator.clipboard.writeText(institutionUrl).then(() => {
@@ -171,10 +173,10 @@ export default function CutDetail() {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={institutionUrl} />
+        <link rel="canonical" href={cutUrl} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={institutionUrl} />
+        <meta property="og:url" content={cutUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:image" content="https://college-cuts.com/opengraph.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -186,7 +188,7 @@ export default function CutDetail() {
           "@type": "Article",
           "headline": pageTitle,
           "description": pageDescription,
-          "url": institutionUrl,
+          "url": cutUrl,
           "datePublished": cut.announcementDate ?? undefined,
           "publisher": {
             "@type": "Organization",
