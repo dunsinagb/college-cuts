@@ -1,4 +1,4 @@
-import { Link, useParams } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { format, parseISO } from "date-fns";
@@ -82,8 +82,16 @@ type StateData = {
 
 export default function StatePage() {
   const params = useParams<{ statename: string }>();
-  const slug = params.statename ?? "";
-  const stateCode = SLUG_TO_CODE[slug.toLowerCase()];
+  const [, navigate] = useLocation();
+  const rawSlug = params.statename ?? "";
+  const slug = rawSlug.toLowerCase();
+  const stateCode = SLUG_TO_CODE[slug];
+
+  // Redirect mixed-case URLs to the canonical lowercase version
+  if (rawSlug !== slug) {
+    navigate(`/state/${slug}`, { replace: true });
+    return null;
+  }
 
   const { data, isLoading, error } = useQuery<StateData>({
     queryKey: ["state", stateCode],
