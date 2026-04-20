@@ -41,9 +41,15 @@ const ACADEMIC_PROGRAM_TERMS = [
 
 function deriveCategory(programName: string | null, notes: string | null): string {
   const text = ((programName ?? "") + " " + (notes ?? "")).toLowerCase();
-  const hasAthletics = ATHLETICS_KEYWORDS.some((kw) => text.includes(kw));
+  const hasAthletics = ATHLETICS_KEYWORDS.some((kw) => {
+    const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}\\b`).test(text);
+  });
   if (!hasAthletics) return "Academic";
-  const hasAcademic = ACADEMIC_PROGRAM_TERMS.some((kw) => text.includes(kw));
+  const hasAcademic = ACADEMIC_PROGRAM_TERMS.some((kw) => {
+    const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}\\b`).test(text);
+  });
   return hasAcademic ? "Mixed" : "Athletics";
 }
 
