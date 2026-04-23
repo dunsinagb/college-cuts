@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { GraduationCap, Rss, Linkedin } from "lucide-react";
+import { GraduationCap, Rss, Linkedin, Facebook } from "lucide-react";
 
 const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
@@ -76,6 +76,17 @@ export function Footer() {
                 >
                   <Linkedin className="h-3.5 w-3.5 text-[#0077b5]" />
                   LinkedIn
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.facebook.com/collegecutstracker"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-blue-200/70 hover:text-white transition-colors"
+                >
+                  <Facebook className="h-3.5 w-3.5 text-[#1877f2]" />
+                  Facebook
                 </a>
               </li>
               <li>
