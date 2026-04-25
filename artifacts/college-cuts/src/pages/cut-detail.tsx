@@ -67,9 +67,10 @@ export default function CutDetail() {
     const reason      = cut?.primaryReason ?? null;
     const students    = cut?.studentsAffected ?? null;
     const faculty     = cut?.facultyAffected ?? null;
-    // First complete sentence of notes, capped at 200 chars
-    const firstSentence = cut?.notes
-      ? (cut.notes.match(/^.+?[.!?](?:\s|$)/)?.[0]?.trim() ?? cut.notes.slice(0, 200))
+    // First complete sentence of notes, capped at 200 chars (strip [staff] tag)
+    const cleanedNotes = cut?.notes?.replace(/\[staff\]/gi, "").trim() ?? null;
+    const firstSentence = cleanedNotes
+      ? (cleanedNotes.match(/^.+?[.!?](?:\s|$)/)?.[0]?.trim() ?? cleanedNotes.slice(0, 200))
       : null;
     return { institution, label, program, state, date, reason, students, faculty, firstSentence };
   }
@@ -130,7 +131,7 @@ export default function CutDetail() {
     : "Higher Education Action | CollegeCuts";
 
   const pageDescription = cut
-    ? `Higher education ${cutTypeLabel.toLowerCase()} at ${cut.institution} (${cut.state})${cut.announcementDate ? `, announced ${format(parseISO(cut.announcementDate), "MMMM yyyy")}` : ""}. ${cut.notes ? cut.notes.slice(0, 120) + "…" : "Tracked by CollegeCuts, a civic higher ed data project monitoring program cuts, closures, and faculty layoffs across US universities."}`
+    ? `Higher education ${cutTypeLabel.toLowerCase()} at ${cut.institution} (${cut.state})${cut.announcementDate ? `, announced ${format(parseISO(cut.announcementDate), "MMMM yyyy")}` : ""}. ${cut.notes ? cut.notes.replace(/\[staff\]/gi, "").trim().slice(0, 120) + "…" : "Tracked by CollegeCuts, a civic higher ed data project monitoring program cuts, closures, and faculty layoffs across US universities."}`
     : "Track higher education program closures, department suspensions, and faculty layoffs at US colleges and universities. CollegeCuts civic data project.";
 
   if (isLoading) {
@@ -363,7 +364,7 @@ export default function CutDetail() {
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="prose prose-sm dark:prose-invert max-w-none text-base">
-                    {cut.notes}
+                    {cut.notes.replace(/\[staff\]/gi, "").trim()}
                   </div>
                 </CardContent>
               </Card>
@@ -412,7 +413,7 @@ export default function CutDetail() {
                 
                 <div>
                   <div className="flex items-center gap-2 text-muted-foreground mb-2 font-medium">
-                    <Users className="h-5 w-5" /> Faculty/Staff Affected
+                    <Users className="h-5 w-5" /> {cut.cutType === "staff_layoff" || cut.notes?.toLowerCase().includes("[staff]") ? "Staff" : "Faculty"} Affected
                   </div>
                   <div className="text-3xl font-bold">
                     {cut.facultyAffected !== null ? cut.facultyAffected.toLocaleString() : "Unknown"}

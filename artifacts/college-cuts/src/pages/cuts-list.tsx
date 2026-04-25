@@ -606,7 +606,7 @@ export default function CutsList() {
                           <div className="inline-flex flex-col items-end">
                             <span className="font-medium">{cut.facultyAffected.toLocaleString()}</span>
                             <span className="text-[10px] text-muted-foreground leading-none mt-0.5">
-                              {cut.cutType === "staff_layoff" ? "staff" : "faculty"}
+                              {cut.cutType === "staff_layoff" || cut.notes?.toLowerCase().includes("[staff]") ? "staff" : "faculty"}
                             </span>
                           </div>
                         ) : (
