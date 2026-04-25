@@ -231,7 +231,9 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   function renderSection(bucket: { label: string; typeKeys: string[]; urlKey: string; rows: Cut[] }): string {
     const shown = bucket.rows.slice(0, 5);
     const total = bucket.rows.length;
-    const filteredUrl = `${SITE_URL}/cuts?cutType=${bucket.urlKey}`;
+    const filteredUrl = bucket.typeKeys.length === 1
+      ? `${SITE_URL}/cuts?cutType=${bucket.urlKey}`
+      : `${SITE_URL}/cuts`;
     const rowsHtml = shown.map(c => {
       const programLine = c.program_name
         ? `<br/><span style="font-size:12px;color:#9ca3af">${c.program_name}</span>`
