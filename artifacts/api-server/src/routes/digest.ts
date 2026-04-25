@@ -205,11 +205,11 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
 
   type Cut = { id: string; institution: string; program_name: string | null; state: string; cut_type: string; announcement_date: string | null; status: string; source_url: string | null };
 
-  const buckets: Array<{ label: string; typeKeys: string[]; urlKey: string; rows: Cut[] }> = [
-    { label: "Staff Layoffs", typeKeys: ["staff_layoff"], urlKey: "staff_layoff", rows: [] },
-    { label: "Program Suspensions & Teach-Outs", typeKeys: ["program_suspension", "teach_out"], urlKey: "program_suspension", rows: [] },
-    { label: "Department & Campus Closures", typeKeys: ["department_closure", "campus_closure"], urlKey: "department_closure", rows: [] },
-    { label: "Institution Closures", typeKeys: ["institution_closure"], urlKey: "institution_closure", rows: [] },
+  const buckets: Array<{ label: string; typeKeys: string[]; rows: Cut[] }> = [
+    { label: "Staff Layoffs", typeKeys: ["staff_layoff"], rows: [] },
+    { label: "Program Suspensions & Teach-Outs", typeKeys: ["program_suspension", "teach_out"], rows: [] },
+    { label: "Department & Campus Closures", typeKeys: ["department_closure", "campus_closure"], rows: [] },
+    { label: "Institution Closures", typeKeys: ["institution_closure"], rows: [] },
   ];
 
   for (const cut of rows as Cut[]) {
@@ -222,14 +222,15 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   }
 
   const activeBuckets = buckets.filter(b => b.rows.length > 0);
+  const sectionCap = isFallback ? 15 : 5;
 
   function fmtDate(d: string | null): string {
     if (!d) return "";
     return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }
 
-  function renderSection(bucket: { label: string; typeKeys: string[]; urlKey: string; rows: Cut[] }): string {
-    const shown = bucket.rows.slice(0, 5);
+  function renderSection(bucket: { label: string; typeKeys: string[]; rows: Cut[] }): string {
+    const shown = bucket.rows.slice(0, sectionCap);
     const total = bucket.rows.length;
     const filteredUrl = `${SITE_URL}/cuts?cutType=${bucket.typeKeys.join(",")}`;
     const rowsHtml = shown.map(c => {
@@ -250,7 +251,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
         </tr>`;
     }).join("");
 
-    const seeAllLabel = total > 5
+    const seeAllLabel = total > sectionCap
       ? `See all ${total} ${bucket.label.toLowerCase()} on CollegeCuts →`
       : `See all ${bucket.label.toLowerCase()} on CollegeCuts →`;
 
