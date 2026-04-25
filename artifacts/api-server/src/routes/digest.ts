@@ -168,13 +168,27 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) { res.status(500).json({ error: "Resend not configured" }); return; }
 
-  const { data: cuts, error: cutsErr } = await supabase
+  const since90 = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
+
+  let isFallback = false;
+  let { data: cuts, error: cutsErr } = await supabase
     .from("v_latest_cuts")
     .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url")
-    .order("announcement_date", { ascending: false })
-    .limit(10);
+    .gte("announcement_date", since90)
+    .order("announcement_date", { ascending: false });
 
   if (cutsErr) { res.status(500).json({ error: cutsErr.message }); return; }
+
+  if (!cuts || cuts.length === 0) {
+    isFallback = true;
+    const { data: fallback, error: fbErr } = await supabase
+      .from("v_latest_cuts")
+      .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url")
+      .order("announcement_date", { ascending: false })
+      .limit(15);
+    if (fbErr) { res.status(500).json({ error: fbErr.message }); return; }
+    cuts = fallback ?? [];
+  }
 
   const { data: subs, error: subsErr } = await supabase
     .from("subscribers")
@@ -189,34 +203,106 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   if (!rows.length) { res.json({ ok: true, sent: 0, reason: "No actions in database" }); return; }
   if (!emails.length) { res.json({ ok: true, sent: 0, reason: "No subscribers" }); return; }
 
-  const CUT_LABELS: Record<string, string> = {
-    staff_layoff: "Staff Layoff", program_suspension: "Program Suspension",
-    teach_out: "Teach-Out", department_closure: "Department Closure",
-    campus_closure: "Campus Closure", institution_closure: "Institution Closure",
-  };
+  type Cut = { id: string; institution: string; program_name: string | null; state: string; cut_type: string; announcement_date: string | null; status: string; source_url: string | null };
 
-  const rows_html = rows.map((c: any) => {
-    const label = CUT_LABELS[c.cut_type] ?? c.cut_type;
-    const slug = slugify(c.institution);
-    const date = c.announcement_date
-      ? new Date(c.announcement_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-      : "";
-    const programLine = c.program_name ? `<br/><span style="font-size:12px;color:#9ca3af">${c.program_name}</span>` : "";
+  const buckets: Array<{ label: string; typeKeys: string[]; rows: Cut[] }> = [
+    { label: "Staff Layoffs", typeKeys: ["staff_layoff"], rows: [] },
+    { label: "Program Suspensions & Teach-Outs", typeKeys: ["program_suspension", "teach_out"], rows: [] },
+    { label: "Department & Campus Closures", typeKeys: ["department_closure", "campus_closure"], rows: [] },
+    { label: "Institution Closures", typeKeys: ["institution_closure"], rows: [] },
+  ];
+
+  for (const cut of rows as Cut[]) {
+    for (const bucket of buckets) {
+      if (bucket.typeKeys.includes(cut.cut_type)) {
+        bucket.rows.push(cut);
+        break;
+      }
+    }
+  }
+
+  const activeBuckets = buckets.filter(b => b.rows.length > 0);
+
+  function fmtDate(d: string | null): string {
+    if (!d) return "";
+    return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  function renderSection(bucket: { label: string; typeKeys: string[]; rows: Cut[] }): string {
+    const shown = bucket.rows.slice(0, 5);
+    const total = bucket.rows.length;
+    const rowsHtml = shown.map(c => {
+      const programLine = c.program_name
+        ? `<br/><span style="font-size:12px;color:#9ca3af">${c.program_name}</span>`
+        : "";
+      return `
+        <tr>
+          <td style="padding:11px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top">
+            <a href="${SITE_URL}/cuts/${c.id}" style="color:#1e3a5f;font-weight:600;text-decoration:none;font-size:14px">${c.institution}</a>
+            ${programLine}
+            <br/><span style="font-size:12px;color:#6b7280">${c.state}</span>
+          </td>
+          <td style="padding:11px 8px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:13px;vertical-align:top;white-space:nowrap">${fmtDate(c.announcement_date)}</td>
+          <td style="padding:11px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top;text-align:right">
+            <a href="${SITE_URL}/cuts/${c.id}" style="color:#d97706;font-size:12px;text-decoration:none;white-space:nowrap;font-weight:600">View →</a>
+          </td>
+        </tr>`;
+    }).join("");
+
+    const seeAllLabel = total > 5
+      ? `See all ${total} ${bucket.label.toLowerCase()} →`
+      : `See full database →`;
+
     return `
-      <tr>
-        <td style="padding:12px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top">
-          <a href="${SITE_URL}/cuts/${c.id}" style="color:#1e3a5f;font-weight:600;text-decoration:none">${c.institution}</a>
-          ${programLine}
-          <br/><span style="font-size:12px;color:#6b7280">${c.state} · ${label}</span>
-        </td>
-        <td style="padding:12px 8px;border-bottom:1px solid #e5e7eb;color:#374151;font-size:13px;vertical-align:top;white-space:nowrap">${date}</td>
-        <td style="padding:12px 8px;border-bottom:1px solid #e5e7eb;vertical-align:top">
-          <a href="${SITE_URL}/cuts/${c.id}" style="color:#d97706;font-size:12px;text-decoration:none;white-space:nowrap">View →</a>
-        </td>
-      </tr>`;
-  }).join("");
+      <div style="margin-bottom:32px">
+        <div style="display:flex;align-items:center;margin-bottom:12px">
+          <span style="display:inline-block;width:4px;height:18px;background:#d97706;border-radius:2px;margin-right:10px;vertical-align:middle"></span>
+          <span style="font-size:13px;font-weight:800;color:#1e3a5f;text-transform:uppercase;letter-spacing:.08em;vertical-align:middle">${bucket.label}</span>
+        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden">
+          <tbody>${rowsHtml}</tbody>
+        </table>
+        <div style="margin-top:8px;text-align:right">
+          <a href="${SITE_URL}/cuts" style="font-size:12px;color:#6b7280;text-decoration:none">${seeAllLabel}</a>
+        </div>
+      </div>`;
+  }
+
+  const sectionsHtml = activeBuckets.map(renderSection).join("");
+
+  const topTwo = [...activeBuckets]
+    .sort((a, b) => b.rows.length - a.rows.length)
+    .slice(0, 2);
+
+  function shortLabel(label: string): string {
+    const map: Record<string, string> = {
+      "Staff Layoffs": "layoffs",
+      "Program Suspensions & Teach-Outs": "program suspensions",
+      "Department & Campus Closures": "closures",
+      "Institution Closures": "institution closures",
+    };
+    return map[label] ?? label.toLowerCase();
+  }
+
+  const subjectParts = topTwo.map(b => `${b.rows.length} ${shortLabel(b.label)}`);
+  const subjectLine = isFallback
+    ? `CollegeCuts: ${subjectParts.join(", ")} — most recent on record`
+    : `CollegeCuts Weekly: ${subjectParts.join(", ")} tracked`;
+
+  const periodNote = isFallback
+    ? "No new actions have been added recently. Here are the most recent cuts on record."
+    : "The most recent program cuts, layoffs, and closures tracked in the past 90 days. Click any record for full details and sources.";
 
   const weekLabel = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+  const talentCtaHtml = `
+    <div style="margin:32px 0;padding:20px 24px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
+      <div style="font-size:13px;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Talent Pool</div>
+      <p style="margin:0 0 14px;color:#374151;font-size:14px;line-height:1.65">
+        Affected by a cut? The <strong>CollegeCuts Talent Pool</strong> is a free, searchable directory of displaced faculty, staff, and administrators open to new opportunities. Employers browse it directly.
+      </p>
+      <a href="${SITE_URL}/talent" style="display:inline-block;background:#d97706;color:#fff;padding:10px 22px;border-radius:6px;font-weight:700;text-decoration:none;font-size:13px">Join the Talent Pool — Free →</a>
+    </div>`;
 
   const html = `
 <!DOCTYPE html>
@@ -238,22 +324,11 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
         </tr>
       </table>
     </div>
-    <div style="padding:28px 32px">
-      <h2 style="color:#1e3a5f;margin:0 0 4px">Latest 10 actions as of ${weekLabel}</h2>
-      <p style="color:#6b7280;margin:0 0 24px;font-size:14px">The most recent program cuts, layoffs, and closures tracked in the CollegeCuts database. Click any record to see full details.</p>
-      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">
-        <thead>
-          <tr style="background:#f8fafc">
-            <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e5e7eb">Institution</th>
-            <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #e5e7eb">Date</th>
-            <th style="padding:10px 8px;border-bottom:2px solid #e5e7eb"></th>
-          </tr>
-        </thead>
-        <tbody>${rows_html}</tbody>
-      </table>
-      <div style="margin-top:28px;text-align:center">
-        <a href="${SITE_URL}/cuts" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 28px;border-radius:6px;font-weight:700;text-decoration:none;font-size:14px">Browse Full Database →</a>
-      </div>
+    <div style="padding:28px 32px 8px">
+      <h2 style="color:#1e3a5f;margin:0 0 6px;font-size:20px">Higher Ed Intelligence — ${weekLabel}</h2>
+      <p style="color:#6b7280;margin:0 0 28px;font-size:14px;line-height:1.6">${periodNote}</p>
+      ${sectionsHtml}
+      ${talentCtaHtml}
     </div>
     <div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;text-align:center">
       <p style="margin:0 0 6px;color:#9ca3af;font-size:12px">You're receiving this because you subscribed at <a href="${SITE_URL}" style="color:#d97706">${SITE_URL.replace("https://","")}</a>.</p>
@@ -272,7 +347,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
       await resend.emails.send({
         from: "CollegeCuts <hello@college-cuts.com>",
         to: [email],
-        subject: `CollegeCuts Weekly: ${rows.length} latest higher-ed action${rows.length !== 1 ? "s" : ""} tracked`,
+        subject: subjectLine,
         html,
         headers: {
           "List-Unsubscribe": `<${SITE_URL}/subscribe>`,
