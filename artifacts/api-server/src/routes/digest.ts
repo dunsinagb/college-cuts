@@ -168,13 +168,13 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) { res.status(500).json({ error: "Resend not configured" }); return; }
 
-  const since90 = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
+  const since30 = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
 
   let isFallback = false;
   let { data: cuts, error: cutsErr } = await supabase
     .from("v_latest_cuts")
     .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url, students_affected, faculty_affected")
-    .gte("announcement_date", since90)
+    .gte("announcement_date", since30)
     .order("announcement_date", { ascending: false });
 
   if (cutsErr) { res.status(500).json({ error: cutsErr.message }); return; }
@@ -318,8 +318,8 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     : `CollegeCuts Weekly: ${topCutLabel}${otherSuffix}`;
 
   const periodNote = isFallback
-    ? "No new actions have been added recently. Here are the most recent cuts on record."
-    : "The most recent program cuts, layoffs, and closures tracked in the past 90 days. Click any record for full details and sources.";
+    ? "No new actions have been added in the past 30 days. Here are the most recent cuts on record."
+    : "Program cuts, layoffs, and closures tracked in the past 30 days. Click any record for full details and sources.";
 
   const weekLabel = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
