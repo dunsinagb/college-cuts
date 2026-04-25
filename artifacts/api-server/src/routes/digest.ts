@@ -129,7 +129,7 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
     </div>
     <div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;text-align:center">
       <p style="margin:0 0 6px;color:#9ca3af;font-size:12px">You're receiving this because you subscribed at <a href="${SITE_URL}" style="color:#d97706">${SITE_URL.replace("https://","")}</a>.</p>
-      <p style="margin:0;font-size:11px;color:#d1d5db"><a href="${SITE_URL}/subscribe" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a></p>
+      <p style="margin:0;font-size:11px;color:#d1d5db"><a href="__UNSUB_URL__" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a></p>
     </div>
   </div>
 </body>
@@ -141,12 +141,13 @@ router.post("/admin/send-digest", async (req, res): Promise<void> => {
 
   for (const email of emails) {
     try {
-      const unsubscribeUrl = `${SITE_URL}/subscribe`;
+      const unsubscribeUrl = `${SITE_URL}/unsubscribe?email=${encodeURIComponent(email)}`;
+      const personalizedHtml = html.replace(/__UNSUB_URL__/g, unsubscribeUrl);
       await resend.emails.send({
         from: "CollegeCuts <hello@college-cuts.com>",
         to: [email],
         subject: `CollegeCuts ${periodLabel} Recap — ${rows.length} higher-ed action${rows.length !== 1 ? "s" : ""} tracked`,
-        html,
+        html: personalizedHtml,
         headers: {
           "List-Unsubscribe": `<${unsubscribeUrl}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -360,7 +361,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     </div>
     <div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e5e7eb;text-align:center">
       <p style="margin:0 0 6px;color:#9ca3af;font-size:12px">You're receiving this because you subscribed at <a href="${SITE_URL}" style="color:#d97706">${SITE_URL.replace("https://","")}</a>.</p>
-      <p style="margin:0;font-size:11px;color:#d1d5db"><a href="${SITE_URL}/subscribe" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a></p>
+      <p style="margin:0;font-size:11px;color:#d1d5db"><a href="__UNSUB_URL__" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a></p>
     </div>
   </div>
 </body>
@@ -376,9 +377,9 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
         from: "CollegeCuts <hello@college-cuts.com>",
         to: [email],
         subject: subjectLine,
-        html,
+        html: html.replace(/__UNSUB_URL__/g, `${SITE_URL}/unsubscribe?email=${encodeURIComponent(email)}`),
         headers: {
-          "List-Unsubscribe": `<${SITE_URL}/subscribe>`,
+          "List-Unsubscribe": `<${SITE_URL}/unsubscribe?email=${encodeURIComponent(email)}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
           "Precedence": "bulk",
         },
@@ -502,7 +503,7 @@ router.post("/admin/broadcast-talent-pool", async (req, res): Promise<void> => {
         <a href="${SITE_URL}" style="color:#d97706">${SITE_URL.replace("https://","")}</a>.
       </p>
       <p style="margin:0;font-size:11px;color:#d1d5db">
-        <a href="${SITE_URL}/subscribe" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a>
+        <a href="__UNSUB_URL__" style="color:#9ca3af;text-decoration:underline">Unsubscribe</a>
       </p>
     </div>
 
@@ -520,9 +521,9 @@ router.post("/admin/broadcast-talent-pool", async (req, res): Promise<void> => {
         from: "CollegeCuts <hello@college-cuts.com>",
         to: [email],
         subject: "New: Join the CollegeCuts Talent Pool — free, takes 30 seconds",
-        html,
+        html: html.replace(/__UNSUB_URL__/g, `${SITE_URL}/unsubscribe?email=${encodeURIComponent(email)}`),
         headers: {
-          "List-Unsubscribe": `<${SITE_URL}/subscribe>`,
+          "List-Unsubscribe": `<${SITE_URL}/unsubscribe?email=${encodeURIComponent(email)}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
           "Precedence": "bulk",
         },

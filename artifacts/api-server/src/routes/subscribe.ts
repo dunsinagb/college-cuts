@@ -96,6 +96,23 @@ router.post("/subscribe", async (req, res): Promise<void> => {
   res.json({ ok: true });
 });
 
+router.get("/unsubscribe", async (req, res): Promise<void> => {
+  const { email } = req.query as { email?: string };
+  if (!email) { res.status(400).json({ error: "email required" }); return; }
+
+  const { error } = await supabase
+    .from("subscribers")
+    .delete()
+    .eq("email", email.toLowerCase());
+
+  if (error) {
+    res.status(500).json({ error: "Failed to unsubscribe." });
+    return;
+  }
+
+  res.json({ ok: true });
+});
+
 router.get("/subscriber-check", async (req, res): Promise<void> => {
   const { email } = req.query as { email?: string };
   if (!email) { res.status(400).json({ error: "email required" }); return; }

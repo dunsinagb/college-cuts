@@ -15,6 +15,7 @@ import Analytics from "@/pages/analytics";
 import SubmitTip from "@/pages/submit-tip";
 import About from "@/pages/about";
 import Subscribe from "@/pages/subscribe";
+import Unsubscribe from "@/pages/unsubscribe";
 import JobOutlook from "@/pages/job-outlook";
 import News from "@/pages/news";
 import InstitutionPage from "@/pages/institution";
@@ -108,6 +109,7 @@ function Router() {
             <Route path="/job-outlook">{() => <JobOutlook />}</Route>
             <Route path="/news">{() => <News />}</Route>
             <Route path="/subscribe">{() => <Subscribe />}</Route>
+            <Route path="/unsubscribe">{() => <Unsubscribe />}</Route>
             <Route path="/auth/login">{() => <Login />}</Route>
             <Route path="/auth/signup">{() => <Signup />}</Route>
             <Route path="/auth/callback">{() => <AuthCallback />}</Route>
