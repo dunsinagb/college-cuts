@@ -184,7 +184,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     const { data: fallback, error: fbErr } = await supabase
       .from("v_latest_cuts")
       .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url")
-      .order("announcement_date", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(15);
     if (fbErr) { res.status(500).json({ error: fbErr.message }); return; }
     cuts = fallback ?? [];
@@ -205,11 +205,11 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
 
   type Cut = { id: string; institution: string; program_name: string | null; state: string; cut_type: string; announcement_date: string | null; status: string; source_url: string | null };
 
-  const buckets: Array<{ label: string; typeKeys: string[]; rows: Cut[] }> = [
-    { label: "Staff Layoffs", typeKeys: ["staff_layoff"], rows: [] },
-    { label: "Program Suspensions & Teach-Outs", typeKeys: ["program_suspension", "teach_out"], rows: [] },
-    { label: "Department & Campus Closures", typeKeys: ["department_closure", "campus_closure"], rows: [] },
-    { label: "Institution Closures", typeKeys: ["institution_closure"], rows: [] },
+  const buckets: Array<{ label: string; typeKeys: string[]; urlKey: string; rows: Cut[] }> = [
+    { label: "Staff Layoffs", typeKeys: ["staff_layoff"], urlKey: "staff_layoff", rows: [] },
+    { label: "Program Suspensions & Teach-Outs", typeKeys: ["program_suspension", "teach_out"], urlKey: "program_suspension", rows: [] },
+    { label: "Department & Campus Closures", typeKeys: ["department_closure", "campus_closure"], urlKey: "department_closure", rows: [] },
+    { label: "Institution Closures", typeKeys: ["institution_closure"], urlKey: "institution_closure", rows: [] },
   ];
 
   for (const cut of rows as Cut[]) {
@@ -228,9 +228,10 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   }
 
-  function renderSection(bucket: { label: string; typeKeys: string[]; rows: Cut[] }): string {
+  function renderSection(bucket: { label: string; typeKeys: string[]; urlKey: string; rows: Cut[] }): string {
     const shown = bucket.rows.slice(0, 5);
     const total = bucket.rows.length;
+    const filteredUrl = `${SITE_URL}/cuts?cutType=${bucket.urlKey}`;
     const rowsHtml = shown.map(c => {
       const programLine = c.program_name
         ? `<br/><span style="font-size:12px;color:#9ca3af">${c.program_name}</span>`
@@ -250,8 +251,8 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     }).join("");
 
     const seeAllLabel = total > 5
-      ? `See all ${total} ${bucket.label.toLowerCase()} →`
-      : `See full database →`;
+      ? `See all ${total} ${bucket.label.toLowerCase()} on CollegeCuts →`
+      : `See all ${bucket.label.toLowerCase()} on CollegeCuts →`;
 
     return `
       <div style="margin-bottom:32px">
@@ -263,7 +264,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
           <tbody>${rowsHtml}</tbody>
         </table>
         <div style="margin-top:8px;text-align:right">
-          <a href="${SITE_URL}/cuts" style="font-size:12px;color:#6b7280;text-decoration:none">${seeAllLabel}</a>
+          <a href="${filteredUrl}" style="font-size:12px;color:#6b7280;text-decoration:none">${seeAllLabel}</a>
         </div>
       </div>`;
   }
