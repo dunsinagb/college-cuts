@@ -173,7 +173,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   let isFallback = false;
   let { data: cuts, error: cutsErr } = await supabase
     .from("v_latest_cuts")
-    .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url")
+    .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url, students_affected, faculty_affected")
     .gte("announcement_date", since90)
     .order("announcement_date", { ascending: false });
 
@@ -183,7 +183,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     isFallback = true;
     const { data: fallback, error: fbErr } = await supabase
       .from("v_latest_cuts")
-      .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url")
+      .select("id, institution, program_name, state, cut_type, announcement_date, status, source_url, students_affected, faculty_affected")
       .order("created_at", { ascending: false })
       .limit(15);
     if (fbErr) { res.status(500).json({ error: fbErr.message }); return; }
@@ -203,7 +203,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
   if (!rows.length) { res.json({ ok: true, sent: 0, reason: "No actions in database" }); return; }
   if (!emails.length) { res.json({ ok: true, sent: 0, reason: "No subscribers" }); return; }
 
-  type Cut = { id: string; institution: string; program_name: string | null; state: string; cut_type: string; announcement_date: string | null; status: string; source_url: string | null };
+  type Cut = { id: string; institution: string; program_name: string | null; state: string; cut_type: string; announcement_date: string | null; status: string; source_url: string | null; students_affected: number | null; faculty_affected: number | null };
 
   const buckets: Array<{ label: string; typeKeys: string[]; rows: Cut[] }> = [
     { label: "Staff Layoffs", typeKeys: ["staff_layoff"], rows: [] },
@@ -251,9 +251,7 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
         </tr>`;
     }).join("");
 
-    const seeAllLabel = total > sectionCap
-      ? `See all ${total} ${bucket.label.toLowerCase()} on CollegeCuts →`
-      : `See all ${bucket.label.toLowerCase()} on CollegeCuts →`;
+    const seeAllLabel = `See all ${bucket.label.toLowerCase()} on CollegeCuts →`;
 
     return `
       <div style="margin-bottom:32px">
@@ -265,17 +263,39 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
           <tbody>${rowsHtml}</tbody>
         </table>
         <div style="margin-top:8px;text-align:right">
-          <a href="${filteredUrl}" style="font-size:12px;color:#6b7280;text-decoration:none">${seeAllLabel}</a>
+          <a href="${filteredUrl}" style="font-size:12px;color:#d97706;text-decoration:underline">${seeAllLabel}</a>
         </div>
       </div>`;
   }
 
   const sectionsHtml = activeBuckets.map(renderSection).join("");
 
-  const topTwo = [...activeBuckets]
-    .sort((a, b) => b.rows.length - a.rows.length)
-    .slice(0, 2);
+  function cutTypeLabel(cutType: string): string {
+    const map: Record<string, string> = {
+      institution_closure: "institution closure",
+      staff_layoff: "staff layoff",
+      program_suspension: "program suspension",
+      teach_out: "teach-out",
+      department_closure: "department closure",
+      campus_closure: "campus closure",
+    };
+    return map[cutType] ?? cutType.replace(/_/g, " ");
+  }
 
+  // Find the single most impactful cut by student or faculty count
+  const sortedByImpact = [...rows as Cut[]].sort((a, b) => {
+    const aImpact = Math.max(a.students_affected ?? 0, a.faculty_affected ?? 0);
+    const bImpact = Math.max(b.students_affected ?? 0, b.faculty_affected ?? 0);
+    return bImpact - aImpact;
+  });
+  const topCut = sortedByImpact[0];
+  const topImpact = Math.max(topCut.students_affected ?? 0, topCut.faculty_affected ?? 0);
+  const topImpactLabel = topImpact > 0
+    ? ` (${topImpact.toLocaleString()} ${(topCut.students_affected ?? 0) >= (topCut.faculty_affected ?? 0) ? "students" : "staff"})`
+    : "";
+  const topCutLabel = `${topCut.institution}, ${cutTypeLabel(topCut.cut_type)}${topImpactLabel}`;
+
+  // Build supporting summary from remaining buckets (excluding the top cut's bucket)
   function shortLabel(label: string): string {
     const map: Record<string, string> = {
       "Staff Layoffs": "layoffs",
@@ -286,10 +306,16 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     return map[label] ?? label.toLowerCase();
   }
 
-  const subjectParts = topTwo.map(b => `${b.rows.length} ${shortLabel(b.label)}`);
+  const otherBuckets = activeBuckets
+    .filter(b => !b.typeKeys.includes(topCut.cut_type))
+    .sort((a, b) => b.rows.length - a.rows.length)
+    .slice(0, 2);
+  const otherParts = otherBuckets.map(b => `${b.rows.length} ${shortLabel(b.label)}`);
+  const otherSuffix = otherParts.length > 0 ? `, ${otherParts.join(", ")}` : "";
+
   const subjectLine = isFallback
-    ? `CollegeCuts: ${subjectParts.join(", ")} — most recent on record`
-    : `CollegeCuts Weekly: ${subjectParts.join(", ")} tracked`;
+    ? `CollegeCuts: ${topCutLabel}${otherSuffix} — most recent on record`
+    : `CollegeCuts Weekly: ${topCutLabel}${otherSuffix}`;
 
   const periodNote = isFallback
     ? "No new actions have been added recently. Here are the most recent cuts on record."
