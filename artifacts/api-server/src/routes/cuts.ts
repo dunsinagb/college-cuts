@@ -175,7 +175,12 @@ router.get("/cuts", async (req, res): Promise<void> => {
 
   query = query.gte("announcement_date", "2024-01-01");
   if (state)    query = query.eq("state", state);
-  if (cutType)  query = query.eq("cut_type", cutType);
+  if (cutType) {
+    const types = cutType.split(",").map(t => t.trim()).filter(Boolean);
+    query = types.length === 1
+      ? query.eq("cut_type", types[0])
+      : query.in("cut_type", types);
+  }
   if (status)   query = query.eq("status", status);
   if (control)  query = query.eq("control", control);
   if (search) {
