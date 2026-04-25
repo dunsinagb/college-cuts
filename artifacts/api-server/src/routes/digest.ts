@@ -45,9 +45,12 @@ router.post("/admin/send-weekly-digest", async (req, res): Promise<void> => {
     cuts = fallback ?? [];
   }
 
-  const { data: subs, error: subsErr } = await supabase
-    .from("subscribers")
-    .select("email");
+  const subscribedSince = req.query.subscribedSince as string | undefined;
+  let subsQuery = supabase.from("subscribers").select("email");
+  if (subscribedSince) {
+    subsQuery = subsQuery.gte("created_at", subscribedSince);
+  }
+  const { data: subs, error: subsErr } = await subsQuery;
 
   if (subsErr) { res.status(500).json({ error: subsErr.message }); return; }
 
