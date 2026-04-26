@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge, CutTypeBadge } from "@/components/shared/Badges";
-import { ArrowLeft, ExternalLink, Calendar, Users, GraduationCap, Building2, MapPin, Lock, BarChart3, Briefcase, Link2, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Calendar, Users, GraduationCap, Building2, MapPin, Lock, BarChart3, Briefcase, Link2, Check, UserPlus } from "lucide-react";
 import { InstitutionInfoCard } from "@/components/shared/InstitutionInfoCard";
 import { slugify } from "@/lib/slugify";
 
@@ -428,6 +428,29 @@ export default function CutDetail() {
               </p>
               <Button asChild variant="outline" className="w-full mt-4">
                 <Link href="/submit-tip">Submit an Update</Link>
+              </Button>
+            </div>
+
+            {/* Talent pool CTA */}
+            <div
+              className="rounded-xl p-5 space-y-3 border border-amber-200"
+              style={{ background: "linear-gradient(135deg, #fffbeb, #fef3c7)" }}
+            >
+              <div className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-amber-600 shrink-0" />
+                <h3 className="text-sm font-bold text-[#1e3a5f]">Affected by cuts at {cut.institution}?</h3>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Add your profile to the talent pool. Employers actively hiring displaced academics will find you directly.
+              </p>
+              <Button
+                asChild
+                size="sm"
+                className="w-full bg-[#1e3a5f] hover:bg-[#2a4e7c] text-white font-semibold border-0"
+              >
+                <Link href={`/talent?institution=${encodeURIComponent(cut.institution)}&slug=${encodeURIComponent(institutionSlug)}`}>
+                  Register Free <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
               </Button>
             </div>
 
